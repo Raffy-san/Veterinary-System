@@ -1,17 +1,19 @@
 <?php
-// config.php
+// Use environment variables for sensitive data
+$localhost = getenv('DB_HOST') ?: 'localhost';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
+$dbname = getenv('DB_NAME') ?: 'veterinary_system';
 
-// Database configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'veterinary_system');
+// Use mysqli with error reporting and exception mode
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-// Create database connection
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+try {
+    $conn = new mysqli($localhost, $username, $password, $dbname);
+    $conn->set_charset('utf8mb4'); // Set charset for security
+} catch (mysqli_sql_exception $e) {
+    error_log('Database connection error: ' . $e->getMessage());
+    // Show generic error message to user
+    die('Database connection failed. Please try again later.');
 }
 ?>
