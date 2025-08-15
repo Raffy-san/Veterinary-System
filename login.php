@@ -1,3 +1,14 @@
+<?php
+session_start();
+include_once 'config/config.php';
+
+
+if (isset($_SESSION['user_id'])) {
+    header("Location: dashboard.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,11 +39,17 @@
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
                             data-value="option1">
                             <i
-                                class="fa-solid fa-paw mr-2 text-green-500 rotate-45 group-hover:text-white transition-colors"></i>
-                            Veterinarian
+                                class="fa-solid fa-stethoscope mr-2 text-green-500 rotate-45 group-hover:text-white transition-colors"></i>
+                            Admin Access
                         </li>
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
                             data-value="option2">
+                            <i
+                                class="fa-solid fa-stethoscope mr-2 text-green-500 rotate-45 group-hover:text-white transition-colors"></i>
+                            Veterinary Staff
+                        </li>
+                        <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
+                            data-value="option3">
                             <i
                                 class="fa-solid fa-paw mr-2 text-green-500 rotate-45 group-hover:text-white transition-colors"></i>
                             Pet Owner
