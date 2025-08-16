@@ -17,8 +17,8 @@ if (isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Medical Record System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="../assests/js/login.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
 
 <body class="bg-green-100 flex items-center justify-center min-h-screen">
     <section class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
@@ -27,31 +27,25 @@ if (isset($_SESSION['user_id'])) {
         </div>
         <h2 class="text-2xl font-normal text-center text-gray-800">Veterinary System</h2>
         <h3 class="text-xl font-light mb-4 text-center text-gray-700">Sign in to access your dashboard</h3>
-        <form>
+        <form id="loginForm">
             <div class="mb-2">
                 <label class="font-bold block text-gray-700 mb-2" for="custom-select">Access Type</label>
                 <div class="relative inline-block w-full">
                     <div class="bg-white border border-gray-300 rounded-md p-2 cursor-pointer"
-                        id="custom-select-trigger">
+                        id="custom-select-trigger" tabindex="0">
                         <i class="fa-solid fa-paw mr-2 text-green-500 rotate-45"></i>
                         <span>Pet Owner</span>
                     </div>
                     <ul class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 hidden"
                         id="custom-select-options">
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
-                            data-value="option1">
+                            data-value="admin">
                             <i
                                 class="fa-solid fa-shield mr-2 text-green-500 group-hover:text-white transition-colors"></i>
                             Admin Access
                         </li>
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
-                            data-value="option2">
-                            <i
-                                class="fa-solid fa-stethoscope mr-2 text-green-500 group-hover:text-white transition-colors"></i>
-                            Veterinary Staff
-                        </li>
-                        <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
-                            data-value="option3">
+                            data-value="owner">
                             <i
                                 class="fa-solid fa-paw mr-2 text-green-500 rotate-45 group-hover:text-white transition-colors"></i>
                             Pet Owner
@@ -64,7 +58,7 @@ if (isset($_SESSION['user_id'])) {
                         <i id="desc-icon" class="fa-solid fa-paw text-green-500 rotate-45"></i>
                         <span id="desc-text" class="font-semibold">Pet Owner</span>
                     </div>
-                    <span id="desc-description">View your pet's medical records and appointments</span>
+                    <span id="desc-description">View your pet's medical records</span>
                 </div>
             </div>
             <div class="mb-2">
@@ -82,9 +76,88 @@ if (isset($_SESSION['user_id'])) {
                 type="submit">
                 Sign in
             </button>
+            <input type="hidden" name="access_type" id="access-type" value="owner">
         </form>
     </section>
-    <script src="../assests/js/login.js"></script>
+    <script>
+        // Descriptions and icons for each option
+        const descriptions = {
+            admin: {
+                icon: '<i class="fa-solid fa-shield text-green-500"></i>',
+                text: 'Admin Access',
+                description: "Manage clinic operations and create client accounts."
+            },
+            owner: {
+                icon: '<i class="fa-solid fa-paw text-green-500 rotate-45"></i>',
+                text: 'Pet Owner',
+                description: "View your pet\'s medical records"
+            }
+        };
+
+        // Set default selected value
+        let selectedValue = "owner";
+        document.getElementById('custom-select-trigger').dataset.value = selectedValue;
+
+        document.getElementById('custom-select-trigger').addEventListener('click', function () {
+            document.getElementById('custom-select-options').classList.toggle('hidden');
+        });
+
+        document.querySelectorAll('#custom-select-options li').forEach(item => {
+            item.addEventListener('click', function () {
+                // Get the icon HTML and the text
+                const iconHTML = this.querySelector('i').outerHTML;
+                const text = this.textContent.trim();
+
+                // Set the trigger's HTML to icon + text
+                document.getElementById('custom-select-trigger').innerHTML = iconHTML + '<span>' + text + '</span>';
+                document.getElementById('custom-select-options').classList.add('hidden');
+                // Set selected value
+                selectedValue = this.dataset.value;
+                document.getElementById('custom-select-trigger').dataset.value = selectedValue;
+                // Update description icon and text
+                document.getElementById('desc-icon').outerHTML = descriptions[selectedValue].icon.replace('">', '" id="desc-icon">');
+                document.getElementById('desc-text').textContent = descriptions[selectedValue].text;
+                document.getElementById('desc-description').textContent = descriptions[selectedValue].description;
+            });
+        });
+
+        // On page load, set the default description icon and text
+        document.getElementById('desc-icon').outerHTML = descriptions[selectedValue].icon.replace('">', '" id="desc-icon">');
+        document.getElementById('desc-text').textContent = descriptions[selectedValue].text;
+        document.getElementById('desc-description').textContent = descriptions[selectedValue].description;
+    </script>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            // Ensure hidden input is updated
+            document.getElementById('access-type').value = selectedValue;
+            const form = e.target;
+            const formData = new FormData(form);
+
+            fetch('login_handler.php', {
+                method: 'POST',
+                body: formData
+            })
+                // ...existing code...
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        let path = '';
+                        if (formData.get('access_type') === 'admin') path = 'admin/admin-dashboard.php';
+                        else path = 'owner/dashboard.php';
+                        window.location.href = path;
+                    } else {
+                        alert(data.message || 'Login failed');
+                    }
+                })
+                .catch(err => {
+                    alert('An error occurred. Please try again.');
+                    console.error(err);
+                });
+            // ...existing code...
+        });
+    </script>
 </body>
 
 </html>
