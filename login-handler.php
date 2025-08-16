@@ -16,14 +16,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
     $result = $conn->query($query);
 
-    if ($result->num_rows === 1) {
+    if ($result && $result->rowCount() === 1) {
         // Login successful
-        $_SESSION['username'] = $username;
-        header('Location: dashboard.php');
+        $user = $result->fetch(PDO::FETCH_ASSOC);
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['access_type'] = $user['access_type']; // assuming column name is access_type
+
+        if ($user['access_type'] === 'admin') {
+            header('Location: admin-dashboard.php');
+        } else if ($user['access_type'] === 'owner') {
+            header('Location: owner-dashboard.php');
+        } else {
+            header('Location: dashboard.php');
+        }
         exit;
-    } else {
-        // Login failed
-        $error = "Invalid username or password.";
     }
+} else {
+    // Login failed
+    $error = "Invalid username or password.";
 }
+
 ?>
