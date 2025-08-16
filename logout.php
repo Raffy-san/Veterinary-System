@@ -1,7 +1,3 @@
 <?php
-    include_once 'admin/session.php';
-
-    if (isLoggedIn()) {
-        logout();
-    }
-?>
+require_once 'session.php';
+SessionManager::logout();

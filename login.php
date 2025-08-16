@@ -1,10 +1,13 @@
 <?php
-session_start();
+require_once 'session.php';
 include_once 'config/config.php';
 
-if (isset($_SESSION['user_id'])) {
-    header("Location: dashboard.php");
-    exit();
+if (SessionManager::isLoggedIn()) {
+    if (isset($_SESSION['access_type']) && $_SESSION['access_type'] === 'admin') {
+        header("Location: admin/admin-dashboard.php");
+    } else {
+        header("Location: owner/owner-dashboard.php");
+    }
 }
 ?>
 
@@ -15,6 +18,7 @@ if (isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/img/green-paw.png">
     <title>Login - Medical Record System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -145,7 +149,7 @@ if (isset($_SESSION['user_id'])) {
                     if (data.success) {
                         let path = '';
                         if (formData.get('access_type') === 'admin') path = 'admin/admin-dashboard.php';
-                        else path = 'owner/dashboard.php';
+                        else path = 'owner/owner-dashboard.php';
                         window.location.href = path;
                     } else {
                         alert(data.message || 'Login failed');
@@ -155,7 +159,6 @@ if (isset($_SESSION['user_id'])) {
                     alert('An error occurred. Please try again.');
                     console.error(err);
                 });
-            // ...existing code...
         });
     </script>
 </body>

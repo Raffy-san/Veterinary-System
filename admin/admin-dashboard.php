@@ -1,6 +1,7 @@
 <?php
-include_once 'admin/session.php';
-notLoggedIn();
+include_once '../config/config.php';
+require_once '../session.php';
+SessionManager::requireLogin();
 ?>
 <!DOCTYPE html>
 <html lang="en">

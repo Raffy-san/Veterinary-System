@@ -1,3 +1,8 @@
+<?php
+include_once '../config/config.php';
+require_once '../session.php';
+SessionManager::requireLogin();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,38 +30,52 @@
                     </div>
                     <button onclick="closeModal()" class="text-xl">&times;</button>
                 </div>
-                <form class="flex flex-wrap items-center justify-between">
+                <form class="flex flex-wrap items-center justify-between" method="POST" action="add-client.php">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Name</label>
-                        <input type="text"
+                        <input type="text" name="name"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Name">
                     </div>
                     <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm">Username</label>
+                        <input type="text" name="username"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Client Username">
+                    </div>
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm">Password</label>
+                        <input type="password" name="password"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Client Password">
+                    </div>
+                    
+                    <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Email</label>
-                        <input type="email"
+                        <input type="email" name="email"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Email">
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Phone</label>
-                        <input type="text"
+                        <input type="text" name="phone"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Phone">
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Emergency Contact</label>
-                        <input type="text"
+                        <input type="text" name="emergency_contact"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Emergency Contact">
                     </div>
+
                     <div class="mb-4 w-full">
                         <label class="block text-gray-700 mb-1 text-sm">Address</label>
-                        <input type="text"
+                        <input type="text" name="address"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter Client Full Address">
                     </div>
-                    
+
                     <div class="flex justify-end w-full">
                         <button type="button" onclick="closeModal()"
                             class="mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
