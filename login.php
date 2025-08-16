@@ -18,6 +18,7 @@ if (isset($_SESSION['user_id'])) {
     <title>Login - Medical Record System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
 
 <body class="bg-green-100 flex items-center justify-center min-h-screen">
     <section class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
@@ -31,20 +32,20 @@ if (isset($_SESSION['user_id'])) {
                 <label class="font-bold block text-gray-700 mb-2" for="custom-select">Access Type</label>
                 <div class="relative inline-block w-full">
                     <div class="bg-white border border-gray-300 rounded-md p-2 cursor-pointer"
-                        id="custom-select-trigger">
+                        id="custom-select-trigger" tabindex="0">
                         <i class="fa-solid fa-paw mr-2 text-green-500 rotate-45"></i>
                         <span>Pet Owner</span>
                     </div>
                     <ul class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 hidden"
                         id="custom-select-options">
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
-                            data-value="option1">
+                            data-value="admin">
                             <i
                                 class="fa-solid fa-shield mr-2 text-green-500 group-hover:text-white transition-colors"></i>
                             Admin Access
                         </li>
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
-                            data-value="option2">
+                            data-value="owner">
                             <i
                                 class="fa-solid fa-paw mr-2 text-green-500 rotate-45 group-hover:text-white transition-colors"></i>
                             Pet Owner
@@ -75,18 +76,18 @@ if (isset($_SESSION['user_id'])) {
                 type="submit">
                 Sign in
             </button>
-            <input type="hidden" name="access_type" id="access-type" value="option2">
+            <input type="hidden" name="access_type" id="access-type" value="owner">
         </form>
     </section>
     <script>
         // Descriptions and icons for each option
         const descriptions = {
-            option1: {
+            admin: {
                 icon: '<i class="fa-solid fa-shield text-green-500"></i>',
                 text: 'Admin Access',
                 description: "Manage clinic operations and create client accounts."
             },
-            option2: {
+            owner: {
                 icon: '<i class="fa-solid fa-paw text-green-500 rotate-45"></i>',
                 text: 'Pet Owner',
                 description: "View your pet\'s medical records"
@@ -94,7 +95,7 @@ if (isset($_SESSION['user_id'])) {
         };
 
         // Set default selected value
-        let selectedValue = "option2";
+        let selectedValue = "owner";
         document.getElementById('custom-select-trigger').dataset.value = selectedValue;
 
         document.getElementById('custom-select-trigger').addEventListener('click', function () {
@@ -138,18 +139,23 @@ if (isset($_SESSION['user_id'])) {
                 method: 'POST',
                 body: formData
             })
+                // ...existing code...
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
                         let path = '';
-                        if (formData.get('access_type') === 'option1') path = 'admin/admin-dashboard.php';
+                        if (formData.get('access_type') === 'admin') path = 'admin/admin-dashboard.php';
                         else path = 'owner/dashboard.php';
                         window.location.href = path;
                     } else {
                         alert(data.message || 'Login failed');
                     }
                 })
-                .catch(() => alert('An error occurred. Please try again.'));
+                .catch(err => {
+                    alert('An error occurred. Please try again.');
+                    console.error(err);
+                });
+            // ...existing code...
         });
     </script>
 </body>
