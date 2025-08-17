@@ -1,28 +1,13 @@
 <?php
 include_once '../config/config.php';
 require_once '../functions/session.php';
+require_once '../helpers/fetch.php';
 SessionManager::requireLogin();
 
-$stmt = $pdo->prepare("SELECT * FROM users WHERE access_type = 'owner'");
-$stmt->execute();
-$petOwners = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$stmt = $pdo->prepare("
-    SELECT *
-    FROM owners
-    ORDER BY created_at DESC
-    LIMIT 3
-");
-$stmt->execute();
-$allPetOwners = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$stmt = $pdo->prepare("SELECT * FROM owners WHERE active = 1");
-$stmt->execute();
-$activePetOwners = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$stmt = $pdo->prepare("SELECT * FROM pets");
-$stmt->execute();
-$totalPets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$petOwners = fetchAllData($pdo, "SELECT * FROM users WHERE access_type = 'owner'");
+$allPetOwners = fetchAllData($pdo, "SELECT * FROM owners ORDER BY created_at DESC LIMIT 3");
+$activePetOwners = fetchAllData($pdo, "SELECT * FROM owners WHERE active = 1");
+$totalPets = fetchAllData($pdo, "SELECT * FROM pets");
 ?>
 <!DOCTYPE html>
 <html lang="en">
