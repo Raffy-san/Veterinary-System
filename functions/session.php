@@ -1,11 +1,6 @@
 <?php
 session_start();
 
-/**
- * Class SessionManager
- * Handles user session logic.
- */
-
 class SessionManager
 {
     /**
@@ -47,6 +42,27 @@ class SessionManager
     {
         header("Location: $url");
         exit();
+    }
+
+    /**
+     * Get logged-in user info from database.
+     * @param PDO $pdo
+     * @return array|null
+     */
+    public static function getUser(PDO $pdo): ?array
+    {
+        if (!self::isLoggedIn()) {
+            return null;
+        }
+
+        $stmt = $pdo->prepare("
+        SELECT o.id AS owner_id, o.name, o.email, o.phone, o.address, u.id AS user_id, u.username
+        FROM owners o
+        INNER JOIN users u ON o.user_id = u.id
+        WHERE u.id = ?
+    ");
+        $stmt->execute([$_SESSION['user_id']]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 }
 ?>

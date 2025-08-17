@@ -1,6 +1,6 @@
 <?php
 include_once '../config/config.php';
-require_once '../session.php';
+require_once '../functions/session.php';
 SessionManager::requireLogin();
 ?>
 <!DOCTYPE html>
