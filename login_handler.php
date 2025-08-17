@@ -1,45 +1,29 @@
 <?php
-session_start();
+require_once 'config/config.php';
+require_once 'functions/session.php';
+
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once 'config/config.php';
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-    $username = trim($_POST['username'] ?? '');
-    $password = trim($_POST['password'] ?? '');
-
-    // Use prepared statements for security
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt = $pdo->prepare("SELECT id, username, password, access_type FROM users WHERE username = ?");
     $stmt->execute([$username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user) {
-        // If you store hashed passwords, use password_verify
-        // if (password_verify($password, $user['password'])) {
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['access_type'] = $user['access_type'];
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['access_type'] = $user['access_type'];
 
-            // Return JSON with access type
-            echo json_encode([
-                'success' => true,
-                'access_type' => $user['access_type']
-            ]);
-            exit;
-        }
+        echo json_encode([
+            'success' => true,
+            'access_type' => $user['access_type']  // send actual DB role
+        ]);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Invalid username or password'
+        ]);
     }
-
-    // Login failed
-    echo json_encode([
-        'success' => false,
-        'message' => 'Invalid username or password.'
-    ]);
-    exit;
 }
-echo json_encode([
-    'success' => false,
-    'message' => 'Invalid request.'
-]);
-exit;
-?>

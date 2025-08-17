@@ -1,5 +1,5 @@
 <?php
-require_once 'session.php';
+require_once 'functions/session.php';
 include_once 'config/config.php';
 
 if (SessionManager::isLoggedIn()) {
@@ -33,7 +33,7 @@ if (SessionManager::isLoggedIn()) {
         <h3 class="text-xl font-light mb-4 text-center text-gray-700">Sign in to access your dashboard</h3>
         <form id="loginForm">
             <div class="mb-2">
-                <label class="font-bold block text-gray-700 mb-2" for="custom-select">Access Type</label>
+                <label class="font-bold block text-gray-700 mb-2">Access Type</label>
                 <div class="relative inline-block w-full">
                     <div class="bg-white border border-gray-300 rounded-md p-2 cursor-pointer"
                         id="custom-select-trigger" tabindex="0">
@@ -44,14 +44,12 @@ if (SessionManager::isLoggedIn()) {
                         id="custom-select-options">
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
                             data-value="admin">
-                            <i
-                                class="fa-solid fa-shield mr-2 text-green-500 group-hover:text-white transition-colors"></i>
+                            <i class="fa-solid fa-shield mr-2 text-green-500 group-hover:text-white"></i>
                             Admin Access
                         </li>
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
                             data-value="owner">
-                            <i
-                                class="fa-solid fa-paw mr-2 text-green-500 rotate-45 group-hover:text-white transition-colors"></i>
+                            <i class="fa-solid fa-paw mr-2 text-green-500 rotate-45 group-hover:text-white"></i>
                             Pet Owner
                         </li>
                     </ul>
@@ -65,6 +63,7 @@ if (SessionManager::isLoggedIn()) {
                     <span id="desc-description">View your pet's medical records</span>
                 </div>
             </div>
+
             <div class="mb-2">
                 <label class="font-bold block text-gray-700 mb-2" for="username">Username</label>
                 <input class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -75,13 +74,14 @@ if (SessionManager::isLoggedIn()) {
                 <input class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                     type="password" id="password" name="password" placeholder="Enter Your Password" required>
             </div>
+
             <button
                 class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700 transition-colors font-semibold"
                 type="submit">
                 Sign in
             </button>
-            <input type="hidden" name="access_type" id="access-type" value="owner">
         </form>
+
     </section>
     <script>
         // Descriptions and icons for each option
@@ -134,8 +134,7 @@ if (SessionManager::isLoggedIn()) {
     <script>
         document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            // Ensure hidden input is updated
-            document.getElementById('access-type').value = selectedValue;
+
             const form = e.target;
             const formData = new FormData(form);
 
@@ -143,13 +142,15 @@ if (SessionManager::isLoggedIn()) {
                 method: 'POST',
                 body: formData
             })
-                // ...existing code...
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
                         let path = '';
-                        if (formData.get('access_type') === 'admin') path = 'admin/admin-dashboard.php';
-                        else path = 'owner/owner-dashboard.php';
+                        if (data.access_type === 'admin') {
+                            path = 'admin/admin-dashboard.php';
+                        } else {
+                            path = 'owner/owner-dashboard.php';
+                        }
                         window.location.href = path;
                     } else {
                         alert(data.message || 'Login failed');
