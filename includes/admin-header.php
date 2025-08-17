@@ -8,9 +8,8 @@
             <h2 class="text-lg font-normal">Manage clinic operations and client accounts</h2>
         </div>
         <div>
-            <a
-                class="text-gray text-xs font-semibold border border-green-400 px-4 py-2 rounded-lg hover:bg-green-300" href="../logout.php"><i
-                    class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Sign Out</a>
+            <a class="text-gray text-xs font-semibold border border-green-400 px-4 py-2 rounded-lg hover:bg-green-300"
+                href="../logout.php"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Sign Out</a>
         </div>
     </section>
     <div class="px-10 w-full flex items-center justify-between">

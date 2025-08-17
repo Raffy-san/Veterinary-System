@@ -35,19 +35,19 @@ SessionManager::requireLogin();
                         <label class="block text-gray-700 mb-1 text-sm">Name</label>
                         <input type="text" name="name"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Name">
+                            placeholder="Client Name" required>
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Username</label>
                         <input type="text" name="username"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Username">
+                            placeholder="Client Username" required>
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Password</label>
                         <input type="password" name="password"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Password">
+                            placeholder="Client Password" required>
                     </div>
                     
                     <div class="mb-4 w-auto">
@@ -58,9 +58,9 @@ SessionManager::requireLogin();
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Phone</label>
-                        <input type="text" name="phone"
+                        <input type="tel" name="phone"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Phone">
+                            placeholder="Client Phone" required>
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Emergency Contact</label>
@@ -73,7 +73,7 @@ SessionManager::requireLogin();
                         <label class="block text-gray-700 mb-1 text-sm">Address</label>
                         <input type="text" name="address"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Enter Client Full Address">
+                            placeholder="Enter Client Full Address" required>
                     </div>
 
                     <div class="flex justify-end w-full">
