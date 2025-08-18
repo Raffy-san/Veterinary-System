@@ -25,7 +25,7 @@
                     </li>
                 </a>
                 <a class="flex-1 text-center shadow-md font-semibold py-2 bg-white rounded-full border hover:border-green-500"
-                    href="#">
+                    href="../admin/pet-management.php">
                     <li>Patients</li>
                 </a>
                 <a class="flex-1 text-center shadow-md font-semibold py-2 bg-white rounded-full border hover:border-green-500"
