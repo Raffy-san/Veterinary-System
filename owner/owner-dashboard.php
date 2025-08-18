@@ -1,6 +1,7 @@
 <?php
 require_once '../functions/session.php';
 include_once '../config/config.php';
+require_once '../helpers/fetch.php';
 SessionManager::requireLogin();
 
 $client = SessionManager::getUser($pdo);
@@ -46,9 +47,9 @@ $client = SessionManager::getUser($pdo);
                     <h4 class="text-gray-500">Information we have on the file</h4>
                 </div>
                 <div>
-                    <p><i class="fa-solid fa-envelope text-green-500 mr-2"></i> <?= htmlspecialchars($client['email']); ?></p>
-                    <p><i class="fa-solid fa-phone text-green-500 mr-2"></i> <?= htmlspecialchars($client['phone']); ?></p>
-                    <p><i class="fa-solid fa-map-marker-alt text-green-500 mr-2"></i> <?= htmlspecialchars($client['address']); ?></p>
+                    <p><i class="fa-solid fa-envelope text-green-500 mr-2 mb-2"></i><?= htmlspecialchars($client['email']); ?></p>
+                    <p><i class="fa-solid fa-phone text-green-500 mr-2 mb-2"></i><?= htmlspecialchars($client['phone']); ?></p>
+                    <p><i class="fa-solid fa-map-marker-alt text-green-500 mr-2 mb-2"></i> <?= htmlspecialchars($client['address']); ?></p>
                 </div>
             </div>
         </section>
