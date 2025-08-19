@@ -45,6 +45,7 @@ if (isset($_POST['submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Client Management</title>
 </head>
@@ -157,7 +158,7 @@ if (isset($_POST['submit'])) {
                                 o.user_id,
                                 o.name, 
                                 o.email, 
-                                o.phone, 
+                                o.phone,
                                 o.created_at,
                                 o.address, 
                                 o.status,
@@ -212,21 +213,26 @@ if (isset($_POST['submit'])) {
 
         <!-- View Modal -->
         <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-green-100 rounded-lg p-4">
-                <div>
-                    <h3 class="font-semibold text-m">Client Details - <span id="clientName"></span></h3>
-                    <h4 class="text-gray-500 text-sm">Complete client and pet information</h4>
+            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-semibold text-m">Client Details - <span id="clientName"></span></h3>
+                        <h4 class="text-gray-500 text-sm">Complete client and pet information</h4>
+                    </div>
+                    <button class="close text-xl" aria-label="Close">&times;</button>
                 </div>
                 <div class="flex flex-row justify-between space-x-2">
                     <div id="clientDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[200px]">
                         <!-- Client details will be populated here -->
                     </div>
                     <div id="additionalDetails"
-                        class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 min-w-[230px]">
+                        class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[200px]">
                         <!-- Additional details will be populated here -->
                     </div>
                 </div>
-                <button class="close mt-4 bg-green-500 text-white py-2 px-4 rounded">Close</button>
+                <div id="petDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 min-w-[230px]">
+                    <!-- Pet details will be populated here -->
+                </div>
             </div>
         </div>
 
@@ -258,6 +264,7 @@ if (isset($_POST['submit'])) {
         document.addEventListener("DOMContentLoaded", () => {
             const clientDetails = document.getElementById("clientDetails");
             const additionalDetails = document.getElementById("additionalDetails");
+            const petDetails = document.getElementById("petDetails");
             const clientNameSpan = document.getElementById("clientName");
             const tableBody = document.getElementById("clientsBody");
             const rows = tableBody.querySelectorAll("tr");
@@ -265,6 +272,7 @@ if (isset($_POST['submit'])) {
             const rowsPerPage = 6;
             let currentPage = 1;
             const totalPages = Math.ceil(rows.length / rowsPerPage);
+
 
             // Utility to add fields
             const addField = (container, label, value) => {
@@ -277,9 +285,21 @@ if (isset($_POST['submit'])) {
             document.querySelectorAll(".open-modal").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const modal = document.getElementById(btn.dataset.modal);
-                    clientDetails.innerHTML = "";
-                    additionalDetails.innerHTML = "";
+                    clientDetails.innerHTML = "<h3 class='font-semibold mb-4'>Contact information</h3>";
+                    additionalDetails.innerHTML = "<h4 class='font-semibold mb-4'>Additional information</h4>";
                     clientNameSpan.textContent = btn.dataset.name;
+
+
+                    let statusBadge = document.createElement("p");
+                    statusBadge.innerHTML = `
+                    <span class="font-semibold">Status:</span> 
+                    <span class="px-1 py-1/2 text-xs font-semibold rounded 
+                        ${btn.dataset.status === "Active"
+                                    ? "bg-green-600 text-white"
+                                    : "bg-gray-400 text-white"}">
+                        ${btn.dataset.status}
+                    </span>
+                    `;
 
                     addField(clientDetails, "Name", btn.dataset.name);
                     addField(clientDetails, "Email", btn.dataset.email);
@@ -289,7 +309,40 @@ if (isset($_POST['submit'])) {
 
                     addField(additionalDetails, "Join Date", btn.dataset.created);
                     addField(additionalDetails, "Pet Count", btn.dataset.petcount);
-                    addField(additionalDetails, "Status", btn.dataset.status);
+                    additionalDetails.appendChild(statusBadge);
+
+                    fetch(`../helpers/fetch-pet.php?owner_id=${btn.dataset.id}`)
+                        .then(res => res.json())
+                        .then(pets => {
+                            petDetails.innerHTML = "<h3 class='font-semibold font-sm mb-4'>Registered Pets</h3>";
+                            if (pets.length === 0) {
+                                petDetails.innerHTML = "<p>No pets found</p>";
+                            } else {
+                                pets.forEach((pet, i) => {
+                                    const petDiv = document.createElement("div");
+                                    petDiv.className = "mb-2 p-2 border rounded bg-green-50";
+                                    petDiv.innerHTML = `
+                                      <div class="bg-white border border-green-300 rounded-lg shadow-sm p-3">
+                                        <div class="flex flex-row mb-2 space-x-2">
+                                            <h4 class="font-bold">${pet.name}</h4>
+                                            <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
+                                                ${pet.species || "Unknown"}
+                                            </span>
+                                        </div>
+                                        <ul class="text-sm space-x-2 text-gray-500 flex flex-row">
+                                            <li>${pet.breed || "N/A"}</li>
+                                            <li>•</li>
+                                            <li>${pet.age || "N/A"}<span>&nbspYears</span></li>
+                                            <li>•</li>
+                                            <li>${pet.gender || "N/A"}</li>
+                                        </ul>
+                                        <span class="text-sm text-gray-500">Registered:&nbsp${pet.registered_at}</span>
+                                    </div>
+                                `;
+                                    petDetails.appendChild(petDiv);
+                                });
+                            }
+                        })
 
                     modal.classList.remove("hidden");
                     document.body.style.overflow = "hidden";

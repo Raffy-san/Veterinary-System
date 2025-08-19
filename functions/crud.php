@@ -31,6 +31,7 @@
       // Then, delete from the users table
       $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
       return $stmt->execute([$user_id]);
+
   }
 
   function activateClient($pdo, $user_id) {
