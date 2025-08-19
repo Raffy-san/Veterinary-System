@@ -6,7 +6,7 @@ SessionManager::requireLogin();
 
 $petOwners = fetchAllData($pdo, "SELECT * FROM users WHERE access_type = 'owner'");
 $allPetOwners = fetchAllData($pdo, "SELECT * FROM owners ORDER BY created_at DESC LIMIT 3");
-$activePetOwners = fetchAllData($pdo, "SELECT * FROM owners WHERE active = 1");
+$activePetOwners = fetchAllData($pdo, "SELECT * FROM owners WHERE status = 1");
 $totalPets = fetchAllData($pdo, "SELECT * FROM pets");
 ?>
 <!DOCTYPE html>
