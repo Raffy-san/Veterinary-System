@@ -2,7 +2,40 @@
 include_once '../config/config.php';
 require_once '../functions/session.php';
 require_once '../helpers/fetch.php';
+require_once '../functions/crud.php';
 SessionManager::requireLogin();
+
+if (isset($_GET['delete_id'])) {
+    $user_id = intval($_GET['delete_id']);
+    if (deleteClient($pdo, $user_id)) {
+        header("Location: client-management.php?deleted=1");
+        exit;
+    } else {
+        header("Location: client-management.php?deleted=0");
+        exit;
+    }
+}
+
+if (isset($_POST['submit'])) {
+    $data = [
+        'name' => $_POST['name'],
+        'username' => $_POST['username'],
+        'password' => $_POST['password'],
+        'email' => $_POST['email'],
+        'phone' => $_POST['phone'],
+        'emergency' => $_POST['emergency'],
+        'address' => $_POST['address']
+    ];
+
+    if (addClient($pdo, $data)) {
+        header("Location: client-management.php?added=1");
+        exit;
+    } else {
+        header("Location: client-management.php?added=0");
+        exit;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +64,7 @@ SessionManager::requireLogin();
                     </div>
                     <button class="close text-xl" aria-label="Close">&times;</button>
                 </div>
-                <form class="flex flex-wrap items-center justify-between" method="POST" action="add-client.php">
+                <form class="flex flex-wrap items-center justify-between" method="POST" action="client-management.php">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Name</label>
                         <input type="text" name="name" required
@@ -64,7 +97,7 @@ SessionManager::requireLogin();
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Emergency Contact</label>
-                        <input type="tel" name="emergency_contact" pattern="^09\d{9}$"
+                        <input type="tel" name="emergency" pattern="^09\d{9}$"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="09XXXXXXXXX">
                     </div>
@@ -77,7 +110,7 @@ SessionManager::requireLogin();
                     <div class="flex justify-end w-full">
                         <button type="button"
                             class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
-                        <button type="submit"
+                        <button type="submit" name="submit"
                             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Create
                             Account</button>
                     </div>
@@ -120,21 +153,23 @@ SessionManager::requireLogin();
                 <tbody id="clientsBody">
                     <?php
                     $clients = fetchAllData($pdo, "SELECT 
-                        o.id AS owner_id, 
-                        o.name, 
-                        o.email, 
-                        o.phone, 
-                        o.created_at, 
-                        o.active,
-                        GROUP_CONCAT(p.name SEPARATOR ', ') AS pets,
-                        COUNT(p.id) AS pet_count
-                    FROM owners o
-                    LEFT JOIN pets p ON o.id = p.owner_id
-                    GROUP BY o.id ORDER BY o.created_at DESC");
-
+                                o.id AS owner_id, 
+                                o.user_id,
+                                o.name, 
+                                o.email, 
+                                o.phone, 
+                                o.created_at,
+                                o.address, 
+                                o.status,
+                                GROUP_CONCAT(p.name SEPARATOR ', ') AS pets,
+                                COUNT(p.id) AS pet_count
+                            FROM owners o
+                            LEFT JOIN pets p ON o.id = p.owner_id
+                            GROUP BY o.id ORDER BY o.created_at DESC
+                            ");
                     foreach ($clients as $client) {
-                        $status = $client['active'] ? "Active" : "Inactive";
-                        $statusClass = $client['active']
+                        $status = $client['status'] ? "Active" : "Inactive";
+                        $statusClass = $client['status']
                             ? "bg-green-600 text-white"
                             : "bg-gray-400 text-white";
 
@@ -152,13 +187,21 @@ SessionManager::requireLogin();
                                     data-email="' . htmlspecialchars($client['email']) . '"
                                     data-phone="' . htmlspecialchars($client['phone']) . '"
                                     data-created="' . htmlspecialchars($client['created_at']) . '"
-                                    data-active="' . $status . '"
+                                    data-status="' . $status . '"
+                                    data-address="' . htmlspecialchars($client['address']) . '"
+                                    data-petcount="' . $client['pet_count'] . '"
+                                    data-pets="' . htmlspecialchars($client['pets']) . '"
                                     class="open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
                                 </button>
                                 <button class="fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300"></button>
                                 <button class="text-xs font-semibold mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">Deactivate</button>
-                                <button class="fa-solid fa-trash text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300"></button>
-                              </td>';
+                                <button 
+                                    class="open-delete-modal fa-solid fa-trash text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-300"
+                                    data-id="' . $client['user_id'] . '" 
+                                    data-name="' . htmlspecialchars($client['name']) . '">
+                                </button>
+
+                            </td>';
                         echo '</tr>';
                     }
                     ?>
@@ -169,37 +212,84 @@ SessionManager::requireLogin();
 
         <!-- View Modal -->
         <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg p-4">
-                <h3 class="font-semibold mb-2">Client Details</h3>
-                <div id="clientDetails"></div>
+            <div class="bg-green-100 rounded-lg p-4">
+                <div>
+                    <h3 class="font-semibold text-m">Client Details - <span id="clientName"></span></h3>
+                    <h4 class="text-gray-500 text-sm">Complete client and pet information</h4>
+                </div>
+                <div class="flex flex-row justify-between space-x-2">
+                    <div id="clientDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[200px]">
+                        <!-- Client details will be populated here -->
+                    </div>
+                    <div id="additionalDetails"
+                        class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 min-w-[230px]">
+                        <!-- Additional details will be populated here -->
+                    </div>
+                </div>
                 <button class="close mt-4 bg-green-500 text-white py-2 px-4 rounded">Close</button>
             </div>
         </div>
+
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal"
+            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                <div class="flex flex-row items-center mb-4">
+                    <i class="fa-solid fa-circle-exclamation mr-2" style="color: #c00707;"></i>
+                    <h3 class="font-semibold text-lg">Delete Client Account</h3>
+                </div>
+                <p id="deleteMessage" class="mb-4 text-sm text-gray-600">
+                    Are you sure you want to delete this client?
+                </p>
+                <div class="flex justify-end space-x-2">
+                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
+                    <a id="confirmDeleteBtn" href="#"
+                        class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", () => {
             const clientDetails = document.getElementById("clientDetails");
-            const pagination = document.getElementById("pagination");
-            const rowsPerPage = 6;
+            const additionalDetails = document.getElementById("additionalDetails");
+            const clientNameSpan = document.getElementById("clientName");
             const tableBody = document.getElementById("clientsBody");
             const rows = tableBody.querySelectorAll("tr");
-            const totalPages = Math.ceil(rows.length / rowsPerPage);
+            const pagination = document.getElementById("pagination");
+            const rowsPerPage = 6;
             let currentPage = 1;
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
 
-            // Open modal
-            document.querySelectorAll(".open-modal").forEach(button => {
-                button.addEventListener("click", () => {
-                    const modal = document.getElementById(button.dataset.modal);
+            // Utility to add fields
+            const addField = (container, label, value) => {
+                const p = document.createElement("p");
+                p.innerHTML = `<span class="font-semibold">${label}:</span> ${value || "N/A"}`;
+                container.appendChild(p);
+            };
+
+            // Open View Modal
+            document.querySelectorAll(".open-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const modal = document.getElementById(btn.dataset.modal);
                     clientDetails.innerHTML = "";
+                    additionalDetails.innerHTML = "";
+                    clientNameSpan.textContent = btn.dataset.name;
 
-                    // Build details safely
-                    const fields = ["name", "email", "phone", "created", "active"];
-                    fields.forEach(field => {
-                        const p = document.createElement("p");
-                        p.innerHTML = `<strong>${field.charAt(0).toUpperCase() + field.slice(1)}:</strong> ${button.dataset[field]}`;
-                        clientDetails.appendChild(p);
-                    });
+                    addField(clientDetails, "Name", btn.dataset.name);
+                    addField(clientDetails, "Email", btn.dataset.email);
+                    addField(clientDetails, "Phone", btn.dataset.phone);
+                    addField(clientDetails, "Emergency Contact", btn.dataset.emergency || "None");
+                    addField(clientDetails, "Address", btn.dataset.address);
+
+                    addField(additionalDetails, "Join Date", btn.dataset.created);
+                    addField(additionalDetails, "Pet Count", btn.dataset.petcount);
+                    addField(additionalDetails, "Status", btn.dataset.status);
 
                     modal.classList.remove("hidden");
                     document.body.style.overflow = "hidden";
@@ -207,14 +297,14 @@ SessionManager::requireLogin();
             });
 
             // Close modal
-            document.querySelectorAll(".modal .close").forEach(closeBtn => {
-                closeBtn.addEventListener("click", () => {
-                    closeBtn.closest(".modal").classList.add("hidden");
+            document.querySelectorAll(".modal .close").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    btn.closest(".modal").classList.add("hidden");
                     document.body.style.overflow = "auto";
                 });
             });
 
-            // Close modal when clicking outside
+            // Close modal by clicking outside
             document.querySelectorAll(".modal").forEach(modal => {
                 modal.addEventListener("click", e => {
                     if (e.target === modal) {
@@ -224,53 +314,69 @@ SessionManager::requireLogin();
                 });
             });
 
-            // Search
-            document.getElementById('search').addEventListener('input', function () {
-                const searchTerm = this.value.toLowerCase();
+            // Search functionality
+            document.getElementById("search").addEventListener("input", function () {
+                const term = this.value.toLowerCase();
                 rows.forEach(row => {
                     const name = row.cells[0].textContent.toLowerCase();
                     const contact = row.cells[1].textContent.toLowerCase();
-                    row.style.display = (name.includes(searchTerm) || contact.includes(searchTerm)) ? '' : 'none';
+                    row.style.display = (name.includes(term) || contact.includes(term)) ? "" : "none";
                 });
             });
 
             // Pagination
-            function showPage(page) {
+            const showPage = page => {
                 currentPage = page;
                 const start = (page - 1) * rowsPerPage;
                 const end = start + rowsPerPage;
-                rows.forEach((row, index) => {
-                    row.style.display = (index >= start && index < end) ? "" : "none";
-                });
+                rows.forEach((row, i) => row.style.display = (i >= start && i < end) ? "" : "none");
                 renderPagination();
-            }
+            };
 
-            function renderPagination() {
+            const renderPagination = () => {
                 pagination.innerHTML = "";
                 if (currentPage > 1) {
                     const prev = document.createElement("button");
-                    prev.textContent = "Prev";
                     prev.className = "text-xs px-3 py-1 bg-gray-200 rounded";
+                    prev.textContent = "Prev";
                     prev.onclick = () => showPage(currentPage - 1);
                     pagination.appendChild(prev);
                 }
                 for (let i = 1; i <= totalPages; i++) {
                     const btn = document.createElement("button");
+                    btn.className = `text-xs px-3 py-1 rounded ${i === currentPage ? "bg-green-500 text-white" : "bg-gray-200"}`;
                     btn.textContent = i;
-                    btn.className = "text-xs px-3 py-1 rounded " + (i === currentPage ? "bg-green-500 text-white" : "bg-gray-200");
                     btn.onclick = () => showPage(i);
                     pagination.appendChild(btn);
                 }
                 if (currentPage < totalPages) {
                     const next = document.createElement("button");
-                    next.textContent = "Next";
                     next.className = "text-xs px-3 py-1 bg-gray-200 rounded";
+                    next.textContent = "Next";
                     next.onclick = () => showPage(currentPage + 1);
                     pagination.appendChild(next);
                 }
-            }
+            };
+
             showPage(1);
+
+            // Delete Modal Logic
+            document.querySelectorAll(".open-delete-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const modal = document.getElementById("deleteModal");
+                    const clientName = btn.dataset.name;
+                    const userId = btn.dataset.id;
+
+                    document.getElementById("deleteMessage").textContent =
+                        `Are you sure you want to delete "${clientName}" and their account? This action cannot be undone and will remove all associated pets and medical records.`;
+                    document.getElementById("confirmDeleteBtn").href = `client-management.php?delete_id=${userId}`;
+
+                    modal.classList.remove("hidden");
+                    document.body.style.overflow = "hidden";
+                });
+            });
         });
+
     </script>
 </body>
 
