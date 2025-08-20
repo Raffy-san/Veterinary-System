@@ -36,6 +36,26 @@ if (isset($_POST['submit'])) {
     }
 }
 
+if(isset($_POST['add_pet'])) {
+    $data = [
+        'name' => $_POST['name'],
+        'species' => $_POST['species'],
+        'breed' => $_POST['breed'],
+        'age' => $_POST['age'],
+        'gender' => $_POST['gender'],
+        'owner_id' => $_POST['owner_id'],
+        'notes' => $_POST['notes']
+    ];
+
+    if (addPet($pdo, $data)) {
+        header("Location: client-management.php?pet_added=1");
+        exit;
+    } else {
+        header("Location: client-management.php?pet_added=0");
+        exit;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -147,7 +167,6 @@ if (isset($_POST['submit'])) {
                         <th class="font-semibold">Contact</th>
                         <th class="font-semibold">Join Date</th>
                         <th class="font-semibold">Pets</th>
-                        <th class="font-semibold text-center">Status</th>
                         <th class="font-semibold text-right">Actions</th>
                     </tr>
                 </thead>
@@ -161,7 +180,6 @@ if (isset($_POST['submit'])) {
                                 o.phone,
                                 o.created_at,
                                 o.address, 
-                                o.status,
                                 GROUP_CONCAT(p.name SEPARATOR ', ') AS pets,
                                 COUNT(p.id) AS pet_count
                             FROM owners o
@@ -169,17 +187,12 @@ if (isset($_POST['submit'])) {
                             GROUP BY o.id ORDER BY o.created_at DESC
                             ");
                     foreach ($clients as $client) {
-                        $status = $client['status'] ? "Active" : "Inactive";
-                        $statusClass = $client['status']
-                            ? "bg-green-600 text-white"
-                            : "bg-gray-400 text-white";
 
                         echo '<tr class="border-b hover:bg-green-50 text-sm text-left">';
                         echo '<td class="py-2">' . htmlspecialchars($client['name']) . '</td>';
                         echo '<td class="py-2 flex flex-col">' . '<span><i class="fa-solid fa-envelope text-green-600"></i>&nbsp;' . htmlspecialchars($client['email']) . '</span>' . '<span class="text-gray-500 text-xs"><i class="fa-solid fa-phone">&nbsp;</i>' . htmlspecialchars($client['phone']) . '</span></td>';
                         echo '<td class="py-2">' . htmlspecialchars($client['created_at']) . '</td>';
                         echo '<td class="py-2"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['pet_count'] . '</span></td>';
-                        echo '<td class="py-2 text-center"><span class="text-xs font-semibold px-2.5 py-0.5 rounded ' . $statusClass . '">' . $status . '</span></td>';
                         echo '<td class="py-2 text-right">
                                 <button 
                                     data-modal="viewModal" 
@@ -188,14 +201,17 @@ if (isset($_POST['submit'])) {
                                     data-email="' . htmlspecialchars($client['email']) . '"
                                     data-phone="' . htmlspecialchars($client['phone']) . '"
                                     data-created="' . htmlspecialchars($client['created_at']) . '"
-                                    data-status="' . $status . '"
                                     data-address="' . htmlspecialchars($client['address']) . '"
                                     data-petcount="' . $client['pet_count'] . '"
                                     data-pets="' . htmlspecialchars($client['pets']) . '"
                                     class="open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
                                 </button>
                                 <button class="fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300"></button>
-                                <button class="text-xs font-semibold mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">Deactivate</button>
+                                <button 
+                                data-owner="' . $client['owner_id'] . '" 
+                                class="open-pet-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
+                                <i class="fa-solid fa-plus mr-1"></i>Add Pet
+                                </button>
                                 <button 
                                     class="open-delete-modal fa-solid fa-trash text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-300"
                                     data-id="' . $client['user_id'] . '" 
@@ -258,6 +274,83 @@ if (isset($_POST['submit'])) {
             </div>
         </div>
 
+        <div id="addPetModal"
+            class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+            <div class="bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-m font-semibold">Add new Pet</h3>
+                        <h4 class="text-sm text-gray-600">Link this pet to the selected client</h4>
+                    </div>
+                    <button class="close text-xl">&times;</button>
+                </div>
+                <form class="flex flex-wrap items-center justify-between" method="POST" action="client-management.php">
+                    <div class="mb-4 w-full">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Pet Name</label>
+                        <input type="text" name="name"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Pet Name" required>
+                    </div>
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Species</label>
+                        <select
+                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            name="species" required>
+                            <option value="" disabled selected>Select Species</option>
+                            <option value="Dog">Dog</option>
+                            <option value="Cat">Cat</option>
+                            <option value="Bird">Bird</option>
+                            <option value="Rabbit">Rabbit</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Breed</label>
+                        <input type="text" name="breed"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Breed">
+                    </div>
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
+                        <input type="number" name="age"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Years">
+                    </div>
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Gender</label>
+                        <select
+                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            name="gender" required>
+                            <option value="" disabled selected>Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <input type="hidden" name="owner_id" id="modal_owner_id">
+
+                    <div class="mb-4 w-full">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Notes</label>
+                        <textarea name="notes"
+                            class="w-full border rounded px-2 py-1 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Any special notes about the pet"></textarea>
+                    </div>
+
+                    <div class="flex justify-end w-full">
+                        <button type="button"
+                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
+                        <button type="submit" name="add_pet"
+                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Add
+                            Pet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </main>
 
     <script>
@@ -290,17 +383,6 @@ if (isset($_POST['submit'])) {
                     clientNameSpan.textContent = btn.dataset.name;
 
 
-                    let statusBadge = document.createElement("p");
-                    statusBadge.innerHTML = `
-                    <span class="font-semibold">Status:</span> 
-                    <span class="px-1 py-1/2 text-xs font-semibold rounded 
-                        ${btn.dataset.status === "Active"
-                                    ? "bg-green-600 text-white"
-                                    : "bg-gray-400 text-white"}">
-                        ${btn.dataset.status}
-                    </span>
-                    `;
-
                     addField(clientDetails, "Name", btn.dataset.name);
                     addField(clientDetails, "Email", btn.dataset.email);
                     addField(clientDetails, "Phone", btn.dataset.phone);
@@ -309,7 +391,6 @@ if (isset($_POST['submit'])) {
 
                     addField(additionalDetails, "Join Date", btn.dataset.created);
                     addField(additionalDetails, "Pet Count", btn.dataset.petcount);
-                    additionalDetails.appendChild(statusBadge);
 
                     fetch(`../helpers/fetch-pet.php?owner_id=${btn.dataset.id}`)
                         .then(res => res.json())
@@ -346,6 +427,14 @@ if (isset($_POST['submit'])) {
 
                     modal.classList.remove("hidden");
                     document.body.style.overflow = "hidden";
+                });
+            });
+
+            document.querySelectorAll(".open-pet-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const ownerId = btn.dataset.owner;
+                    document.getElementById("modal_owner_id").value = ownerId;
+                    document.getElementById("addPetModal").classList.remove("hidden");
                 });
             });
 
