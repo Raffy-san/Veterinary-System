@@ -43,3 +43,12 @@
       $stmt = $pdo->prepare("UPDATE owners SET status = 0 WHERE id = ?");
       return $stmt->execute([$user_id]);
   }
+
+
+  function addPet($pdo, $data) {
+      $stmt = $pdo->prepare("
+        INSERT INTO pets (name, species, breed, age, gender, owner_id, notes) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+      return $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['owner_id'], $data['notes']]);
+  }
