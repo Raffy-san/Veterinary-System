@@ -124,7 +124,7 @@ SessionManager::requireLogin();
                     <h4 class="text-gray-600">Manage Pet informations</h4>
                 </div>
                 <button data-modal="addPetModal"
-                    class="open-modal mt-4 px-4 py-2 bg-green-700 text-white rounded-lg text-xs hover:bg-green-700"><i
+                    class="open-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700"><i
                         class="fa-solid fa-plus mr-2"></i>Add
                     Pet</button>
             </div>

@@ -1,24 +1,18 @@
-    /* globals.css */
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 8px;
-        /* Adjust width as needed */
-        height: 8px;
-        /* Adjust height for horizontal scrollbars */
-    }
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
 
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        /* Track background color */
-        border-radius: 10px;
-    }
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
 
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #888;
-        /* Thumb color */
-        border-radius: 10px;
-    }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
 
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #555;
-        /* Thumb color on hover */
-    }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

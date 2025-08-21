@@ -149,7 +149,7 @@ if (isset($_POST['add_pet'])) {
                     <h4 class="text-gray-600">Manage client information and accounts</h4>
                 </div>
                 <button data-modal="addClientModal"
-                    class="open-modal mt-4 px-4 py-2 bg-green-700 text-white rounded-lg text-xs hover:bg-green-800">
+                    class="open-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700">
                     <i class="fa-solid fa-plus mr-2"></i>Add Client
                 </button>
             </div>
