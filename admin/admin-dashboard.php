@@ -21,11 +21,11 @@ $totalPets = fetchAllData($pdo, "SELECT * FROM pets");
     <title>Overview</title>
 </head>
 
-<body class="bg-green-100 w-full">
+<body class="bg-green-100 w-full h-screen overflow-y-auto">
     <?php
     include_once '../includes/admin-header.php';
     ?>
-    <main>
+    <main class="pb-10">
         <section class="p-10 flex flex-col md:flex-row gap-8 w-full">
             <div class="bg-white rounded-lg shadow-md p-8 flex-1">
                 <div class="w-full flex items-center justify-between mb-4">
