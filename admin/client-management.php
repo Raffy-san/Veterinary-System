@@ -36,13 +36,15 @@ if (isset($_POST['submit'])) {
     }
 }
 
-if(isset($_POST['add_pet'])) {
+if (isset($_POST['add_pet'])) {
     $data = [
         'name' => $_POST['name'],
         'species' => $_POST['species'],
         'breed' => $_POST['breed'],
         'age' => $_POST['age'],
         'gender' => $_POST['gender'],
+        'weight' => $_POST['weight'],
+        'color' => $_POST['color'],
         'owner_id' => $_POST['owner_id'],
         'notes' => $_POST['notes']
     ];
@@ -206,7 +208,7 @@ if(isset($_POST['add_pet'])) {
                                     data-pets="' . htmlspecialchars($client['pets']) . '"
                                     class="open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
                                 </button>
-                                <button class="fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300"></button>
+                                <button class="open-update-modal fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300"></button>
                                 <button 
                                 data-owner="' . $client['owner_id'] . '" 
                                 class="open-pet-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
@@ -252,6 +254,43 @@ if(isset($_POST['add_pet'])) {
             </div>
         </div>
 
+        <div id="updateClientModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-green-100 rounded-lg p-4 max-w-md w-full">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-semibold text-m">Update Client Information</h3>
+                        <h4 class="text-gray-500 text-sm">Edit the details of the selected client</h4>
+                    </div>
+                    <button class="close text-xl" aria-label="Close">&times;</button>
+                </div>
+                <form id="updateClientForm" method="POST" action="client-management.php">
+                    <input type="hidden" name="id" id="updateClientId">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Name</label>
+                        <input type="text" name="name" id="updateClientName"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Client Name" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Email</label>
+                        <input type="email" name="email" id="updateClientEmail"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Client Email" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Phone</label>
+                        <input type="text" name="phone" id="updateClientPhone"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Client Phone" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" name="update"
+                            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
 
         <!-- Delete Confirmation Modal -->
         <div id="deleteModal"
@@ -285,7 +324,7 @@ if(isset($_POST['add_pet'])) {
                     <button class="close text-xl">&times;</button>
                 </div>
                 <form class="flex flex-wrap items-center justify-between" method="POST" action="client-management.php">
-                    <div class="mb-4 w-full">
+                    <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Pet Name</label>
                         <input type="text" name="name"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -306,29 +345,47 @@ if(isset($_POST['add_pet'])) {
                         </select>
                     </div>
 
-                    <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Breed</label>
-                        <input type="text" name="breed"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Breed">
+                    <div class="flex flex-row space-x-2">
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Breed</label>
+                            <input type="text" name="breed"
+                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="Breed">
+                        </div>
+
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
+                            <input type="number" name="age"
+                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="Years">
+                        </div>
+
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Gender</label>
+                            <select
+                                class="w-auto border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                name="gender" required>
+                                <option value="" disabled selected>Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
-                        <input type="number" name="age"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Years">
-                    </div>
 
                     <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Gender</label>
-                        <select
-                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            name="gender" required>
-                            <option value="" disabled selected>Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
+                        <input type="text" name="weight"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="e.g. 10kg">
+                    </div>
+
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
+                        <input type="text" name="color"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Pet Color">
                     </div>
 
                     <input type="hidden" name="owner_id" id="modal_owner_id">
@@ -430,11 +487,28 @@ if(isset($_POST['add_pet'])) {
                 });
             });
 
+            document.querySelectorAll(".open-update-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const modal = document.getElementById("updateClientModal");
+                    const clientRow = btn.closest("tr");
+                    const cells = clientRow.querySelectorAll("td");
+
+                    document.getElementById("updateClientId").value = cells[0].dataset.id;
+                    document.getElementById("updateClientName").value = cells[0].textContent.trim();
+                    document.getElementById("updateClientEmail").value = cells[1].textContent.trim();
+                    document.getElementById("updateClientPhone").value = cells[2].textContent.trim();
+
+                    modal.classList.remove("hidden");
+                    document.body.style.overflow = "hidden";
+                });
+            });
+
             document.querySelectorAll(".open-pet-modal").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const ownerId = btn.dataset.owner;
                     document.getElementById("modal_owner_id").value = ownerId;
                     document.getElementById("addPetModal").classList.remove("hidden");
+                    document.body.style.overflow = "hidden";
                 });
             });
 

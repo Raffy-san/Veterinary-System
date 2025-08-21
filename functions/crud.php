@@ -47,8 +47,8 @@
 
   function addPet($pdo, $data) {
       $stmt = $pdo->prepare("
-        INSERT INTO pets (name, species, breed, age, gender, owner_id, notes) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO pets (name, species, breed, age, gender, weight, color, owner_id, notes) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
-      return $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['owner_id'], $data['notes']]);
+      return $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['owner_id'], $data['notes']]);
   }
