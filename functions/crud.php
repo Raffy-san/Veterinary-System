@@ -52,3 +52,21 @@
     ");
       return $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['owner_id'], $data['notes']]);
   }
+
+  function addMedicalRecord($pdo, $data) {
+      $stmt = $pdo->prepare("
+          INSERT INTO medical_records (pet_id, date, visit_type, weight, temperature, diagnosis, treatment, medications, notes) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ");
+      return $stmt->execute([
+          $data['pet_id'],
+          $data['date'],
+          $data['visit_type'],
+          $data['weight'],
+          $data['temperature'],
+          $data['diagnosis'],
+          $data['treatment'],
+          $data['medications'],
+          $data['notes']
+      ]);
+  }
