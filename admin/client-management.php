@@ -214,6 +214,7 @@ if (isset($_POST['add_pet'])) {
                                 class="open-pet-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
                                 <i class="fa-solid fa-plus mr-1"></i>Add Pet
                                 </button>
+                                 <button class="open-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">View Pet</button>
                                 <button 
                                     class="open-delete-modal fa-solid fa-trash text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-300"
                                     data-id="' . $client['user_id'] . '" 
@@ -254,7 +255,8 @@ if (isset($_POST['add_pet'])) {
             </div>
         </div>
 
-        <div id="updateClientModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div id="updateClientModal"
+            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div class="bg-green-100 rounded-lg p-4 max-w-md w-full">
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -454,7 +456,7 @@ if (isset($_POST['add_pet'])) {
                         .then(pets => {
                             petDetails.innerHTML = "<h3 class='font-semibold font-sm mb-4'>Registered Pets</h3>";
                             if (pets.length === 0) {
-                                petDetails.innerHTML = "<p>No pets found</p>";
+                                petDetails.innerHTML = "<p class='font-semibold'>No pets found</p>";
                             } else {
                                 pets.forEach((pet, i) => {
                                     const petDiv = document.createElement("div");

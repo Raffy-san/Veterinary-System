@@ -8,14 +8,15 @@ SessionManager::requireLogin();
 if (isset($_POST['submit'])) {
     $data = [
         'pet_id' => $_POST['patient'],
-        'date' => $_POST['date'],
+        'visit_date' => $_POST['visit_date'],
         'visit_type' => $_POST['visit_type'],
         'weight' => $_POST['weight'],
         'temperature' => $_POST['temperature'],
         'diagnosis' => $_POST['diagnosis'],
         'treatment' => $_POST['treatment'],
         'medications' => $_POST['medications'],
-        'notes' => $_POST['notes']
+        'notes' => $_POST['notes'],
+        'follow_up_date' => $_POST['follow_up_date']
     ];
 
     if (addMedicalRecord($pdo, $data)) {
@@ -86,7 +87,7 @@ if (isset($_POST['submit'])) {
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Date</label>
-                        <input type="date" name="date"
+                        <input type="date" name="visit_date"
                             class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             required>
                     </div>
@@ -97,7 +98,7 @@ if (isset($_POST['submit'])) {
                                 class="w-auto border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
                                 <option value="" selected disabled>Select Type</option>
                                 <option value="Routine Checkup">Routine Checkup</option>
-                                <option value="vaccination">Vaccination</option>
+                                <option value="Vaccination">Vaccination</option>
                                 <option value="Treatment">Treatment</option>
                                 <option value="Emergency">Emergency</option>
                                 <option value="Surgery">Surgery</option>
@@ -124,32 +125,33 @@ if (isset($_POST['submit'])) {
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Treatment</label>
-                        <textarea name="" id=""
+                        <textarea name="treatment" id=""
                             class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
                             placeholder="Describe the treatment of procedures performed"></textarea>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Medications</label>
-                        <textarea name="" id=""
+                        <textarea name="medications" id=""
                             class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
                             placeholder="List the medications prescribed with dosage and frequency"></textarea>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Additional Notes</label>
-                        <textarea name="" id=""
+                        <textarea name="notes" id=""
                             class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
                             placeholder="Add additional observations, instructions, or notes"></textarea>
                     </div>
 
                     <div class="mb-4 w-full">
                         <div class="flex flex-row space-x-2">
-                            <input type="checkbox" name="required">
-                            <label for="" class="text-sm font-semibold">Follow-up appointment required</label>
+                            <input type="checkbox" id="followUpRequired" name="required">
+                            <label for="followUpRequired" class="text-sm font-semibold">Follow-up appointment
+                                required</label>
                         </div>
-                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Follow-Up Date (if applicable)</label>
-                        <input type="date" name="date"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            required>
+                        <label for="follow_up_date" class="block text-gray-700 mb-1 text-sm font-semibold">Follow-Up
+                            Date (if applicable)</label>
+                        <input type="date" id="follow_up_date" name="follow_up_date"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
                     </div>
 
                     <div class="flex justify-end w-full">
@@ -218,6 +220,17 @@ if (isset($_POST['submit'])) {
                 const contact = row.cells[1].textContent.toLowerCase();
                 row.style.display = (name.includes(searchTerm) || contact.includes(searchTerm)) ? '' : 'none';
             });
+        });
+
+        const followUpCheckbox = document.getElementById('followUpRequired');
+        const followUpDate = document.getElementById('follow_up_date');
+
+        followUpCheckbox.addEventListener('change', () => {
+            if (followUpCheckbox.checked) {
+                followUpDate.setAttribute('required', 'true');
+            } else {
+                followUpDate.removeAttribute('required');
+            }
         });
     </script>
 </body>

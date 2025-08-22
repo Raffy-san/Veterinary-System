@@ -38,19 +38,19 @@ if (SessionManager::isLoggedIn()) {
                     <div class="bg-white border border-gray-300 rounded-md p-2 cursor-pointer"
                         id="custom-select-trigger" tabindex="0">
                         <i class="fa-solid fa-paw mr-2 text-green-500 rotate-45"></i>
-                        <span>Pet Owner</span>
+                        <span>Owner Login</span>
                     </div>
                     <ul class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 hidden"
                         id="custom-select-options">
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
                             data-value="admin">
                             <i class="fa-solid fa-shield mr-2 text-green-500 group-hover:text-white"></i>
-                            Admin Access
+                            Admin Login
                         </li>
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
                             data-value="owner">
                             <i class="fa-solid fa-paw mr-2 text-green-500 rotate-45 group-hover:text-white"></i>
-                            Pet Owner
+                            Owner Login
                         </li>
                     </ul>
                 </div>
@@ -91,12 +91,12 @@ if (SessionManager::isLoggedIn()) {
         const descriptions = {
             admin: {
                 icon: '<i class="fa-solid fa-shield text-green-500"></i>',
-                text: 'Admin Access',
+                text: 'Admin Login',
                 description: "Manage clinic operations and create client accounts."
             },
             owner: {
                 icon: '<i class="fa-solid fa-paw text-green-500 rotate-45"></i>',
-                text: 'Pet Owner',
+                text: 'Owner Login',
                 description: "View your pet\'s medical records"
             }
         };
