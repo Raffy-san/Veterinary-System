@@ -158,7 +158,7 @@ if (isset($_POST['add_pet'])) {
                 <form>
                     <i class="fa-solid fa-search text-sm"></i>
                     <input type="search" id="search" placeholder="Search Clients..."
-                        class="bg-gray-100 rounded px-3 py-2 mb-4 text-sm w-64">
+                        class="bg-gray-100 rounded px-3 py-2 mb-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-green-500">
                 </form>
             </div>
 
