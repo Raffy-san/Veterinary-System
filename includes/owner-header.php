@@ -3,7 +3,7 @@
         <div>
             <div class="flex items-center space-x-2">
                 <?php if ($client): ?>
-                <h1 class="font-semibold text-2xl">Welcome, <?= htmlspecialchars($client['name']); ?>!</h1>
+                    <h1 class="font-semibold text-2xl">Welcome, <?= htmlspecialchars($client['name']); ?>!</h1>
                 <?php endif; ?>
             </div>
             <h2 class="text-lg font-normal">Your pet's health dashboard</h2>
@@ -13,23 +13,32 @@
                 href="../logout.php"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Sign Out</a>
         </div>
     </section>
+
     <div class="px-10 w-full flex items-center justify-between">
         <nav class="w-full">
             <ul class="flex space-x-4 text-gray-700 text-xs font-semibold">
-                <a class="flex-1 text-center shadow-md font-semibold py-2 bg-white rounded-full border hover:border-green-500 s"
-                    href="../owner/owner-dashboard.php">
+                <a href="../owner/owner-dashboard.php"
+                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'owner-dashboard.php' ? 'active' : 'bg-white' ?>">
                     <li>Overview</li>
                 </a>
-                <a class="flex-1 text-center shadow-md font-semibold py-2 bg-white rounded-full border hover:border-green-500"
-                    href="../owner/my-pets.php">
-                    <li>My Pets
-                    </li>
+                <a href="../owner/my-pets.php"
+                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'my-pets.php' ? 'active' : 'bg-white' ?>">
+                    <li>My Pets</li>
                 </a>
-                <a class="flex-1 text-center shadow-md font-semibold py-2 bg-white rounded-full border hover:border-green-500"
-                    href="../owner/medical-records.php">
+                <a href="../owner/medical-records.php"
+                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'medical-records.php' ? 'active' : 'bg-white' ?>">
                     <li>Medical Records</li>
                 </a>
             </ul>
         </nav>
     </div>
 </header>
+
+<style>
+    .active {
+        background-color: #22c55e;
+        /* Tailwind green-500 */
+        color: white;
+        border-color: #22c55e;
+    }
+</style>

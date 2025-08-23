@@ -28,6 +28,7 @@ SessionManager::requireLogin();
                     <h4 class="text-gray-600">Manage Pet information</h4>
                 </div>
                 <div class="relative inline-block mt-4">
+                    <label for="speciesFilter" class="sr-only">Filter by Species</label>
                     <select id="speciesFilter"
                         class="appearance-none w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
                bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
@@ -44,7 +45,6 @@ SessionManager::requireLogin();
                         <i class="fa-solid fa-chevron-down text-green-600"></i>
                     </span>
                 </div>
-
             </div>
 
             <!-- Search -->

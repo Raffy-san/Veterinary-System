@@ -18,7 +18,16 @@ $totalPets = fetchAllData($pdo, "SELECT * FROM pets");
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>Overview</title>
+    <style>
+        .card-hover {
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card-hover:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    <title>Veterinary Clinic - Dashboard Overview</title>
 </head>
 
 <body class="bg-green-100 w-full h-screen overflow-y-auto">
@@ -26,63 +35,193 @@ $totalPets = fetchAllData($pdo, "SELECT * FROM pets");
     include_once '../includes/admin-header.php';
     ?>
     <main class="pb-10">
-        <section class="p-10 flex flex-col md:flex-row gap-8 w-full">
-            <div class="bg-white rounded-lg shadow-md p-8 flex-1">
-                <div class="w-full flex items-center justify-between mb-4">
-                    <h3 class="font-semibold">Total Clients</h3>
-                    <i class="fa-solid fa-user"></i>
+        <!-- Statistics Cards Section -->
+        <section class="p-6 md:p-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                <!-- Total Clients Card -->
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-700">Total Clients</h3>
+                            <p class="text-sm text-gray-500">All registered clients</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <i class="fa-solid fa-users text-xl text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800"><?php echo count($petOwners); ?></h2>
+                        <span
+                            class="bg-blue-50 text-blue-700 text-xs font-medium px-2 py-1 rounded-full mt-2 inline-block">
+                            Registered
+                        </span>
+                    </div>
                 </div>
-                <h4 class="font-semibold"><?php echo count($petOwners); ?></h4>
-                <h4 class="text-gray-500">Registered Clients</h4>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-8 flex-1">
-                <div class="w-full flex items-center justify-between mb-4">
-                    <h3 class="font-semibold">Active Clients</h3>
-                    <i class="fa-solid fa-user-check"></i>
+
+                <!-- Active Clients Card -->
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover border-l-4 border-green-600">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-700">Active Clients</h3>
+                            <p class="text-sm text-gray-500">Currently active clients</p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded-lg">
+                            <i class="fa-solid fa-user-check text-xl text-green-600"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800"><?php echo count($activePetOwners); ?></h2>
+                        <span
+                            class="bg-green-50 text-green-700 text-xs font-medium px-2 py-1 rounded-full mt-2 inline-block">
+                            Active
+                        </span>
+                    </div>
                 </div>
-                <h4 class="font-semibold"><?php echo count($activePetOwners); ?></h4>
-                <h4 class="text-gray-500">Active Clients</h4>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-8 flex-1">
-                <div class="w-full flex items-center justify-between mb-4">
-                    <h3 class="font-semibold">Total Pets</h3>
-                    <i class="fa-solid fa-paw"></i>
+
+                <!-- Total Pets Card -->
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover border-l-4 border-orange-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-700">Total Pets</h3>
+                            <p class="text-sm text-gray-500">Registered pets in system</p>
+                        </div>
+                        <div class="bg-orange-50 p-3 rounded-lg">
+                            <i class="fa-solid fa-paw text-xl text-orange-600"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800"><?php echo count($totalPets); ?></h2>
+                        <span
+                            class="bg-orange-50 text-orange-700 text-xs font-medium px-2 py-1 rounded-full mt-2 inline-block">
+                            Pets
+                        </span>
+                    </div>
                 </div>
-                <h4 class="font-semibold"><?php echo count($totalPets); ?></h4>
-                <h4 class="text-gray-500">Registered Pets</h4>
             </div>
         </section>
-        <section class="px-10 flex flex-col md:flex-row gap-8 w-full mb-6">
-            <div class="bg-white rounded-lg shadow-md p-8 flex-1">
-                <div class="mb-4">
-                    <h3 class="font-semibold">Recent Client Activity</h3>
-                    <h4 class="text-gray-500">Latest Client Registration</h4>
-                </div>
-                <?php
-                foreach ($allPetOwners as $owner) {
-                    echo '<div class="flex items-center border rounded-lg p-4 mb-4">';
-                    echo '<i class="fa-solid fa-user-plus mr-4"></i>';
-                    echo '<div>';
-                    echo '<h4 class="font-semibold">Client Registered: ' . htmlspecialchars($owner['name']) . '</h4>';
-                    echo '<h4 class="text-gray-500">Registered on ' . htmlspecialchars($owner['created_at']) . '</h4>';
-                    echo '</div>';
-                    echo '</div>';
-                }
-                ?>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-8 flex-1">
-                <div class="mb-4">
-                    <h4 class="font-semibold">System Status</h4>
-                    <h4 class="text-gray-500">Current Clinic Operation</h4>
-                </div>
-                <div class="flex justify-between flex-col mb-4">
-                    <div class="flex justify-between w-full mb-2">
-                        <h4 class="font-semibold">Active Clients</h4>
-                        <p class="py-1 px-2 text-sm font-semibold text-white border bg-green-600 rounded-lg"><?php echo count($activePetOwners); ?></p>
+
+        <!-- Activity and Status Section -->
+        <section class="px-6 md:px-10 grid grid-cols-1 lg:grid-cols-2 gap-8 w-full mb-6">
+            <!-- Recent Client Activity -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover animate-slide-up" style="animation-delay: 0.3s;">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 flex items-center">
+                            <i class="fa-solid fa-clock-rotate-left text-vet-purple mr-3"></i>
+                            Recent Activity
+                        </h3>
+                        <p class="text-gray-600">Latest client registrations</p>
                     </div>
-                    <div class="flex justify-between w-full mb-2">
-                        <h4 class="font-semibold">Total Pets</h4>
-                        <p class="py-1 px-2 text-sm font-semibold text-black border bg-green-400 rounded-lg"><?php echo count($totalPets); ?></p>
+                    <div class="bg-purple-100 p-2 rounded-lg">
+                        <i class="fa-solid fa-chart-line text-vet-purple"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <?php
+                    $colors = ['bg-blue-50 border-blue-200', 'bg-green-50 border-green-200', 'bg-purple-50 border-purple-200'];
+                    $iconColors = ['text-blue-600', 'text-green-600', 'text-purple-600'];
+                    $index = 0;
+
+                    foreach ($allPetOwners as $owner) {
+                        $colorClass = $colors[$index % 3];
+                        $iconColor = $iconColors[$index % 3];
+                        echo '<div class="flex items-center p-4 ' . $colorClass . ' border rounded-lg hover:shadow-md transition-all duration-300">';
+                        echo '<div class="bg-white p-2 rounded-full mr-4">';
+                        echo '<i class="fa-solid fa-user-plus ' . $iconColor . '"></i>';
+                        echo '</div>';
+                        echo '<div class="flex-1">';
+                        echo '<h4 class="font-semibold text-gray-800">New Client: ' . htmlspecialchars($owner['name']) . '</h4>';
+                        echo '<p class="text-sm text-gray-600">Registered on ' . date('M d, Y', strtotime($owner['created_at'])) . '</p>';
+                        echo '</div>';
+                        echo '<div class="bg-white px-3 py-1 rounded-full">';
+                        echo '<span class="text-xs font-medium text-gray-700">New</span>';
+                        echo '</div>';
+                        echo '</div>';
+                        $index++;
+                    }
+                    ?>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover animate-slide-up" style="animation-delay: 0.4s;">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 flex items-center">
+                            <i class="fa-solid fa-stethoscope text-vet-pink mr-3"></i>
+                            System Status
+                        </h3>
+                        <p class="text-gray-600">Current clinic operation metrics</p>
+                    </div>
+                    <div class="bg-pink-100 p-2 rounded-lg">
+                        <i class="fa-solid fa-hospital text-vet-pink"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Active Clients Status -->
+                    <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <div class="bg-green-500 p-2 rounded-lg mr-3">
+                                    <i class="fa-solid fa-user-check text-white text-sm"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-800">Active Clients</h4>
+                            </div>
+                            <div class="bg-green-500 text-white px-4 py-2 rounded-full font-bold text-lg">
+                                <?php echo count($activePetOwners); ?>
+                            </div>
+                        </div>
+                        <div class="w-full bg-green-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full"
+                                style="width: <?php echo min(100, (count($activePetOwners) / max(1, count($petOwners))) * 100); ?>%">
+                            </div>
+                        </div>
+                        <p class="text-xs text-green-700 mt-2">
+                            <?php echo round((count($activePetOwners) / max(1, count($petOwners))) * 100, 1); ?>% of
+                            total clients
+                        </p>
+                    </div>
+
+                    <!-- Total Pets Status -->
+                    <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-xl border border-orange-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <div class="bg-orange-500 p-2 rounded-lg mr-3">
+                                    <i class="fa-solid fa-paw text-white text-sm"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-800">Total Pets</h4>
+                            </div>
+                            <div class="bg-orange-500 text-white px-4 py-2 rounded-full font-bold text-lg">
+                                <?php echo count($totalPets); ?>
+                            </div>
+                        </div>
+                        <div class="w-full bg-orange-200 rounded-full h-2">
+                            <div class="bg-orange-500 h-2 rounded-full"
+                                style="width: <?php echo min(100, (count($totalPets) / max(1, count($totalPets) + 50)) * 100); ?>%">
+                            </div>
+                        </div>
+                        <p class="text-xs text-orange-700 mt-2">Pets registered in the system</p>
+                    </div>
+
+                    <!-- System Health Indicator -->
+                    <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="bg-blue-500 p-2 rounded-lg mr-3">
+                                    <i class="fa-solid fa-heartbeat text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">System Health</h4>
+                                    <p class="text-sm text-gray-600">All systems operational</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                                <span class="text-sm font-medium text-green-700">Online</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
