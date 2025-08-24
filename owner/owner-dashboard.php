@@ -5,11 +5,44 @@ require_once '../helpers/fetch.php';
 SessionManager::requireLogin();
 
 $client = SessionManager::getUser($pdo);
+
+$pet = fetchAllData(
+    $pdo,
+    "SELECT * FROM pets WHERE owner_id = ?",
+    [$client['owner_id']]
+);
 $petCount = fetchOneData(
     $pdo,
     "SELECT COUNT(*) as total FROM pets WHERE owner_id = ?",
     [$client['owner_id']]
 );
+
+$lastVisit = fetchOneData(
+    $pdo,
+    "SELECT MAX(visit_date) as last_visit FROM medical_records WHERE pet_id IN (SELECT id FROM pets WHERE owner_id = ?)",
+    [$client['owner_id']]
+);
+
+$medicalRecordCount = fetchOneData(
+    $pdo,
+    "SELECT COUNT(*) as total FROM medical_records WHERE pet_id IN (SELECT id FROM pets WHERE owner_id = ?)",
+    [$client['owner_id']]
+);
+
+$speciesIcons = [
+    'Dog' => ['icon' => 'fa-dog', 'bg' => 'bg-orange-100', 'color' => 'text-orange-600'],
+    'Cat' => ['icon' => 'fa-cat', 'bg' => 'bg-purple-100', 'color' => 'text-purple-600'],
+    'Bird' => ['icon' => 'fa-dove', 'bg' => 'bg-blue-100', 'color' => 'text-blue-600'],
+    'Rabbit' => ['icon' => 'fa-carrot', 'bg' => 'bg-pink-100', 'color' => 'text-pink-600'],
+    'Fish' => ['icon' => 'fa-fish', 'bg' => 'bg-cyan-100', 'color' => 'text-cyan-600'],
+    'default' => ['icon' => 'fa-paw', 'bg' => 'bg-gray-100', 'color' => 'text-gray-600']
+];
+
+$speciesCount = [];
+foreach ($pet as $p) {
+    $species = ucfirst(strtolower($p['species']));
+    $speciesCount[$species] = ($speciesCount[$species] ?? 0) + 1;
+}
 
 ?>
 <!DOCTYPE html>
@@ -22,46 +55,178 @@ $petCount = fetchOneData(
     <title>Owner Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 
-<body class="bg-green-100 w-full">
-    <?php
-    include_once '../includes/owner-header.php';
-    ?>
-    <main>
-        <section class="p-10 flex flex-col md:flex-row gap-8 w-full">
-            <div class="bg-white rounded-lg shadow-md p-8 flex-1">
-                <div class="w-full flex items-center justify-between mb-4">
-                    <h3 class="font-semibold">Total Pets</h3>
-                    <i class="fa-solid fa-paw"></i>
+<body class="bg-green-100 min-h-screen">
+    <?php include_once '../includes/owner-header.php'; ?>
+
+    <main class="p-10">
+        <!-- Stats Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            <!-- Total Pets Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-paw text-emerald-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Total Pets</h3>
+                            <p class="text-sm text-gray-500">Registered</p>
+                        </div>
+                    </div>
                 </div>
-                <h4 class="font-semibold"><?= $petCount['total']; ?></h4>
-                <h4 class="text-gray-500">Registered Pets</h4>
+                <div class="text-3xl font-bold text-gray-800 mb-1"><?= $petCount['total']; ?></div>
+                <div class="flex items-center text-sm text-emerald-600">
+                    <i class="fa-solid fa-arrow-up mr-1"></i>
+                    <span>All pets registered</span>
+                </div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-8 flex-1">
-                <div class="w-full flex items-center justify-between mb-4">
-                    <h3 class="font-semibold">Medical Records</h3>
-                    <i class="fa-solid fa-file"></i>
+
+            <!-- Medical Records Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-file-medical text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Medical Records</h3>
+                            <p class="text-sm text-gray-500">Total records</p>
+                        </div>
+                    </div>
                 </div>
-                <h4 class="font-semibold">3</h4>
-                <h4 class="text-gray-500">Total Records</h4>
+                <div class="text-3xl font-bold text-gray-800 mb-1"><?= $medicalRecordCount['total']; ?></div>
+                <div class="flex items-center text-sm text-blue-600">
+                    <i class="fa-solid fa-heart mr-1"></i>
+                    <span>Health tracked</span>
+                </div>
+            </div>
+
+            <!-- Account Status Card -->
+            <div
+                class="bg-green-200 rounded-xl shadow-sm border border-gray-100 p-6 card-hover md:col-span-2 lg:col-span-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-user-check text-emerald-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Account Status</h3>
+                            <p class="text-sm text-gray-500">Your account info</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Account Type:</span>
+                        <span
+                            class="text-sm font-medium text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full"><?= htmlspecialchars($client['status']) ?>
+                            Owner</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Member Since:</span>
+                        <span
+                            class="text-sm font-medium text-gray-800"><?= date('Y', strtotime($client['created_at'])) ?></span>
+                    </div>
+                </div>
             </div>
         </section>
-        <section class="px-10 flex flex-col md:flex-row gap-8 w-full mb-6">
-            <div class="bg-white rounded-lg shadow-md p-8 flex-1">
-                <div class="mb-4">
-                    <h3 class="font-semibold">Your Contact information</h3>
-                    <h4 class="text-gray-500">Information we have on the file</h4>
+
+        <!-- Contact Information Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Contact Info Card -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="mb-6">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-address-card text-amber-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800">Contact Information</h3>
+                            <p class="text-gray-500 text-sm">Information we have on file</p>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <p><i
-                            class="fa-solid fa-envelope text-green-500 mr-2 mb-2"></i><?= htmlspecialchars($client['email']); ?>
-                    </p>
-                    <p><i
-                            class="fa-solid fa-phone text-green-500 mr-2 mb-2"></i><?= htmlspecialchars($client['phone']); ?>
-                    </p>
-                    <p><i class="fa-solid fa-map-marker-alt text-green-500 mr-2 mb-2"></i>
-                        <?= htmlspecialchars($client['address']); ?></p>
+
+                <div class="space-y-4">
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fa-solid fa-envelope text-emerald-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Email Address</p>
+                            <p class="font-medium text-gray-800"><?= htmlspecialchars($client['email']); ?></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fa-solid fa-phone text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Phone Number</p>
+                            <p class="font-medium text-gray-800"><?= htmlspecialchars($client['phone']); ?></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fa-solid fa-map-marker-alt text-red-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Address</p>
+                            <p class="font-medium text-gray-800"><?= htmlspecialchars($client['address']); ?></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pet Summary Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="mb-4">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-heart text-indigo-600"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800">Pet Summary</h3>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <?php foreach ($speciesCount as $species => $count):
+                        $iconData = $speciesIcons[$species] ?? $speciesIcons['default'];
+                        ?>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 <?= $iconData['bg']; ?> rounded-full flex items-center justify-center">
+                                    <i class="fa-solid <?= $iconData['icon']; ?> <?= $iconData['color']; ?> text-sm"></i>
+                                </div>
+                                <span class="text-sm font-medium text-gray-800"><?= htmlspecialchars($species); ?></span>
+                            </div>
+                            <span class="text-sm font-bold text-gray-800"><?= $count; ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+
+                <div class="mt-4 pt-3 border-t border-gray-200">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500">Last vet visit</p>
+                        <p class="text-sm font-medium text-gray-800">
+                            <?= $lastVisit['last_visit'] ? date('F j, Y', strtotime($lastVisit['last_visit'])) : 'No visits yet'; ?>
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>

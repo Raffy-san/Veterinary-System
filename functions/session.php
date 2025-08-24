@@ -56,7 +56,7 @@ class SessionManager
         }
 
         $stmt = $pdo->prepare("
-        SELECT o.id AS owner_id, o.name, o.email, o.phone, o.address, u.id AS user_id, u.username
+        SELECT o.id AS owner_id, o.name, o.email, o.phone, o.address, o.status, o.created_at, u.id AS user_id, u.username
         FROM owners o
         INNER JOIN users u ON o.user_id = u.id
         WHERE u.id = ?
