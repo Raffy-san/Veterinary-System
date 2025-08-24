@@ -64,50 +64,63 @@ foreach ($pet as $p) {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-green-100 min-h-screen">
     <?php include_once '../includes/owner-header.php'; ?>
 
-    <main class="p-10">
+    <main class="p-4 md:p-10">
         <!-- Stats Cards -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        <section class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-10">
             <!-- Total Pets Card -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 card-hover">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-paw text-emerald-600 text-xl"></i>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 card-hover">
+                <div class="flex items-center justify-between mb-3 md:mb-4">
+                    <div class="flex items-center space-x-2 md:space-x-3">
+                        <div
+                            class="w-10 h-10 md:w-12 md:h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-paw text-emerald-600 text-lg md:text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-800">Total Pets</h3>
-                            <p class="text-sm text-gray-500">Registered</p>
+                            <h3 class="font-semibold text-gray-800 text-sm md:text-base">Total Pets</h3>
+                            <p class="text-xs md:text-sm text-gray-500">Registered</p>
                         </div>
                     </div>
                 </div>
-                <div class="text-3xl font-bold text-gray-800 mb-1"><?= $petCount['total']; ?></div>
-                <div class="flex items-center text-sm text-emerald-600">
+                <div class="text-2xl md:text-3xl font-bold text-gray-800 mb-1"><?= $petCount['total']; ?></div>
+                <div class="flex items-center text-xs md:text-sm text-emerald-600">
                     <i class="fa-solid fa-arrow-up mr-1"></i>
                     <span>All pets registered</span>
                 </div>
             </div>
 
             <!-- Medical Records Card -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 card-hover">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-file-medical text-blue-600 text-xl"></i>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 card-hover">
+                <div class="flex items-center justify-between mb-3 md:mb-4">
+                    <div class="flex items-center space-x-2 md:space-x-3">
+                        <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-file-medical text-blue-600 text-lg md:text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-800">Medical Records</h3>
-                            <p class="text-sm text-gray-500">Total records</p>
+                            <h3 class="font-semibold text-gray-800 text-sm md:text-base">Medical Records</h3>
+                            <p class="text-xs md:text-sm text-gray-500">Total records</p>
                         </div>
                     </div>
                 </div>
-                <div class="text-3xl font-bold text-gray-800 mb-1"><?= $medicalRecordCount['total']; ?></div>
-                <div class="flex items-center text-sm text-blue-600">
+                <div class="text-2xl md:text-3xl font-bold text-gray-800 mb-1"><?= $medicalRecordCount['total']; ?>
+                </div>
+                <div class="flex items-center text-xs md:text-sm text-blue-600">
                     <i class="fa-solid fa-heart mr-1"></i>
                     <span>Health tracked</span>
                 </div>
@@ -115,116 +128,127 @@ foreach ($pet as $p) {
 
             <!-- Account Status Card -->
             <div
-                class="bg-green-200 rounded-xl shadow-sm border border-gray-100 p-6 card-hover md:col-span-2 lg:col-span-1">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-user-check text-emerald-600 text-xl"></i>
+                class="bg-green-200 rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 card-hover sm:col-span-2 lg:col-span-1">
+                <div class="flex items-center justify-between mb-3 md:mb-4">
+                    <div class="flex items-center space-x-2 md:space-x-3">
+                        <div
+                            class="w-10 h-10 md:w-12 md:h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-user-check text-emerald-600 text-lg md:text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-800">Account Status</h3>
-                            <p class="text-sm text-gray-500">Your account info</p>
+                            <h3 class="font-semibold text-gray-800 text-sm md:text-base">Account Status</h3>
+                            <p class="text-xs md:text-sm text-gray-500">Your account info</p>
                         </div>
                     </div>
                 </div>
-                <div class="space-y-3">
+                <div class="space-y-2 md:space-y-3">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Account Type:</span>
+                        <span class="text-xs md:text-sm text-gray-600">Account Type:</span>
                         <span
-                            class="text-sm font-medium text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full"><?= htmlspecialchars($client['status']) ?>
-                            Owner</span>
+                            class="text-xs md:text-sm font-medium text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">
+                            <?= htmlspecialchars($client['status']) ?> Owner
+                        </span>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Member Since:</span>
-                        <span
-                            class="text-sm font-medium text-gray-800"><?= date('Y', strtotime($client['created_at'])) ?></span>
+                        <span class="text-xs md:text-sm text-gray-600">Member Since:</span>
+                        <span class="text-xs md:text-sm font-medium text-gray-800">
+                            <?= date('Y', strtotime($client['created_at'])) ?>
+                        </span>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Contact Information Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section class="main-grid grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             <!-- Contact Info Card -->
-            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div class="mb-6">
-                    <div class="flex items-center space-x-3 mb-2">
-                        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-address-card text-amber-600"></i>
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
+                <div class="mb-4 md:mb-6">
+                    <div class="flex items-center space-x-2 md:space-x-3 mb-2">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-address-card text-amber-600 text-sm md:text-base"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold text-gray-800">Contact Information</h3>
-                            <p class="text-gray-500 text-sm">Information we have on file</p>
+                            <h3 class="text-lg md:text-xl font-semibold text-gray-800">Contact Information</h3>
+                            <p class="text-gray-500 text-xs md:text-sm">Information we have on file</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-3 md:space-y-4">
                     <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fa-solid fa-envelope text-emerald-600"></i>
+                        <div
+                            class="w-8 h-8 md:w-10 md:h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3 md:mr-4">
+                            <i class="fa-solid fa-envelope text-emerald-600 text-sm"></i>
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Email Address</p>
-                            <p class="font-medium text-gray-800"><?= htmlspecialchars($client['email']); ?></p>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs md:text-sm text-gray-500">Email Address</p>
+                            <p class="font-medium text-gray-800 text-sm md:text-base truncate">
+                                <?= htmlspecialchars($client['email']); ?></p>
                         </div>
                     </div>
 
                     <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fa-solid fa-phone text-blue-600"></i>
+                        <div
+                            class="w-8 h-8 md:w-10 md:h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 md:mr-4">
+                            <i class="fa-solid fa-phone text-blue-600 text-sm"></i>
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Phone Number</p>
-                            <p class="font-medium text-gray-800"><?= htmlspecialchars($client['phone']); ?></p>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs md:text-sm text-gray-500">Phone Number</p>
+                            <p class="font-medium text-gray-800 text-sm md:text-base">
+                                <?= htmlspecialchars($client['phone']); ?></p>
                         </div>
                     </div>
 
                     <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fa-solid fa-map-marker-alt text-red-600"></i>
+                        <div
+                            class="w-8 h-8 md:w-10 md:h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3 md:mr-4">
+                            <i class="fa-solid fa-map-marker-alt text-red-600 text-sm"></i>
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Address</p>
-                            <p class="font-medium text-gray-800"><?= htmlspecialchars($client['address']); ?></p>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs md:text-sm text-gray-500">Address</p>
+                            <p class="font-medium text-gray-800 text-sm md:text-base">
+                                <?= htmlspecialchars($client['address']); ?></p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Pet Summary Card -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
                 <div class="mb-4">
-                    <div class="flex items-center space-x-3 mb-2">
-                        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-heart text-indigo-600"></i>
+                    <div class="flex items-center space-x-2 md:space-x-3 mb-2">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-heart text-indigo-600 text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Pet Summary</h3>
+                        <h3 class="text-base md:text-lg font-semibold text-gray-800">Pet Summary</h3>
                     </div>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-3 md:space-y-4">
                     <?php foreach ($speciesCount as $species => $count):
                         $iconData = $speciesIcons[$species] ?? $speciesIcons['default'];
                         ?>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 <?= $iconData['bg']; ?> rounded-full flex items-center justify-center">
-                                    <i class="fa-solid <?= $iconData['icon']; ?> <?= $iconData['color']; ?> text-sm"></i>
+                        <div class="flex items-center justify-between p-2 md:p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-2 md:space-x-3">
+                                <div
+                                    class="w-6 h-6 md:w-8 md:h-8 <?= $iconData['bg']; ?> rounded-full flex items-center justify-center">
+                                    <i
+                                        class="fa-solid <?= $iconData['icon']; ?> <?= $iconData['color']; ?> text-xs md:text-sm"></i>
                                 </div>
-                                <span class="text-sm font-medium text-gray-800"><?= htmlspecialchars($species); ?></span>
+                                <span
+                                    class="text-xs md:text-sm font-medium text-gray-800"><?= htmlspecialchars($species); ?></span>
                             </div>
-                            <span class="text-sm font-bold text-gray-800"><?= $count; ?></span>
+                            <span class="text-xs md:text-sm font-bold text-gray-800"><?= $count; ?></span>
                         </div>
                     <?php endforeach; ?>
                 </div>
 
-
-                <div class="mt-4 pt-3 border-t border-gray-200">
+                <div class="mt-3 md:mt-4 pt-3 border-t border-gray-200">
                     <div class="text-center">
                         <p class="text-xs text-gray-500">Last vet visit</p>
-                        <p class="text-sm font-medium text-gray-800">
-                            <?= $lastVisit['last_visit'] ? date('F j, Y', strtotime($lastVisit['last_visit'])) : 'No visits yet'; ?>
+                        <p class="text-xs md:text-sm font-medium text-gray-800">
+                            <?= $lastVisit['last_visit'] ? date('M j, Y', strtotime($lastVisit['last_visit'])) : 'No visits yet'; ?>
                         </p>
                     </div>
                 </div>
