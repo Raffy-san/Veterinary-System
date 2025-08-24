@@ -3,10 +3,10 @@
         <div>
             <div class="flex items-center space-x-2">
                 <?php if ($client): ?>
-                    <h1 class="font-semibold text-2xl">Welcome, <?= htmlspecialchars($client['name']); ?>!</h1>
+                    <h1 class="font-bold text-2xl">Welcome, <?= htmlspecialchars($client['name']); ?>!</h1>
                 <?php endif; ?>
             </div>
-            <h2 class="text-lg font-normal">Your pet's health dashboard</h2>
+            <h2 class="text-lg font-semibold">Your pet's health dashboard</h2>
         </div>
         <div>
             <a class="text-gray text-xs font-semibold border border-green-400 px-4 py-2 rounded-lg hover:bg-green-300"

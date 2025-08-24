@@ -5,9 +5,9 @@ require_once '../helpers/fetch.php';
 SessionManager::requireLogin();
 
 $client = SessionManager::getUser($pdo);
-$petCount = fetchOneData(
+$petCount = fetchAllData(
     $pdo,
-    "SELECT COUNT(*) as total FROM pets WHERE owner_id = ?",
+    "SELECT * FROM medical_records WHERE pet_id IN (SELECT id FROM pets WHERE owner_id = ?)",
     [$client['owner_id']]
 );
 ?>
@@ -27,6 +27,13 @@ $petCount = fetchOneData(
     <?php
     include_once '../includes/owner-header.php';
     ?>
+    <main class="p-10">
+        <section class="p-10 w-full bg-white rounded-lg shadow-md">
+            <div class="mb-6">
+                <h3 class="font-semibold">Medical Record</h3>
+                <h4 class="text-gray-500">My pets personal informations</h4>
+            </div>
+    </section>
 </body>
 
 </html>
