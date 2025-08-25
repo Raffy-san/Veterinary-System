@@ -164,12 +164,12 @@ if (isset($_POST['add_pet'])) {
 
             <table class="w-full border-collapse">
                 <thead>
-                    <tr class="text-sm text-left">
-                        <th class="font-semibold">Name</th>
-                        <th class="font-semibold">Contact</th>
-                        <th class="font-semibold">Join Date</th>
-                        <th class="font-semibold">Pets</th>
-                        <th class="font-semibold text-right">Actions</th>
+                    <tr class="text-sm text-left border-b">
+                        <th class="font-semibold py-2">Name</th>
+                        <th class="font-semibold py-2">Contact</th>
+                        <th class="font-semibold py-2">Join Date</th>
+                        <th class="font-semibold py-2">Pets</th>
+                        <th class="font-semibold py-2 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="clientsBody">

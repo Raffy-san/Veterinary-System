@@ -59,15 +59,15 @@ SessionManager::requireLogin();
             <!-- Table -->
             <table class="w-full border-collapse">
                 <thead>
-                    <tr class="text-sm text-left">
-                        <th class="font-semibold">Name</th>
-                        <th class="font-semibold">Species/Breed</th>
-                        <th class="font-semibold">Age</th>
-                        <th class="font-semibold">Gender</th>
-                        <th class="font-semibold">Owner</th>
-                        <th class="font-semibold">Contact</th>
-                        <th class="font-semibold text-center">Status</th>
-                        <th class="text-right font-semibold">Actions</th>
+                    <tr class="text-sm text-left border-b">
+                        <th class="font-semibold py-2">Name</th>
+                        <th class="font-semibold py-2">Species/Breed</th>
+                        <th class="font-semibold py-2">Age</th>
+                        <th class="font-semibold py-2">Gender</th>
+                        <th class="font-semibold py-2">Owner</th>
+                        <th class="font-semibold py-2">Contact</th>
+                        <th class="font-semibold text-center py-2">Status</th>
+                        <th class="text-right font-semibold py-2">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="petsBody">

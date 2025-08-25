@@ -181,58 +181,125 @@ if (isset($_POST['submit'])) {
                         class="bg-gray-100 rounded px-3 py-2 mb-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-green-500">
                 </form>
             </div>
-            
+            <table class="w-full table-collapse">
+                <thead>
+                    <tr class="text-sm text-left border-b">
+                        <th class="font-semibold py-2">Date</th>
+                        <th class="font-semibold py-2">Patient</th>
+                        <th class="font-semibold py-2">Type</th>
+                        <th class="font-semibold py-2">Diagnosis</th>
+                        <th class="font-semibold py-2">Follow-up-Date</th>
+                        <th class="font-semibold py-2 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsBody">
+                    <?php
+                    $records = fetchAllData(
+                        $pdo,
+                        "SELECT m.id AS medical_record_id, m.visit_date, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.follow_up_date
+                             FROM medical_records m
+                             JOIN pets p ON m.pet_id = p.id
+                              JOIN owners o ON p.owner_id = o.id"
+                    );
+
+                    foreach ($records as $record) {
+                        echo '<tr class="border-b hover:bg-green-50 text-sm text-left">';
+                        echo '<td class="py-2">' . htmlspecialchars($record['visit_date']) . '</td>';
+                        echo "<td class='py-2 flex flex-col'>
+                                <span>{$record['patient_name']}</span>
+                                <span class='text-gray-500'>{$record['owner_name']}</span>
+                              </td>";
+                        echo '<td class="py-2">' . htmlspecialchars($record['visit_type']) . '</td>';
+                        echo '<td class="py-2">' . htmlspecialchars($record['diagnosis']) . '</td>';
+                        echo '<td class="py-2">' . htmlspecialchars($record['follow_up_date']) . '</td>';
+                        echo '<td class="py-2 text-right">
+                        <button class="view-record fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button class="edit-record fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button class="delete-record fa-solid fa-trash text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                              </td>';
+                        echo '</tr>';
+                    }
+                    ?>
+                    <tr id="noResults" class="hidden">
+                        <td colspan="8" class="text-center py-4 text-gray-500">No results found</td>
+                    </tr>
+                </tbody>
+            </table>
+
         </section>
     </main>
 
     <script>
-        document.querySelectorAll(".open-modal").forEach(button => {
-            button.addEventListener("click", () => {
-                const modalId = button.dataset.modal;
-
-                document.getElementById(modalId).classList.remove("hidden");
-                document.body.style.overflow = "hidden"; // Prevent background scroll
+        document.addEventListener('DOMContentLoaded', () => {
+            // Modal Open/Close
+            document.querySelectorAll(".open-modal").forEach(button => {
+                button.addEventListener("click", () => {
+                    const modalId = button.dataset.modal;
+                    document.getElementById(modalId).classList.remove("hidden");
+                    document.body.style.overflow = "hidden";
+                });
             });
-        });
 
-        // Close modal when clicking on .close
-        document.querySelectorAll(".modal .close").forEach(closeBtn => {
-            closeBtn.addEventListener("click", () => {
-                const modal = closeBtn.closest(".modal");
-                modal.classList.add("hidden");
-                document.body.style.overflow = "auto";
-
-                const form = modal.querySelector("form");
-                if (form) form.reset();
+            document.querySelectorAll(".modal .close").forEach(closeBtn => {
+                closeBtn.addEventListener("click", () => {
+                    const modal = closeBtn.closest(".modal");
+                    modal.classList.add("hidden");
+                    document.body.style.overflow = "auto";
+                    const form = modal.querySelector("form");
+                    if (form) form.reset();
+                });
             });
-        });
 
-        // Close modal when clicking outside content
-        document.querySelectorAll(".modal").forEach(modal => {
-            modal.addEventListener("click", e => {
-                if (e.target === modal) modal.classList.add("hidden");
+            document.querySelectorAll(".modal").forEach(modal => {
+                modal.addEventListener("click", e => {
+                    if (e.target === modal) modal.classList.add("hidden");
+                });
             });
-        });
 
-        document.getElementById('search').addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase();
-            rows.forEach(row => {
-                const name = row.cells[0].textContent.toLowerCase();
-                const contact = row.cells[1].textContent.toLowerCase();
-                row.style.display = (name.includes(searchTerm) || contact.includes(searchTerm)) ? '' : 'none';
-            });
-        });
+            // Follow-up checkbox logic
+            const followUpCheckbox = document.getElementById('followUpRequired');
+            const followUpDate = document.getElementById('follow_up_date');
 
-        const followUpCheckbox = document.getElementById('followUpRequired');
-        const followUpDate = document.getElementById('follow_up_date');
+            if (followUpCheckbox) {
+                followUpCheckbox.addEventListener('change', () => {
+                    if (followUpCheckbox.checked) {
+                        followUpDate.removeAttribute('disabled');
+                        followUpDate.setAttribute('required', 'true');
+                    } else {
+                        followUpDate.setAttribute('disabled', 'true');
+                        followUpDate.removeAttribute('required');
+                        followUpDate.value = '';
+                    }
+                });
 
-        followUpCheckbox.addEventListener('change', () => {
-            if (followUpCheckbox.checked) {
-                followUpDate.setAttribute('required', 'true');
-            } else {
-                followUpDate.removeAttribute('required');
+                // Initially disable date
+                followUpDate.setAttribute('disabled', 'true');
             }
+
+            // Search functionality
+            const tableBody = document.getElementById("recordsBody");
+            const rows = tableBody.querySelectorAll("tr:not(#noResults)");
+            const noResults = document.getElementById("noResults");
+            const searchInput = document.getElementById("search");
+
+            searchInput.addEventListener("input", function () {
+                const term = this.value.toLowerCase();
+                let hasResults = false;
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(term)) {
+                        row.style.display = "";
+                        hasResults = true;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                noResults.style.display = hasResults ? "none" : "";
+            });
         });
+
     </script>
 </body>
 
