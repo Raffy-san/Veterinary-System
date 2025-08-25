@@ -197,29 +197,46 @@ if (isset($_POST['submit'])) {
                     $records = fetchAllData(
                         $pdo,
                         "SELECT m.id AS medical_record_id, m.visit_date, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.follow_up_date
-                             FROM medical_records m
-                             JOIN pets p ON m.pet_id = p.id
-                              JOIN owners o ON p.owner_id = o.id"
+                        FROM medical_records m
+                        JOIN pets p ON m.pet_id = p.id
+                        JOIN owners o ON p.owner_id = o.id"
                     );
 
+                    $visitType = [
+                        'Routine Checkup' => ['icon' => 'fa-solid fa-stethoscope', 'color' => 'text-green-800', 'bg' => 'bg-green-100'],
+                        'Surgery' => ['icon' => 'fa-solid fa-kit-medical', 'color' => 'text-red-700', 'bg' => 'bg-red-100'],
+                        'Vaccination' => ['icon' => 'fa-solid fa-syringe', 'color' => 'text-blue-700', 'bg' => 'bg-blue-100'],
+                        'Treatment' => ['icon' => 'fa-solid fa-pills', 'color' => 'text-yellow-700', 'bg' => 'bg-yellow-100'],
+                        'Emergency' => ['icon' => 'fa-solid fa-triangle-exclamation', 'color' => 'text-orange-700', 'bg' => 'bg-orange-100']
+                    ];
+
                     foreach ($records as $record) {
-                        echo '<tr class="border-b hover:bg-green-50 text-sm text-left">';
+                        $Type = $record['visit_type'];
+                        $typeinfo = $visitType[$Type] ?? ['icon' => 'fa-solid fa-question', 'color' => 'text-gray-700', 'bg' => 'bg-gray-200'];
+
+                        echo '<tr class="border-b hover:bg-green-50 text-sm">';
                         echo '<td class="py-2">' . htmlspecialchars($record['visit_date']) . '</td>';
-                        echo "<td class='py-2 flex flex-col'>
-                                <span>{$record['patient_name']}</span>
-                                <span class='text-gray-500'>{$record['owner_name']}</span>
-                              </td>";
-                        echo '<td class="py-2">' . htmlspecialchars($record['visit_type']) . '</td>';
+                        echo "<td class='py-2'>
+                                <span class='font-medium'>" . htmlspecialchars($record['patient_name']) . "</span><br>
+                                <span class='text-gray-500 text-xs'>" . htmlspecialchars($record['owner_name']) . "</span>
+                            </td>";
+                        echo '<td class="py-2">
+                              <div class="' . $typeinfo['bg'] . ' ' . $typeinfo['color'] . ' rounded px-3 py-1 inline-flex items-center gap-2">
+                                    <i class="' . $typeinfo['icon'] . '"></i>
+                                    <span>' . htmlspecialchars($record['visit_type']) . '</span>
+                                </div>
+                            </td>';
                         echo '<td class="py-2">' . htmlspecialchars($record['diagnosis']) . '</td>';
                         echo '<td class="py-2">' . htmlspecialchars($record['follow_up_date']) . '</td>';
-                        echo '<td class="py-2 text-right">
-                        <button class="view-record fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
-                                <button class="edit-record fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
-                                <button class="delete-record fa-solid fa-trash text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
-                              </td>';
+                        echo '<td class="py-2 text-right space-x-1">
+                                <button class="view-record fa-solid fa-eye text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button class="edit-record fa-solid fa-pencil text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button class="delete-record fa-solid fa-trash text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                            </td>';
                         echo '</tr>';
                     }
                     ?>
+
                     <tr id="noResults" class="hidden">
                         <td colspan="8" class="text-center py-4 text-gray-500">No results found</td>
                     </tr>

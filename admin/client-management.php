@@ -76,6 +76,98 @@ if (isset($_POST['add_pet'])) {
     <?php include_once '../includes/admin-header.php'; ?>
 
     <main class="p-10">
+        <!-- Main Client Table -->
+        <section class="p-10 bg-white rounded-lg shadow-md">
+            <div class="mb-4 flex items-center justify-between">
+                <div>
+                    <h3 class="font-semibold text-lg">Client Management</h3>
+                    <h4 class="text-gray-600">Manage client information and accounts</h4>
+                </div>
+                <button data-modal="addClientModal"
+                    class="open-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700">
+                    <i class="fa-solid fa-plus mr-2"></i>Add Client
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <form>
+                    <i class="fa-solid fa-search text-sm"></i>
+                    <input type="search" id="search" placeholder="Search Clients..."
+                        class="bg-gray-100 rounded px-3 py-2 mb-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-green-500">
+                </form>
+            </div>
+
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="text-sm text-left border-b">
+                        <th class="font-semibold py-2">Name</th>
+                        <th class="font-semibold py-2">Contact</th>
+                        <th class="font-semibold py-2">Join Date</th>
+                        <th class="font-semibold py-2">Pets</th>
+                        <th class="font-semibold py-2 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="clientsBody">
+                    <?php
+                    $clients = fetchAllData($pdo, "SELECT 
+                                o.id AS owner_id, 
+                                o.user_id,
+                                o.name, 
+                                o.email, 
+                                o.phone,
+                                o.created_at,
+                                o.address, 
+                                GROUP_CONCAT(p.name SEPARATOR ', ') AS pets,
+                                COUNT(p.id) AS pet_count 
+                            FROM owners o
+                            LEFT JOIN pets p ON o.id = p.owner_id
+                            GROUP BY o.id ORDER BY o.created_at DESC
+                            ");
+                    foreach ($clients as $client) {
+
+                        echo '<tr class="border-b hover:bg-green-50 text-sm text-left">';
+                        echo '<td class="py-2">' . htmlspecialchars($client['name']) . '</td>';
+                        echo '<td class="py-2 flex flex-col">' . '<span><i class="fa-solid fa-envelope text-green-600"></i>&nbsp;' . htmlspecialchars($client['email']) . '</span>' . '<span class="text-gray-500 text-xs"><i class="fa-solid fa-phone">&nbsp;</i>' . htmlspecialchars($client['phone']) . '</span></td>';
+                        echo '<td class="py-2">' . htmlspecialchars($client['created_at']) . '</td>';
+                        echo '<td class="py-2"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['pet_count'] . '</span></td>';
+                        echo '<td class="py-2 text-right">
+                                <button 
+                                    data-modal="viewModal" 
+                                    data-id="' . $client['owner_id'] . '"
+                                    data-name="' . htmlspecialchars($client['name']) . '"
+                                    data-email="' . htmlspecialchars($client['email']) . '"
+                                    data-phone="' . htmlspecialchars($client['phone']) . '"
+                                    data-created="' . htmlspecialchars($client['created_at']) . '"
+                                    data-address="' . htmlspecialchars($client['address']) . '"
+                                    data-petcount="' . $client['pet_count'] . '"
+                                    data-pets="' . htmlspecialchars($client['pets']) . '"
+                                    class="open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
+                                </button>
+                                <button class="open-update-modal fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300"></button>
+                                <button 
+                                data-owner="' . $client['owner_id'] . '" 
+                                class="open-pet-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
+                                <i class="fa-solid fa-plus mr-1"></i>Add Pet
+                                </button>
+                                 <button
+                                    data-modal="viewPetModal"
+                                    data-owner="' . $client['owner_id'] . '"
+                                 class="open-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">View Pet</button>
+                                <button 
+                                    class="open-delete-modal fa-solid fa-trash text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
+                                    data-id="' . $client['user_id'] . '" 
+                                    data-name="' . htmlspecialchars($client['name']) . '">
+                                </button>
+
+                            </td>';
+                        echo '</tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
+            <div id="pagination" class="flex justify-center space-x-2 mt-4"></div>
+        </section>
+
         <!-- Add Client Modal -->
         <div id="addClientModal"
             class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
@@ -140,95 +232,6 @@ if (isset($_POST['add_pet'])) {
                 </form>
             </div>
         </div>
-
-        <!-- Main Client Table -->
-        <section class="p-10 bg-white rounded-lg shadow-md">
-            <div class="mb-4 flex items-center justify-between">
-                <div>
-                    <h3 class="font-semibold text-lg">Client Management</h3>
-                    <h4 class="text-gray-600">Manage client information and accounts</h4>
-                </div>
-                <button data-modal="addClientModal"
-                    class="open-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700">
-                    <i class="fa-solid fa-plus mr-2"></i>Add Client
-                </button>
-            </div>
-
-            <div class="mb-4">
-                <form>
-                    <i class="fa-solid fa-search text-sm"></i>
-                    <input type="search" id="search" placeholder="Search Clients..."
-                        class="bg-gray-100 rounded px-3 py-2 mb-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-green-500">
-                </form>
-            </div>
-
-            <table class="w-full border-collapse">
-                <thead>
-                    <tr class="text-sm text-left border-b">
-                        <th class="font-semibold py-2">Name</th>
-                        <th class="font-semibold py-2">Contact</th>
-                        <th class="font-semibold py-2">Join Date</th>
-                        <th class="font-semibold py-2">Pets</th>
-                        <th class="font-semibold py-2 text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="clientsBody">
-                    <?php
-                    $clients = fetchAllData($pdo, "SELECT 
-                                o.id AS owner_id, 
-                                o.user_id,
-                                o.name, 
-                                o.email, 
-                                o.phone,
-                                o.created_at,
-                                o.address, 
-                                GROUP_CONCAT(p.name SEPARATOR ', ') AS pets,
-                                COUNT(p.id) AS pet_count
-                            FROM owners o
-                            LEFT JOIN pets p ON o.id = p.owner_id
-                            GROUP BY o.id ORDER BY o.created_at DESC
-                            ");
-                    foreach ($clients as $client) {
-
-                        echo '<tr class="border-b hover:bg-green-50 text-sm text-left">';
-                        echo '<td class="py-2">' . htmlspecialchars($client['name']) . '</td>';
-                        echo '<td class="py-2 flex flex-col">' . '<span><i class="fa-solid fa-envelope text-green-600"></i>&nbsp;' . htmlspecialchars($client['email']) . '</span>' . '<span class="text-gray-500 text-xs"><i class="fa-solid fa-phone">&nbsp;</i>' . htmlspecialchars($client['phone']) . '</span></td>';
-                        echo '<td class="py-2">' . htmlspecialchars($client['created_at']) . '</td>';
-                        echo '<td class="py-2"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['pet_count'] . '</span></td>';
-                        echo '<td class="py-2 text-right">
-                                <button 
-                                    data-modal="viewModal" 
-                                    data-id="' . $client['owner_id'] . '"
-                                    data-name="' . htmlspecialchars($client['name']) . '"
-                                    data-email="' . htmlspecialchars($client['email']) . '"
-                                    data-phone="' . htmlspecialchars($client['phone']) . '"
-                                    data-created="' . htmlspecialchars($client['created_at']) . '"
-                                    data-address="' . htmlspecialchars($client['address']) . '"
-                                    data-petcount="' . $client['pet_count'] . '"
-                                    data-pets="' . htmlspecialchars($client['pets']) . '"
-                                    class="open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
-                                </button>
-                                <button class="open-update-modal fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300"></button>
-                                <button 
-                                data-owner="' . $client['owner_id'] . '" 
-                                class="open-pet-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
-                                <i class="fa-solid fa-plus mr-1"></i>Add Pet
-                                </button>
-                                 <button class="open-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">View Pet</button>
-                                <button 
-                                    class="open-delete-modal fa-solid fa-trash text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-300"
-                                    data-id="' . $client['user_id'] . '" 
-                                    data-name="' . htmlspecialchars($client['name']) . '">
-                                </button>
-
-                            </td>';
-                        echo '</tr>';
-                    }
-                    ?>
-                </tbody>
-            </table>
-            <div id="pagination" class="flex justify-center space-x-2 mt-4"></div>
-        </section>
 
         <!-- View Modal -->
         <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -409,6 +412,22 @@ if (isset($_POST['add_pet'])) {
                 </form>
             </div>
         </div>
+
+        <div id="viewPetModal"
+            class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+            <div
+                class="custom-scrollbar bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[70vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-m font-semibold">Patient Details</h3>
+                        <h4 class="text-sm text-gray-600">All pets linked to this client</h4>
+                    </div>
+                    <button class="close text-xl">&times;</button>
+                </div>
+                <div id="petDetailsContent" class="space-y-4"></div>
+            </div>
+        </div>
+
 
     </main>
 
@@ -594,6 +613,52 @@ if (isset($_POST['add_pet'])) {
                 });
             });
         });
+
+        document.querySelectorAll('.open-modal[data-modal="viewPetModal"]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const ownerId = this.getAttribute('data-owner');
+                const modal = document.getElementById('viewPetModal');
+                const content = document.getElementById('petDetailsContent');
+
+                content.innerHTML = '<p class="text-gray-500">Loading pets...</p>';
+
+                fetch('../helpers/fetch-pet.php?owner_id=' + ownerId)
+                    .then(response => response.json())
+                    .then(pets => {
+                        if (pets.length === 0) {
+                            content.innerHTML = '<p class="text-gray-500">No pets found for this client.</p>';
+                        } else {
+                            content.innerHTML = '';
+                            pets.forEach(pet => {
+                                const petCard = document.createElement('div');
+                                petCard.className = 'mb-4 bg-white border border-green-300 rounded-lg p-4 shadow-sm';
+                                petCard.innerHTML = `
+                            <h4 class="font-semibold text-lg text-green-700 mb-2">${pet.name}</h4>
+                            <p><span class="font-semibold">Species:</span> ${pet.species || 'N/A'}</p>
+                            <p><span class="font-semibold">Breed:</span> ${pet.breed || 'N/A'}</p>
+                            <p><span class="font-semibold">Age:</span> ${pet.age || 'N/A'} years</p>
+                            <p><span class="font-semibold">Gender:</span> ${pet.gender || 'N/A'}</p>
+                            <p><span class="font-semibold">Weight:</span> ${pet.weight || 'N/A'}</p>
+                            <p><span class="font-semibold">Color:</span> ${pet.color || 'N/A'}</p>
+                            <p><span class="font-semibold">Notes:</span> ${pet.notes || 'None'}</p>
+                            <div class="flex justify-end mt-2">
+                            <button class="font-semibold text-gray-700 text-sm mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"><i class="fa-solid fa-trash pr-2"></i>Delete</button>
+                            </div>
+                        `;
+                                content.appendChild(petCard);
+                            });
+                        }
+                    })
+                    .catch(() => {
+                        content.innerHTML = '<p class="text-red-500">Failed to load pet data.</p>';
+                    });
+
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+
 
     </script>
 </body>
