@@ -16,6 +16,18 @@ if (isset($_GET['delete_id'])) {
     }
 }
 
+if (isset($_GET['delete_pet_id'])) {
+    $pet_id = intval($_GET['delete_pet_id']);
+    if (deletePet($pdo, $pet_id)) {
+        header("Location: client-management.php?pet_deleted=1");
+        exit;
+    } else {
+        header("Location: client-management.php?error=not_found");
+        exit;
+    }
+}
+
+
 if (isset($_POST['submit'])) {
     $data = [
         'name' => $_POST['name'],
@@ -413,6 +425,26 @@ if (isset($_POST['add_pet'])) {
             </div>
         </div>
 
+        <div id="deletePetModal"
+            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                <div class="flex flex-row items-center mb-4">
+                    <i class="fa-solid fa-circle-exclamation mr-2" style="color: #c00707;"></i>
+                    <h3 class="font-semibold text-lg">Delete Pet Account</h3>
+                </div>
+                <p id="deletePetMessage" class="mb-4 text-sm text-gray-600">
+                    Are you sure you want to delete this Pet?
+                </p>
+                <div class="flex justify-end space-x-2">
+                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
+                    <a id="confirmDeleteBtnPet" href="#"
+                        class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <div id="viewPetModal"
             class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
             <div
@@ -642,9 +674,28 @@ if (isset($_POST['add_pet'])) {
                             <p><span class="font-semibold">Color:</span> ${pet.color || 'N/A'}</p>
                             <p><span class="font-semibold">Notes:</span> ${pet.notes || 'None'}</p>
                             <div class="flex justify-end mt-2">
-                            <button class="font-semibold text-gray-700 text-sm mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"><i class="fa-solid fa-trash pr-2"></i>Delete</button>
+                           <button 
+                class="open-delete-pet-modal font-semibold text-gray-700 text-sm mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
+                data-name="${pet.name}" 
+                data-id="${pet.id}">
+                <i class="fa-solid fa-trash pr-2"></i>Delete
+            </button>
                             </div>
                         `;
+                                // Attach delete listener **here**
+                                petCard.querySelector('.open-delete-pet-modal').addEventListener('click', function () {
+                                    const modal = document.getElementById("deletePetModal");
+                                    const petName = this.dataset.name;
+                                    const petId = this.dataset.id;
+
+                                    document.getElementById("deletePetMessage").textContent =
+                                        `Are you sure you want to delete "${petName}"? This action cannot be undone.`;
+                                    document.getElementById("confirmDeleteBtnPet").href = `client-management.php?delete_pet_id=${petId}`;
+
+                                    modal.classList.remove("hidden");
+                                    document.body.style.overflow = "hidden";
+                                });
+
                                 content.appendChild(petCard);
                             });
                         }
@@ -657,9 +708,6 @@ if (isset($_POST['add_pet'])) {
                 document.body.style.overflow = 'hidden';
             });
         });
-
-
-
     </script>
 </body>
 
