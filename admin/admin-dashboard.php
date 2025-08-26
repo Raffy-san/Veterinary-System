@@ -5,9 +5,12 @@ require_once '../helpers/fetch.php';
 SessionManager::requireLogin();
 
 $petOwners = fetchAllData($pdo, "SELECT * FROM users WHERE access_type = 'owner'");
-$allPetOwners = fetchAllData($pdo, "SELECT * FROM owners ORDER BY created_at DESC LIMIT 3");
+$allPetOwners = fetchAllData($pdo, "SELECT * FROM owners ORDER BY created_at DESC LIMIT 4");
 $activePetOwners = fetchAllData($pdo, "SELECT * FROM owners WHERE status = 1");
 $totalPets = fetchAllData($pdo, "SELECT * FROM pets");
+$totalRecords = fetchOneData($pdo, "SELECT COUNT(*) AS total_transactions_today
+FROM medical_records
+WHERE visit_date = CURDATE()");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,18 +65,18 @@ $totalPets = fetchAllData($pdo, "SELECT * FROM pets");
                 <div class="bg-white rounded-lg shadow-md p-6 card-hover border-l-4 border-green-600">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-700">Active Clients</h3>
-                            <p class="text-sm text-gray-500">Currently active clients</p>
+                            <h3 class="text-lg font-semibold text-gray-700">Total Visits</h3>
+                            <p class="text-sm text-gray-500">Todays total Vet Visits</p>
                         </div>
                         <div class="bg-green-50 p-3 rounded-lg">
                             <i class="fa-solid fa-user-check text-xl text-green-600"></i>
                         </div>
                     </div>
                     <div>
-                        <h2 class="text-3xl font-bold text-gray-800"><?php echo count($activePetOwners); ?></h2>
+                        <h2 class="text-3xl font-bold text-gray-800"><?php echo $totalRecords['total_transactions_today']; ?></h2>
                         <span
                             class="bg-green-50 text-green-700 text-xs font-medium px-2 py-1 rounded-full mt-2 inline-block">
-                            Active
+                            Visits
                         </span>
                     </div>
                 </div>
