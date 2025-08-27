@@ -105,6 +105,13 @@ function addPet($pdo, $data)
     return $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['owner_id'], $data['notes']]);
 }
 
+function updatePet ($pdo, $data) {
+    $stmt = $pdo->prepare("
+        UPDATE pets SET name = ?, species = ?, breed = ?, age = ?, gender = ?, weight = ?, color = ?, notes = ? WHERE id = ?
+    ");
+    return $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['notes'], $data['id']]);
+}
+
 function deletePet($pdo, $id)
 {
     $stmt = $pdo->prepare("DELETE FROM pets WHERE id = ?");
