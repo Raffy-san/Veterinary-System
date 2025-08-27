@@ -675,11 +675,11 @@ if (isset($_POST['add_pet'])) {
                             <p><span class="font-semibold">Notes:</span> ${pet.notes || 'None'}</p>
                             <div class="flex justify-end mt-2">
                            <button 
-                class="open-delete-pet-modal font-semibold text-gray-700 text-sm mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
-                data-name="${pet.name}" 
-                data-id="${pet.id}">
-                <i class="fa-solid fa-trash pr-2"></i>Delete
-            </button>
+                                class="open-delete-pet-modal font-semibold text-gray-700 text-sm mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
+                                data-name="${pet.name}" 
+                                data-id="${pet.id}">
+                                <i class="fa-solid fa-trash pr-2"></i>Delete
+                            </button>
                             </div>
                         `;
                                 // Attach delete listener **here**
