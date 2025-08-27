@@ -48,6 +48,27 @@ if (isset($_POST['submit'])) {
     }
 }
 
+if (isset($_POST['update_client'])) {
+    $data = [
+        'owner_id' => $_POST['owner_id'],
+        'name' => $_POST['name'],
+        'username' => $_POST['username'],
+        'password' => $_POST['password'],
+        'email' => $_POST['email'],
+        'phone' => $_POST['phone'],
+        'emergency_contact' => $_POST['emergency'],
+        'address' => $_POST['address']
+    ];
+
+    if (updateClient($pdo, $data)) {
+        header("Location: client-management.php?updated=1");
+        exit;
+    } else {
+        header("Location: client-management.php?updated=0");
+        exit;
+    }
+}
+
 if (isset($_POST['add_pet'])) {
     $data = [
         'name' => $_POST['name'],
@@ -126,6 +147,7 @@ if (isset($_POST['add_pet'])) {
                                 o.user_id,
                                 o.name, 
                                 o.email, 
+                                o.emergency,
                                 o.phone,
                                 o.created_at,
                                 o.address, 
@@ -149,13 +171,14 @@ if (isset($_POST['add_pet'])) {
                                     data-name="' . htmlspecialchars($client['name']) . '"
                                     data-email="' . htmlspecialchars($client['email']) . '"
                                     data-phone="' . htmlspecialchars($client['phone']) . '"
+                                    data-emergency="' . htmlspecialchars($client['emergency']) . '"
                                     data-created="' . htmlspecialchars($client['created_at']) . '"
                                     data-address="' . htmlspecialchars($client['address']) . '"
                                     data-petcount="' . $client['pet_count'] . '"
                                     data-pets="' . htmlspecialchars($client['pets']) . '"
                                     class="open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
                                 </button>
-                                <button class="open-update-modal fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300"></button>
+                                <button class="open-update-modal fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300" data-id="' . $client['owner_id'] . '"></button>
                                 <button 
                                 data-owner="' . $client['owner_id'] . '" 
                                 class="open-pet-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
@@ -272,7 +295,7 @@ if (isset($_POST['add_pet'])) {
 
         <div id="updateClientModal"
             class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-green-100 rounded-lg p-4 max-w-md w-full">
+            <div class="bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-semibold text-m">Update Client Information</h3>
@@ -280,28 +303,64 @@ if (isset($_POST['add_pet'])) {
                     </div>
                     <button class="close text-xl" aria-label="Close">&times;</button>
                 </div>
-                <form id="updateClientForm" method="POST" action="client-management.php">
-                    <input type="hidden" name="id" id="updateClientId">
-                    <div class="mb-4">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Name</label>
-                        <input type="text" name="name" id="updateClientName"
+                <form class="flex flex-wrap items-center justify-between" id="updateClientForm" method="POST"
+                    action="client-management.php">
+                    <!-- Owner ID -->
+                    <input type="hidden" name="owner_id" id="updateClientId">
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm">Name</label>
+                        <input type="text" name="name" id="updateClientName" required
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Name" required>
+                            placeholder="Client Name">
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Email</label>
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm">Username</label>
+                        <input type="text" name="username" id="updateClientUsername" required
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Client Username">
+                    </div>
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm">Password</label>
+                        <input type="password" name="password" id="updateClientPassword"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Leave blank to keep current password">
+                    </div>
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm">Email</label>
                         <input type="email" name="email" id="updateClientEmail"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Email" required>
+                            placeholder="Client Email">
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Phone</label>
-                        <input type="text" name="phone" id="updateClientPhone"
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm">Phone</label>
+                        <input type="tel" name="phone" id="updateClientPhone" required pattern="^09\d{9}$"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Phone" required>
+                            placeholder="09XXXXXXXXX">
                     </div>
-                    <div class="flex justify-end">
-                        <button type="submit" name="update"
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm">Emergency Contact</label>
+                        <input type="tel" name="emergency" id="updateClientEmergency" pattern="^09\d{9}$"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="09XXXXXXXXX">
+                    </div>
+
+                    <div class="mb-4 w-full">
+                        <label class="block text-gray-700 mb-1 text-sm">Address</label>
+                        <input type="text" name="address" id="updateClientAddress" required
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Enter Client Full Address">
+                    </div>
+
+                    <div class="flex justify-end w-full">
+                        <button type="button"
+                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
+                        <button type="submit" name="update_client"
                             class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Update</button>
                     </div>
                 </form>
@@ -410,6 +469,102 @@ if (isset($_POST['add_pet'])) {
                     <div class="mb-4 w-full">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Notes</label>
                         <textarea name="notes"
+                            class="w-full border rounded px-2 py-1 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Any special notes about the pet"></textarea>
+                    </div>
+
+                    <div class="flex justify-end w-full">
+                        <button type="button"
+                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
+                        <button type="submit" name="add_pet"
+                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Add
+                            Pet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <div id="updatePetModal"
+            class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden z-[9999]">
+            <div class="bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-m font-semibold">Update Pet Information</h3>
+                        <h4 class="text-sm text-gray-600"></h4>
+                    </div>
+                    <button class="close text-xl">&times;</button>
+                </div>
+                <form class="flex flex-wrap items-center justify-between" method="POST" action="client-management.php">
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Pet Name</label>
+                        <input type="text" name="name" id="updatePetName"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Pet Name" required>
+                    </div>
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Species</label>
+                        <select
+                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            name="species" id="updatePetSpecies" required>
+                            <option value="" disabled selected>Select Species</option>
+                            <option value="Dog">Dog</option>
+                            <option value="Cat">Cat</option>
+                            <option value="Bird">Bird</option>
+                            <option value="Rabbit">Rabbit</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="flex flex-row space-x-2">
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Breed</label>
+                            <input type="text" name="breed" id="updatePetBreed"
+                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="Breed">
+                        </div>
+
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
+                            <input type="number" name="age" id="updatePetAge"
+                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="Years">
+                        </div>
+
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Gender</label>
+                            <select
+                                class="w-auto border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                name="gender" id="updatePetGender" required>
+                                <option value="" disabled selected>Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
+                        <input type="text" name="weight" id="updatePetWeight"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="e.g. 10kg">
+                    </div>
+
+
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
+                        <input type="text" name="color" id="updatePetColor"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Pet Color">
+                    </div>
+
+                    <input type="hidden" name="pet_id" id="updatePetId">
+
+                    <div class="mb-4 w-full">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Notes</label>
+                        <textarea name="notes" id="updatePetNotes"
                             class="w-full border rounded px-2 py-1 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Any special notes about the pet"></textarea>
                     </div>
@@ -543,13 +698,21 @@ if (isset($_POST['add_pet'])) {
             document.querySelectorAll(".open-update-modal").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const modal = document.getElementById("updateClientModal");
-                    const clientRow = btn.closest("tr");
-                    const cells = clientRow.querySelectorAll("td");
+                    const clientId = btn.dataset.id;
 
-                    document.getElementById("updateClientId").value = cells[0].dataset.id;
-                    document.getElementById("updateClientName").value = cells[0].textContent.trim();
-                    document.getElementById("updateClientEmail").value = cells[1].textContent.trim();
-                    document.getElementById("updateClientPhone").value = cells[2].textContent.trim();
+                    fetch(`../Get/get-owner.php?id=${clientId}`)
+                        .then(res => res.json())
+                        .then(client => {
+                            document.getElementById("updateClientId").value = client.id;         // Owner ID
+                            document.getElementById("updateClientName").value = client.name;
+                            document.getElementById("updateClientUsername").value = client.username;
+                            document.getElementById("updateClientPassword").value = ''; // Leave blank
+                            document.getElementById("updateClientEmail").value = client.email;
+                            document.getElementById("updateClientPhone").value = client.phone;
+                            document.getElementById("updateClientEmergency").value = client.emergency || '';
+                            document.getElementById("updateClientAddress").value = client.address;
+                        });
+
 
                     modal.classList.remove("hidden");
                     document.body.style.overflow = "hidden";
@@ -674,6 +837,11 @@ if (isset($_POST['add_pet'])) {
                             <p><span class="font-semibold">Color:</span> ${pet.color || 'N/A'}</p>
                             <p><span class="font-semibold">Notes:</span> ${pet.notes || 'None'}</p>
                             <div class="flex justify-end mt-2">
+                            <button 
+                                class="open-update-pet-modal font-semibold text-gray-700 text-sm mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-600 hover:text-white"
+                                data-id="${pet.id}">
+                                <i class="fa-solid fa-pen-alt pr-2"></i>Edit
+                            </button>
                            <button 
                                 class="open-delete-pet-modal font-semibold text-gray-700 text-sm mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
                                 data-name="${pet.name}" 
@@ -697,6 +865,16 @@ if (isset($_POST['add_pet'])) {
                                 });
 
                                 content.appendChild(petCard);
+                            });
+
+                            document.querySelectorAll(".open-update-pet-modal").forEach(btn => {
+                                btn.addEventListener("click", () => {
+                                    const modal = document.getElementById("updatePetModal");
+                                    const petId = btn.dataset.id;
+
+                                    modal.classList.remove("hidden");
+                                    document.body.style.overflow = "hidden";
+                                });
                             });
                         }
                     })

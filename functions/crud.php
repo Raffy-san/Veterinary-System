@@ -20,9 +20,55 @@ function addClient($pdo, $data)
 
 function updateClient($pdo, $data)
 {
-    $stmt = $pdo->prepare("UPDATE owners SET name = ?, email = ?, phone = ?, emergency = ?, address = ? WHERE user_id = ?");
-    return $stmt->execute([$data['name'], $data['email'], $data['phone'], $data['emergency_contact'], $data['address'], $data['user_id']]);
+    try {
+        $pdo->beginTransaction();
+
+        // ✅ Update owners table
+        $stmt = $pdo->prepare("UPDATE owners SET name = ?, email = ?, phone = ?, emergency = ?, address = ? WHERE id = ?");
+        $stmt->execute([
+            $data['name'],
+            $data['email'],
+            $data['phone'],
+            $data['emergency_contact'],
+            $data['address'],
+            $data['owner_id'] // from the form
+        ]);
+
+        // ✅ Get user_id linked to this owner
+        $stmt = $pdo->prepare("SELECT user_id FROM owners WHERE id = ?");
+        $stmt->execute([$data['owner_id']]);
+        $user_id = $stmt->fetchColumn();
+
+        if (!$user_id) {
+            throw new Exception("User not found for this owner");
+        }
+
+        // ✅ Check duplicate username excluding current user
+        $checkStmt = $pdo->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
+        $checkStmt->execute([$data['username'], $user_id]);
+        if ($checkStmt->fetch()) {
+            throw new Exception("Username already exists");
+        }
+
+        // ✅ Update users table
+        if (!empty($data['password'])) {
+            $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE users SET username = ?, password = ? WHERE id = ?");
+            $stmt->execute([$data['username'], $hashedPassword, $user_id]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE users SET username = ? WHERE id = ?");
+            $stmt->execute([$data['username'], $user_id]);
+        }
+
+        $pdo->commit();
+        return true;
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
 }
+
 
 
 function deleteClient($pdo, $user_id)
@@ -85,3 +131,4 @@ function addMedicalRecord($pdo, $data)
         $data['follow_up_date']
     ]);
 }
+
