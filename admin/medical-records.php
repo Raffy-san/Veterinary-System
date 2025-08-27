@@ -37,6 +37,7 @@ if (isset($_POST['submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/script.js"></script>
     <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Medical Records</title>
@@ -253,7 +254,7 @@ if (isset($_POST['submit'])) {
                 button.addEventListener("click", () => {
                     const modalId = button.dataset.modal;
                     document.getElementById(modalId).classList.remove("hidden");
-                    document.body.style.overflow = "hidden";
+                    updateBodyScroll();
                 });
             });
 
@@ -261,7 +262,7 @@ if (isset($_POST['submit'])) {
                 closeBtn.addEventListener("click", () => {
                     const modal = closeBtn.closest(".modal");
                     modal.classList.add("hidden");
-                    document.body.style.overflow = "auto";
+                    updateBodyScroll();
                     const form = modal.querySelector("form");
                     if (form) form.reset();
                 });

@@ -100,6 +100,7 @@ if (isset($_POST['add_pet'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/script.js"></script>
     <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Client Management</title>
@@ -168,14 +169,14 @@ if (isset($_POST['add_pet'])) {
                                 <button 
                                     data-modal="viewModal" 
                                     data-id="' . $client['owner_id'] . '"
-                                    data-name="' . htmlspecialchars($client['name']) . '"
-                                    data-email="' . htmlspecialchars($client['email']) . '"
-                                    data-phone="' . htmlspecialchars($client['phone']) . '"
-                                    data-emergency="' . htmlspecialchars($client['emergency']) . '"
-                                    data-created="' . htmlspecialchars($client['created_at']) . '"
-                                    data-address="' . htmlspecialchars($client['address']) . '"
+                                   data-name="' . htmlspecialchars($client['name'] ?? '') . '"
+                                    data-email="' . htmlspecialchars($client['email'] ?? '') . '"
+                                    data-phone="' . htmlspecialchars($client['phone'] ?? '') . '"
+                                    data-emergency="' . htmlspecialchars($client['emergency'] ?? '') . '"
+                                    data-created="' . htmlspecialchars($client['created_at'] ?? '') . '"
+                                    data-address="' . htmlspecialchars($client['address'] ?? '') . '"
                                     data-petcount="' . $client['pet_count'] . '"
-                                    data-pets="' . htmlspecialchars($client['pets']) . '"
+                                    data-pets="' . htmlspecialchars($client['pets'] ?? '') . '"
                                     class="open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
                                 </button>
                                 <button class="open-update-modal fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300" data-id="' . $client['owner_id'] . '"></button>
@@ -491,11 +492,12 @@ if (isset($_POST['add_pet'])) {
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="text-m font-semibold">Update Pet Information</h3>
-                        <h4 class="text-sm text-gray-600"></h4>
+                        <h4 class="text-sm text-gray-600">Edit the details of the selected Pet</h4>
                     </div>
                     <button class="close text-xl">&times;</button>
                 </div>
                 <form class="flex flex-wrap items-center justify-between" method="POST" action="client-management.php">
+                    <input type="hidden" name="pet_id" id="updatePetId">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Pet Name</label>
                         <input type="text" name="name" id="updatePetName"
@@ -544,7 +546,6 @@ if (isset($_POST['add_pet'])) {
                         </div>
                     </div>
 
-
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
                         <input type="text" name="weight" id="updatePetWeight"
@@ -552,15 +553,12 @@ if (isset($_POST['add_pet'])) {
                             placeholder="e.g. 10kg">
                     </div>
 
-
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
                         <input type="text" name="color" id="updatePetColor"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Pet Color">
                     </div>
-
-                    <input type="hidden" name="pet_id" id="updatePetId">
 
                     <div class="mb-4 w-full">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Notes</label>
@@ -691,7 +689,7 @@ if (isset($_POST['add_pet'])) {
                         })
 
                     modal.classList.remove("hidden");
-                    document.body.style.overflow = "hidden";
+                    updateBodyScroll();
                 });
             });
 
@@ -715,7 +713,7 @@ if (isset($_POST['add_pet'])) {
 
 
                     modal.classList.remove("hidden");
-                    document.body.style.overflow = "hidden";
+                    updateBodyScroll();
                 });
             });
 
@@ -724,7 +722,7 @@ if (isset($_POST['add_pet'])) {
                     const ownerId = btn.dataset.owner;
                     document.getElementById("modal_owner_id").value = ownerId;
                     document.getElementById("addPetModal").classList.remove("hidden");
-                    document.body.style.overflow = "hidden";
+                    updateBodyScroll();
                 });
             });
 
@@ -732,7 +730,7 @@ if (isset($_POST['add_pet'])) {
             document.querySelectorAll(".modal .close").forEach(btn => {
                 btn.addEventListener("click", () => {
                     btn.closest(".modal").classList.add("hidden");
-                    document.body.style.overflow = "auto";
+                    updateBodyScroll();
                 });
             });
 
@@ -741,7 +739,7 @@ if (isset($_POST['add_pet'])) {
                 modal.addEventListener("click", e => {
                     if (e.target === modal) {
                         modal.classList.add("hidden");
-                        document.body.style.overflow = "auto";
+                        updateBodyScroll();
                     }
                 });
             });
@@ -804,7 +802,7 @@ if (isset($_POST['add_pet'])) {
                     document.getElementById("confirmDeleteBtn").href = `client-management.php?delete_id=${userId}`;
 
                     modal.classList.remove("hidden");
-                    document.body.style.overflow = "hidden";
+                    updateBodyScroll();
                 });
             });
         });
@@ -861,7 +859,7 @@ if (isset($_POST['add_pet'])) {
                                     document.getElementById("confirmDeleteBtnPet").href = `client-management.php?delete_pet_id=${petId}`;
 
                                     modal.classList.remove("hidden");
-                                    document.body.style.overflow = "hidden";
+                                    updateBodyScroll();
                                 });
 
                                 content.appendChild(petCard);
@@ -872,8 +870,23 @@ if (isset($_POST['add_pet'])) {
                                     const modal = document.getElementById("updatePetModal");
                                     const petId = btn.dataset.id;
 
+                                    fetch(`../Get/get-pet.php?id=${petId}`)
+                                        .then(res => res.json())
+                                        .then(pet => {
+
+                                            document.getElementById('updatePetName').value = pet.name;
+                                            document.getElementById('updatePetSpecies').value = pet.species;
+                                            document.getElementById('updatePetBreed').value = pet.breed || '';
+                                            document.getElementById('updatePetAge').value = pet.age || '';
+                                            document.getElementById('updatePetGender').value = pet.gender;
+                                            document.getElementById('updatePetWeight').value = pet.weight || '';
+                                            document.getElementById('updatePetColor').value = pet.color || '';
+                                            document.getElementById('updatePetNotes').value = pet.notes || '';
+
+                                        });
+
                                     modal.classList.remove("hidden");
-                                    document.body.style.overflow = "hidden";
+                                    updateBodyScroll();
                                 });
                             });
                         }
@@ -883,7 +896,7 @@ if (isset($_POST['add_pet'])) {
                     });
 
                 modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
+                updateBodyScroll();
             });
         });
     </script>
