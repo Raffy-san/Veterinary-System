@@ -78,7 +78,7 @@ if (isset($_GET['delete_id'])) {
                     </div>
                     <button class="close text-xl">&times;</button>
                 </div>
-                <form class="flex flex-wrap items-center justify-between" method="POST" action="">
+                <form class="flex flex-wrap items-center justify-between" method="POST" action="medical-records.php">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
                         <select
@@ -94,9 +94,9 @@ if (isset($_GET['delete_id'])) {
                                     ORDER BY owners.name, pets.name
                                 ");
 
-                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                    echo '<option value="' . htmlspecialchars($row['pet_id']) . '">'
-                                        . htmlspecialchars($row['pet_name']) . ' (' . htmlspecialchars($row['owner_name']) .
+                                while ($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    echo '<option value="' . htmlspecialchars($record['pet_id']) . '">'
+                                        . htmlspecialchars($record['pet_name']) . ' (' . htmlspecialchars($record['owner_name']) .
                                         ')</option>';
                                 }
                             } catch (PDOException $e) {
@@ -111,7 +111,7 @@ if (isset($_GET['delete_id'])) {
                             class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             required>
                     </div>
-                    <div class="flex flex-row space-x-2">
+                    <div class="flex flex-record space-x-2">
                         <div class="mb-4 w-auto">
                             <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Visit Type</label>
                             <select name="visit_type"
@@ -163,7 +163,7 @@ if (isset($_GET['delete_id'])) {
                     </div>
 
                     <div class="mb-4 w-full">
-                        <div class="flex flex-row space-x-2">
+                        <div class="flex flex-record space-x-2">
                             <input type="checkbox" id="followUpRequired" name="required">
                             <label for="followUpRequired" class="text-sm font-semibold">Follow-up appointment
                                 required</label>
@@ -175,32 +175,13 @@ if (isset($_GET['delete_id'])) {
                     </div>
 
                     <div class="flex justify-end w-full">
-                        <button type="button"
-                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
+                        <button type="btn" class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">
+                            Cancel</button>
                         <button type="submit" name="submit"
                             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-xs">Add
                             Record</button>
                     </div>
                 </form>
-            </div>
-        </div>
-        <div id="deleteModal"
-            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg p-6 max-w-md w-full">
-                <div class="flex flex-row items-center mb-4">
-                    <i class="fa-solid fa-circle-exclamation mr-2" style="color: #c00707;"></i>
-                    <h3 class="font-semibold text-lg">Delete Medical Record</h3>
-                </div>
-                <p id="deleteMessage" class="mb-4 text-sm text-gray-600">
-                    Are you sure you want to delete this medical record?
-                </p>
-                <div class="flex justify-end space-x-2">
-                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
-                    <a id="confirmDeleteBtn" href="#"
-                        class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
-                        Delete
-                    </a>
-                </div>
             </div>
         </div>
         <section class="w-full bg-white rounded-lg shadow-md p-8">
@@ -235,7 +216,7 @@ if (isset($_GET['delete_id'])) {
                     <?php
                     $records = fetchAllData(
                         $pdo,
-                        "SELECT m.id AS medical_record_id, m.visit_date, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.follow_up_date
+                        "SELECT m.id AS medical_record_id, m.visit_date, m.weight, m.temperature, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes, m.follow_up_date
                         FROM medical_records m
                         JOIN pets p ON m.pet_id = p.id
                         JOIN owners o ON p.owner_id = o.id"
@@ -260,15 +241,31 @@ if (isset($_GET['delete_id'])) {
                                 <span class='text-gray-500 text-xs'>" . htmlspecialchars($record['owner_name']) . "</span>
                             </td>";
                         echo '<td class="py-2">
-                              <div class="' . $typeinfo['bg'] . ' ' . $typeinfo['color'] . ' rounded px-3 py-1 inline-flex items-center gap-2">
+                              <div class="' . $typeinfo['bg'] . ' ' . $typeinfo['color'] . ' rounded-lg px-3 py-1 inline-flex items-center gap-2">
                                     <i class="' . $typeinfo['icon'] . '"></i>
                                     <span>' . htmlspecialchars($record['visit_type']) . '</span>
                                 </div>
                             </td>';
                         echo '<td class="py-2">' . htmlspecialchars($record['diagnosis']) . '</td>';
-                        echo '<td class="py-2">' . htmlspecialchars($record['follow_up_date']) . '</td>';
+                        echo '<td class="py-2">' . htmlspecialchars($record['follow_up_date'] ?? 'No Follow-up date') . '</td>';
                         echo '<td class="py-2 text-right space-x-1">
-                                <button class="view-record fa-solid fa-eye text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button  
+                                    data-modal = "viewModal"
+                                    data-id="' . $record['medical_record_id'] . '"
+                                    data-date="' . htmlspecialchars($record['visit_date'] ?? '') . '"                  data-type="' . htmlspecialchars($record['visit_type'] ?? '') . '" 
+                                    data-type-bg="' . htmlspecialchars($typeinfo['bg']) . '"
+                                    data-type-color="' . htmlspecialchars($typeinfo['color']) . '"
+                                    data-type-icon="' . htmlspecialchars($typeinfo['icon']) . '"
+                                    data-patient="' . htmlspecialchars($record['patient_name'] ?? '') . '" 
+                                    data-owner="' . htmlspecialchars($record['owner_name'] ?? '') . '" 
+                                    data-weight="' . htmlspecialchars($record['weight'] ?? '') . '"
+                                    data-temperature="' . htmlspecialchars($record['temperature'] ?? '') . '"
+                                    data-diagnosis="' . htmlspecialchars($record['diagnosis'] ?? '') . '" 
+                                    data-treatment="' . htmlspecialchars($record['treatment'] ?? '') . '" 
+                                    data-medications="' . htmlspecialchars($record['medications'] ?? '') . '" 
+                                    data-follow="' . htmlspecialchars($record['follow_up_date'] ?? 'No Follow-up date') . '" 
+                                    data-notes="' . htmlspecialchars($record['notes'] ?? '') . '" 
+                                    class="open-modal fa-solid fa-eye text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                                 <button class="edit-record fa-solid fa-pencil text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                                 <button class="open-delete-modal fa-solid fa-trash text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                             </td>';
@@ -281,18 +278,122 @@ if (isset($_GET['delete_id'])) {
                     </tr>
                 </tbody>
             </table>
-
+            <div id="viewModal"
+                class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-semibold text-m">Medical Record - <span id="petName"></span></h3>
+                            <h4 class="text-gray-500 text-sm"><span id="recordDate"></span></h4>
+                        </div>
+                        <button class="close text-xl" aria-label="Close">&times;</button>
+                    </div>
+                    <div class="flex flex-row justify-between space-x-2">
+                        <div id="medicalDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                            <!-- row details will be populated here -->
+                        </div>
+                        <div id="followUpDetail" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                            <!-- Additional details will be populated here -->
+                        </div>
+                    </div>
+                    <div id="diagnosisDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                        <!-- Additional details will be populated here -->
+                    </div>
+                    <div id="treatmentDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                        <!-- Additional details will be populated here -->
+                    </div>
+                    <div id="medicationsDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                        <!-- Additional details will be populated here -->
+                    </div>
+                    <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                        <!-- Additional details will be populated here -->
+                    </div>
+                </div>
+            </div>
+            <div id="deleteModal"
+                class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                    <div class="flex flex-record items-center mb-4">
+                        <i class="fa-solid fa-circle-exclamation mr-2" style="color: #c00707;"></i>
+                        <h3 class="font-semibold text-lg">Delete Medical Record</h3>
+                    </div>
+                    <p id="deleteMessage" class="mb-4 text-sm text-gray-600">
+                        Are you sure you want to delete this medical record?
+                    </p>
+                    <div class="flex justify-end space-x-2">
+                        <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
+                        <a id="confirmDeleteBtn" href="#"
+                            class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const medicalDetails = document.getElementById('medicalDetails');
+            const followUpDetail = document.getElementById('followUpDetail');
+            const diagnosisDetails = document.getElementById('diagnosisDetails');
+            const treatmentDetails = document.getElementById('treatmentDetails');
+            const medicationsDetails = document.getElementById('medicationsDetails');
+            const notesDetails = document.getElementById('notesDetails');
+            const petName = document.getElementById('petName');
+            const recordDate = document.getElementById('recordDate');
+
+            const addField = (container, label, value) => {
+                const p = document.createElement("p");
+                p.innerHTML = `<span class="font-semibold">${label}</span> ${value || "N/A"}`;
+                container.appendChild(p);
+            };
+
             // Modal Open/Close
-            document.querySelectorAll(".open-modal").forEach(button => {
-                button.addEventListener("click", () => {
-                    const modalId = button.dataset.modal;
+            document.querySelectorAll(".open-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const modalId = btn.dataset.modal;
                     document.getElementById(modalId).classList.remove("hidden");
                     updateBodyScroll();
+
+                    medicalDetails.innerHTML = "<h3 class='font-semibold mb-4'><i class='fa-solid fa-stethoscope mr-2'></i>Visit information</h3>";
+                    followUpDetail.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-calendar mr-2'></i>Follow-up date</h4>";
+                    diagnosisDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-notes-medical mr-2'></i>Diagnosis</h4>";
+                    treatmentDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-syringe mr-2'></i>Treatment</h4>";
+                    medicationsDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-pills mr-2'></i>Medications</h4>";
+                    notesDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-comment mr-2'></i>Notes</h4>";
+                    petName.textContent = btn.dataset.patient;
+                    recordDate.textContent = btn.dataset.date;
+
+
+                    addField(medicalDetails, "Date:", btn.dataset.date);
+                    const visitTypeHTML = `
+                            <div class="${btn.dataset.typeBg} ${btn.dataset.typeColor} rounded-lg px-2 py-1 inline-flex items-center">
+                                <span class="text-xs">${btn.dataset.type}</span>
+                            </div>
+                        `;
+
+                    medicalDetails.insertAdjacentHTML('beforeend', `
+                                <div>
+                                    <span class="font-semibold">Visit Type:</span>
+                                    ${visitTypeHTML}
+                                </div>
+                            `);
+
+                    addField(medicalDetails, "Patient:", btn.dataset.patient);
+                    addField(medicalDetails, "Weight:", btn.dataset.weight);
+                    addField(medicalDetails, "Temperature:", btn.dataset.temperature);
+                    addField(medicalDetails, "Owner:", btn.dataset.owner);
+
+                    addField(followUpDetail, "Follow-up Date:", btn.dataset.follow);
+
+                    addField(diagnosisDetails, "", btn.dataset.diagnosis);
+
+                    addField(treatmentDetails, "", btn.dataset.treatment);
+
+                    addField(medicationsDetails, "", btn.dataset.medications);
+
+                    addField(notesDetails, "", btn.dataset.notes);
                 });
             });
 
@@ -334,7 +435,7 @@ if (isset($_GET['delete_id'])) {
 
             // Search functionality
             const tableBody = document.getElementById("recordsBody");
-            const rows = tableBody.querySelectorAll("tr:not(#noResults)");
+            const records = tableBody.querySelectorAll("tr:not(#noResults)");
             const noResults = document.getElementById("noResults");
             const searchInput = document.getElementById("search");
 
@@ -342,13 +443,13 @@ if (isset($_GET['delete_id'])) {
                 const term = this.value.toLowerCase();
                 let hasResults = false;
 
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
+                records.forEach(record => {
+                    const text = record.textContent.toLowerCase();
                     if (text.includes(term)) {
-                        row.style.display = "";
+                        record.style.display = "";
                         hasResults = true;
                     } else {
-                        row.style.display = "none";
+                        record.style.display = "none";
                     }
                 });
 
