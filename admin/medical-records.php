@@ -4,6 +4,13 @@ require_once '../functions/session.php';
 require_once '../helpers/fetch.php';
 require_once '../functions/crud.php';
 SessionManager::requireLogin();
+SessionManager::requireRole('admin');
+
+$admin = SessionManager::getUser($pdo);
+
+if (!$admin) {
+    SessionManager::logout('../login.php');
+}
 
 if (isset($_POST['submit'])) {
     $data = [
@@ -24,6 +31,18 @@ if (isset($_POST['submit'])) {
         exit;
     } else {
         header("Location: medical-records.php?added=0");
+        exit;
+    }
+}
+
+if (isset($_GET['delete_id'])) {
+    $recordId = $_GET['delete_id'];
+
+    if (deleteMedicalRecord($pdo, $recordId)) {
+        header("Location: medical-records.php?deleted=1");
+        exit;
+    } else {
+        header("Location: medical-records.php?deleted=0");
         exit;
     }
 }
@@ -165,6 +184,25 @@ if (isset($_POST['submit'])) {
                 </form>
             </div>
         </div>
+        <div id="deleteModal"
+            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                <div class="flex flex-row items-center mb-4">
+                    <i class="fa-solid fa-circle-exclamation mr-2" style="color: #c00707;"></i>
+                    <h3 class="font-semibold text-lg">Delete Medical Record</h3>
+                </div>
+                <p id="deleteMessage" class="mb-4 text-sm text-gray-600">
+                    Are you sure you want to delete this medical record?
+                </p>
+                <div class="flex justify-end space-x-2">
+                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
+                    <a id="confirmDeleteBtn" href="#"
+                        class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        </div>
         <section class="w-full bg-white rounded-lg shadow-md p-8">
             <div class="mb-4 flex items-center justify-between">
                 <div>
@@ -232,7 +270,7 @@ if (isset($_POST['submit'])) {
                         echo '<td class="py-2 text-right space-x-1">
                                 <button class="view-record fa-solid fa-eye text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                                 <button class="edit-record fa-solid fa-pencil text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
-                                <button class="delete-record fa-solid fa-trash text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button class="open-delete-modal fa-solid fa-trash text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                             </td>';
                         echo '</tr>';
                     }
@@ -315,6 +353,21 @@ if (isset($_POST['submit'])) {
                 });
 
                 noResults.style.display = hasResults ? "none" : "";
+            });
+        });
+
+
+        document.querySelectorAll(".open-delete-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const modal = document.getElementById("deleteModal");
+                const medicalRecordid = btn.dataset.id;
+
+                document.getElementById("deleteMessage").textContent =
+                    `Are you sure you want to delete this medical record? This action cannot be undone.`;
+                document.getElementById("confirmDeleteBtn").href = `medical-records.php?delete_id=${medicalRecordid}`;
+
+                modal.classList.remove("hidden");
+                updateBodyScroll();
             });
         });
 

@@ -139,3 +139,8 @@ function addMedicalRecord($pdo, $data)
     ]);
 }
 
+function deleteMedicalRecord($pdo, $id)
+{
+    $stmt = $pdo->prepare("DELETE FROM medical_records WHERE id = ?");
+    return $stmt->execute([$id]);
+}
