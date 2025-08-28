@@ -4,6 +4,13 @@ require_once '../functions/session.php';
 require_once '../helpers/fetch.php';
 require_once '../functions/crud.php';
 SessionManager::requireLogin();
+SessionManager::requireRole('admin');
+
+$admin = SessionManager::getUser($pdo);
+
+if (!$admin) {
+    SessionManager::logout('../login.php');
+}
 
 if (isset($_GET['delete_id'])) {
     $user_id = intval($_GET['delete_id']);

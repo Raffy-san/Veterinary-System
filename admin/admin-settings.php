@@ -1,3 +1,16 @@
+<?php
+include_once '../config/config.php';
+require_once '../functions/session.php';
+require_once '../helpers/fetch.php';
+SessionManager::requireLogin();
+SessionManager::requireRole('admin');
+
+$admin = SessionManager::getUser($pdo);
+
+if (!$admin) {
+    SessionManager::logout('../login.php');
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -87,7 +100,7 @@
                 toggleIcon.classList.add('fa-eye');
             }
         }
-        
+
         function handleSubmit(event) {
             event.preventDefault();
             const username = document.getElementById('username').value;

@@ -11,7 +11,6 @@ if (SessionManager::isLoggedIn()) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 

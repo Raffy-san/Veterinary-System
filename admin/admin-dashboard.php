@@ -3,6 +3,13 @@ include_once '../config/config.php';
 require_once '../functions/session.php';
 require_once '../helpers/fetch.php';
 SessionManager::requireLogin();
+SessionManager::requireRole('admin');
+
+$admin = SessionManager::getUser($pdo);
+
+if (!$admin) {
+    SessionManager::logout('../login.php');
+}
 
 $petOwners = fetchAllData($pdo, "SELECT * FROM users WHERE access_type = 'owner'");
 $allPetOwners = fetchAllData($pdo, "SELECT * FROM owners ORDER BY created_at DESC LIMIT 4");
@@ -73,7 +80,8 @@ WHERE visit_date = CURDATE()");
                         </div>
                     </div>
                     <div>
-                        <h2 class="text-3xl font-bold text-gray-800"><?php echo $totalRecords['total_transactions_today']; ?></h2>
+                        <h2 class="text-3xl font-bold text-gray-800">
+                            <?php echo $totalRecords['total_transactions_today']; ?></h2>
                         <span
                             class="bg-green-50 text-green-700 text-xs font-medium px-2 py-1 rounded-full mt-2 inline-block">
                             Visits

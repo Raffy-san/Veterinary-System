@@ -5,7 +5,6 @@ class SessionManager
 {
     /**
      * Check if user is logged in.
-     * @return bool
      */
     public static function isLoggedIn(): bool
     {
@@ -14,7 +13,6 @@ class SessionManager
 
     /**
      * Require login, redirect if not logged in.
-     * @param string $redirect
      */
     public static function requireLogin(string $redirect = '../login.php'): void
     {
@@ -24,8 +22,17 @@ class SessionManager
     }
 
     /**
+     * Require specific role to access a page.
+     */
+    public static function requireRole(string $accessType, string $redirect = '../unauthorized.php'): void
+    {
+        if (!isset($_SESSION['access_type']) || $_SESSION['access_type'] !== $accessType) {
+            self::redirect($redirect);
+        }
+    }
+
+    /**
      * Log out the user and redirect.
-     * @param string $redirect
      */
     public static function logout(string $redirect = 'login.php'): void
     {
@@ -36,7 +43,6 @@ class SessionManager
 
     /**
      * Redirect to a given URL and exit.
-     * @param string $url
      */
     private static function redirect(string $url): void
     {
@@ -46,8 +52,6 @@ class SessionManager
 
     /**
      * Get logged-in user info from database.
-     * @param PDO $pdo
-     * @return array|null
      */
     public static function getUser(PDO $pdo): ?array
     {
@@ -55,14 +59,31 @@ class SessionManager
             return null;
         }
 
-        $stmt = $pdo->prepare("
-        SELECT o.id AS owner_id, o.name, o.email, o.phone, o.address, o.status, o.created_at, u.id AS user_id, u.username
-        FROM owners o
-        INNER JOIN users u ON o.user_id = u.id
-        WHERE u.id = ?
-    ");
-        $stmt->execute([$_SESSION['user_id']]);
-        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        $userId = $_SESSION['user_id'];
+        $accessType = $_SESSION['access_type'] ?? null;
+
+        if ($accessType === 'owner') {
+            // Fetch from owners + users
+            $stmt = $pdo->prepare("
+            SELECT o.id AS owner_id, o.name, o.email, o.phone, o.address, o.status, o.created_at,
+                   u.id AS user_id, u.username, u.access_type
+            FROM owners o
+            INNER JOIN users u ON o.user_id = u.id
+            WHERE u.id = ?
+        ");
+            $stmt->execute([$userId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } else {
+            // Fetch only from users for admin or other roles
+            $stmt = $pdo->prepare("
+            SELECT id AS user_id, username, access_type
+            FROM users
+            WHERE id = ?
+        ");
+            $stmt->execute([$userId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        }
     }
+
 }
 ?>

@@ -4,7 +4,14 @@ include_once '../config/config.php';
 require_once '../helpers/fetch.php';
 SessionManager::requireLogin();
 
+// Require role OWNER
+SessionManager::requireRole('owner');
+
 $client = SessionManager::getUser($pdo);
+
+if (!$client) {
+    SessionManager::logout('../login.php'); // Force logout if user not found
+}
 
 $pet = fetchAllData(
     $pdo,
