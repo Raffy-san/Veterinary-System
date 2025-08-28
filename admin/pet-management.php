@@ -18,10 +18,11 @@ if (!$admin) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
+    <link rel="stylesheet" href="../assets/css/global.css">
     <script src="../assets/js/script.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>Patients</title>
+    <title>Patients Management</title>
 </head>
 
 <body class="bg-green-100 w-full h-screen overflow-y-auto">
@@ -74,7 +75,6 @@ if (!$admin) {
                         <th class="font-semibold py-2">Gender</th>
                         <th class="font-semibold py-2">Owner</th>
                         <th class="font-semibold py-2">Contact</th>
-                        <th class="font-semibold text-center py-2">Status</th>
                         <th class="text-right font-semibold py-2">Actions</th>
                     </tr>
                 </thead>
@@ -82,7 +82,7 @@ if (!$admin) {
                     <?php
                     $pets = fetchAllData(
                         $pdo,
-                        "SELECT p.id, p.name AS pet_name, p.species, p.breed, p.age, p.gender,
+                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.gender, p.color, p.weight, p.notes,
                                 o.name AS owner_name, o.phone AS owner_phone, o.email AS owner_email
                          FROM pets p
                          JOIN owners o ON p.owner_id = o.id"
@@ -103,11 +103,23 @@ if (!$admin) {
                                 <span><i class='fa-solid fa-envelope text-green-600'></i> {$row['owner_email']}</span>
                                 <span class='text-gray-500 text-xs'><i class='fa-solid fa-phone'></i> {$row['owner_phone']}</span>
                               </td>";
-                        echo "<td class='text-center py-2'>
-                                <span class='bg-green-500 text-white py-1 px-2 rounded text-xs font-semibold'>Active</span>
-                              </td>";
                         echo "<td class='text-right py-2'>
-                                <button class='fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300'></button>
+                                <button 
+                                    data-modal='viewModal'
+                                    data-id='" . $row['pet_id'] . "'
+                                   data-name='" . htmlspecialchars($row['pet_name'] ?? '') . "'
+                                    data-species='" . htmlspecialchars($row['species'] ?? '') . "'
+                                    data-breed='" . htmlspecialchars($row['breed'] ?? '') . "'
+                                    data-age='" . htmlspecialchars($row['age'] ?? '') . "'
+                                    data-gender='" . htmlspecialchars($row['gender'] ?? '') . "'
+                                    data-color='" . htmlspecialchars($row['color'] ?? '') . "'
+                                    data-weight='" . htmlspecialchars($row['weight'] ?? '') . "'
+                                    data-notes='" . htmlspecialchars($row['notes'] ?? '') . "'
+                                    data-owner='" . htmlspecialchars($row['owner_name'] ?? '') . "'
+                                    data-email='" . htmlspecialchars($row['owner_email'] ?? '') . "'
+                                    data-phone='" . htmlspecialchars($row['owner_phone'] ?? '') . "'
+                                    class='open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300'>
+                                </button>
                               </td>";
                         echo "</tr>";
                     }
@@ -118,11 +130,37 @@ if (!$admin) {
                 </tbody>
             </table>
         </section>
+        <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-semibold text-m">Pet Details - <span id="petName"></span></h3>
+                        <h4 class="text-gray-500 text-sm">Complete pet information</h4>
+                    </div>
+                    <button class="close text-xl" aria-label="Close">&times;</button>
+                </div>
+                <div class="flex flex-row justify-between space-x-2">
+                    <div id="petDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[200px]">
+                        <!-- row details will be populated here -->
+                    </div>
+                    <div id="ownerDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[200px]">
+                        <!-- Additional details will be populated here -->
+                    </div>
+                </div>
+                <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[390px]">
+                    <!-- Additional details will be populated here -->
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- JS -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            const petDetails = document.getElementById("petDetails");
+            const ownerDetails = document.getElementById("ownerDetails");
+            const notesDetails = document.getElementById("notesDetails");
+            const petNameSpan = document.getElementById("petName");
             const searchInput = document.getElementById('search');
             const filterSelect = document.getElementById('speciesFilter');
             const rows = document.querySelectorAll("#petsBody tr");
@@ -146,7 +184,58 @@ if (!$admin) {
 
             searchInput.addEventListener('input', applyFilters);
             filterSelect.addEventListener('change', applyFilters);
+
+            const addField = (container, label, value) => {
+                const p = document.createElement("p");
+                p.innerHTML = `<span class="font-semibold">${label}:</span> ${value || "N/A"}`;
+                container.appendChild(p);
+            };
+
+            document.querySelectorAll(".open-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const modal = document.getElementById(btn.dataset.modal);
+                    modal.classList.remove("hidden"); // ✅ Show modal
+                    updateBodyScroll();
+
+                    petDetails.innerHTML = "<h3 class='font-semibold mb-4'>Pet information</h3>";
+                    ownerDetails.innerHTML = "<h4 class='font-semibold mb-4'>Owner information</h4>";
+                    notesDetails.innerHTML = "<h4 class='font-semibold mb-4'>Notes</h4>";
+                    petNameSpan.textContent = btn.dataset.name;
+
+                    addField(petDetails, "Pet Name", btn.dataset.name);
+                    addField(petDetails, "Species", btn.dataset.species);
+                    addField(petDetails, "Breed", btn.dataset.breed);
+                    addField(petDetails, "Age", btn.dataset.age || "None");
+                    addField(petDetails, "Color", btn.dataset.color || "None");
+                    addField(petDetails, "Weight", btn.dataset.weight || "None");
+
+                    addField(ownerDetails, "Name", btn.dataset.owner);
+                    addField(ownerDetails, "Email", btn.dataset.email);
+                    addField(ownerDetails, "Phone", btn.dataset.phone);
+
+                    addField(notesDetails, "Notes", btn.dataset.notes || "None");
+                });
+            });
+
+            // Close modal
+            document.querySelectorAll(".modal .close").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    btn.closest(".modal").classList.add("hidden");
+                    updateBodyScroll();
+                });
+            });
+
+            // Close modal by clicking outside
+            document.querySelectorAll(".modal").forEach(modal => {
+                modal.addEventListener("click", e => {
+                    if (e.target === modal) {
+                        modal.classList.add("hidden");
+                        updateBodyScroll();
+                    }
+                });
+            });
         });
+
     </script>
 </body>
 
