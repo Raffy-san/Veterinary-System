@@ -98,6 +98,28 @@ if (isset($_POST['add_pet'])) {
     }
 }
 
+if (isset($_POST['update_pet'])) {
+    $data = [
+        'pet_id' => $_POST['pet_id'],
+        'name' => $_POST['name'],
+        'species' => $_POST['species'],
+        'breed' => $_POST['breed'],
+        'age' => $_POST['age'],
+        'gender' => $_POST['gender'],
+        'weight' => $_POST['weight'],
+        'color' => $_POST['color'],
+        'notes' => $_POST['notes']
+    ];
+
+    if (updatePet($pdo, $data)) {
+        header("Location: client-management.php?pet_updated=1");
+        exit;
+    } else {
+        header("Location: client-management.php?pet_updated=0");
+        exit;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -577,8 +599,8 @@ if (isset($_POST['add_pet'])) {
                     <div class="flex justify-end w-full">
                         <button type="button"
                             class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
-                        <button type="submit" name="add_pet"
-                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Add
+                        <button type="submit" name="update_pet"
+                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Update
                             Pet</button>
                     </div>
                 </form>
@@ -880,7 +902,8 @@ if (isset($_POST['add_pet'])) {
                                     fetch(`../Get/get-pet.php?id=${petId}`)
                                         .then(res => res.json())
                                         .then(pet => {
-
+                                            
+                                            document.getElementById('updatePetId').value = pet.id;
                                             document.getElementById('updatePetName').value = pet.name;
                                             document.getElementById('updatePetSpecies').value = pet.species;
                                             document.getElementById('updatePetBreed').value = pet.breed || '';

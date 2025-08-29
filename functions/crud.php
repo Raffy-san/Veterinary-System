@@ -83,18 +83,6 @@ function deleteClient($pdo, $user_id)
 
 }
 
-function activateClient($pdo, $user_id)
-{
-    $stmt = $pdo->prepare("UPDATE owners SET status = 1 WHERE id = ?");
-    return $stmt->execute([$user_id]);
-}
-
-function deactivateClient($pdo, $user_id)
-{
-    $stmt = $pdo->prepare("UPDATE owners SET status = 0 WHERE id = ?");
-    return $stmt->execute([$user_id]);
-}
-
 
 function addPet($pdo, $data)
 {
@@ -105,11 +93,12 @@ function addPet($pdo, $data)
     return $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['owner_id'], $data['notes']]);
 }
 
-function updatePet ($pdo, $data) {
+function updatePet($pdo, $data)
+{
     $stmt = $pdo->prepare("
         UPDATE pets SET name = ?, species = ?, breed = ?, age = ?, gender = ?, weight = ?, color = ?, notes = ? WHERE id = ?
     ");
-    return $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['notes'], $data['id']]);
+    return $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['notes'], $data['pet_id']]);
 }
 
 function deletePet($pdo, $id)
@@ -136,6 +125,26 @@ function addMedicalRecord($pdo, $data)
         $data['medications'],
         $data['notes'],
         $data['follow_up_date']
+    ]);
+}
+
+function updateMedicalRecord($pdo, $data)
+{
+    $stmt = $pdo->prepare("
+        UPDATE medical_records SET pet_id = ?, visit_date = ?, visit_type = ?, weight = ?, temperature = ?, diagnosis = ?, treatment = ?, medications = ?, notes = ?, follow_up_date = ? WHERE id = ?
+    ");
+    return $stmt->execute([
+        $data['pet_id'],
+        $data['visit_date'],
+        $data['visit_type'],
+        $data['weight'],
+        $data['temperature'],
+        $data['diagnosis'],
+        $data['treatment'],
+        $data['medications'],
+        $data['notes'],
+        $data['follow_up_date'],
+        $data['medical_record_id']
     ]);
 }
 
