@@ -266,7 +266,7 @@ if (isset($_GET['delete_id'])) {
                                     data-follow="' . htmlspecialchars($record['follow_up_date'] ?? 'No Follow-up date') . '" 
                                     data-notes="' . htmlspecialchars($record['notes'] ?? '') . '" 
                                     class="open-modal fa-solid fa-eye text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
-                                <button class="edit-record fa-solid fa-pencil text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button class="open-edit-modal fa-solid fa-pencil text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                                 <button class="open-delete-modal fa-solid fa-trash text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                             </td>';
                         echo '</tr>';
@@ -308,6 +308,101 @@ if (isset($_GET['delete_id'])) {
                     <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
                         <!-- Additional details will be populated here -->
                     </div>
+                </div>
+            </div>
+            <div id="updateMedicalRecordModal"
+                class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+                <div
+                    class="custom-scrollbar bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[80vh] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-m font-semibold">Update Medical Record</h3>
+                            <h4 class="text-sm text-gray-600">Document a medical visit, treatment, or procedure.</h4>
+                        </div>
+                        <button class="close text-xl">&times;</button>
+                    </div>
+                    <form class="flex flex-wrap items-center justify-between" method="POST"
+                        action="medical-records.php">
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
+                            <input type="text" name="pet_name" id="updatePetName"
+                                class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                required>
+                        </div>
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Date</label>
+                            <input type="date" name="visit_date" id="updateVisitDate"
+                                class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                required>
+                        </div>
+                        <div class="flex flex-record space-x-2">
+                            <div class="mb-4 w-auto">
+                                <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Visit Type</label>
+                                <select name="visit_type" id="updateVisitType"
+                                    class="w-auto border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="" selected disabled>Select Type</option>
+                                    <option value="Routine Checkup">Routine Checkup</option>
+                                    <option value="Vaccination">Vaccination</option>
+                                    <option value="Treatment">Treatment</option>
+                                    <option value="Emergency">Emergency</option>
+                                    <option value="Surgery">Surgery</option>
+                                </select>
+                            </div>
+                            <div class="mb-4 w-auto">
+                                <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
+                                <input type="text" id="updateWeight"
+                                    class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    name="weight" placeholder="e.g, 20lbs" required>
+                            </div>
+                            <div class="mb-4 w-auto">
+                                <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
+                                <input type="text" id="updateTemperature"
+                                    class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    name="temperature" placeholder="e.g, 36°C" required>
+                            </div>
+                        </div>
+                        <div class="mb-4 w-full">
+                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Diagnosis</label>
+                            <input type="text" id="updateDiagnosis"
+                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                name="diagnosis" placeholder="Primary diagnosis or reason for visit" required>
+                        </div>
+                        <div class="mb-4 w-full">
+                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Treatment</label>
+                            <textarea name="treatment" id="updateTreatment"
+                                class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
+                                placeholder="Describe the treatment of procedures performed"></textarea>
+                        </div>
+                        <div class="mb-4 w-full">
+                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Medications</label>
+                            <textarea name="medications" id="updateMedications"
+                                class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
+                                placeholder="List the medications prescribed with dosage and frequency"></textarea>
+                        </div>
+                        <div class="mb-4 w-full">
+                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Additional
+                                Notes</label>
+                            <textarea name="notes" id="updateNotes"
+                                class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
+                                placeholder="Add additional observations, instructions, or notes"></textarea>
+                        </div>
+
+                        <div class="mb-4 w-full">
+                            <label for="follow_up_date" class="block text-gray-700 mb-1 text-sm font-semibold">Follow-Up
+                                Date</label>
+                            <input type="date" id="updateFollowUpDate" name="follow_up_date"
+                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+
+                        <div class="flex justify-end w-full">
+                            <button type="btn"
+                                class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">
+                                Cancel</button>
+                            <button type="submit" name="submit"
+                                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-xs">Update
+                                Record</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <div id="deleteModal"
@@ -356,12 +451,12 @@ if (isset($_GET['delete_id'])) {
                     document.getElementById(modalId).classList.remove("hidden");
                     updateBodyScroll();
 
-                    medicalDetails.innerHTML = "<h3 class='font-semibold mb-4'><i class='fa-solid fa-stethoscope mr-2'></i>Visit information</h3>";
-                    followUpDetail.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-calendar mr-2'></i>Follow-up date</h4>";
-                    diagnosisDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-notes-medical mr-2'></i>Diagnosis</h4>";
-                    treatmentDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-syringe mr-2'></i>Treatment</h4>";
-                    medicationsDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-pills mr-2'></i>Medications</h4>";
-                    notesDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-comment mr-2'></i>Notes</h4>";
+                    medicalDetails.innerHTML = "<h3 class='font-semibold mb-4'><i class='fa-solid fa-stethoscope mr-2 text-green-600'></i>Visit information</h3>";
+                    followUpDetail.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-calendar mr-2 text-green-600'></i>Follow-up date</h4>";
+                    diagnosisDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-notes-medical mr-2 text-green-600'></i>Diagnosis</h4>";
+                    treatmentDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-syringe mr-2 text-green-600'></i>Treatment</h4>";
+                    medicationsDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-pills mr-2 text-green-600'></i>Medications</h4>";
+                    notesDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-comment mr-2 text-green-600'></i>Notes</h4>";
                     petName.textContent = btn.dataset.patient;
                     recordDate.textContent = btn.dataset.date;
 
@@ -385,7 +480,7 @@ if (isset($_GET['delete_id'])) {
                     addField(medicalDetails, "Temperature:", btn.dataset.temperature);
                     addField(medicalDetails, "Owner:", btn.dataset.owner);
 
-                    addField(followUpDetail, "Follow-up Date:", btn.dataset.follow);
+                    addField(followUpDetail, "", btn.dataset.follow);
 
                     addField(diagnosisDetails, "", btn.dataset.diagnosis);
 
@@ -471,6 +566,12 @@ if (isset($_GET['delete_id'])) {
                 updateBodyScroll();
             });
         });
+        
+        document.querySelectorAll(".open-edit-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                
+            })
+        })
 
     </script>
 </body>

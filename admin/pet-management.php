@@ -187,7 +187,7 @@ if (!$admin) {
 
             const addField = (container, label, value) => {
                 const p = document.createElement("p");
-                p.innerHTML = `<span class="font-semibold">${label}:</span> ${value || "N/A"}`;
+                p.innerHTML = `<span class="font-semibold">${label}</span> ${value || "N/A"}`;
                 container.appendChild(p);
             };
 
@@ -202,18 +202,18 @@ if (!$admin) {
                     notesDetails.innerHTML = "<h4 class='font-semibold mb-4'>Notes</h4>";
                     petNameSpan.textContent = btn.dataset.name;
 
-                    addField(petDetails, "Pet Name", btn.dataset.name);
-                    addField(petDetails, "Species", btn.dataset.species);
-                    addField(petDetails, "Breed", btn.dataset.breed);
-                    addField(petDetails, "Age", btn.dataset.age || "None");
-                    addField(petDetails, "Color", btn.dataset.color || "None");
-                    addField(petDetails, "Weight", btn.dataset.weight || "None");
+                    addField(petDetails, "Pet Name:", btn.dataset.name);
+                    addField(petDetails, "Species:", btn.dataset.species);
+                    addField(petDetails, "Breed:", btn.dataset.breed);
+                    addField(petDetails, "Age:", btn.dataset.age || "None");
+                    addField(petDetails, "Color:", btn.dataset.color || "None");
+                    addField(petDetails, "Weight:", btn.dataset.weight || "None");
 
-                    addField(ownerDetails, "Name", btn.dataset.owner);
-                    addField(ownerDetails, "Email", btn.dataset.email);
-                    addField(ownerDetails, "Phone", btn.dataset.phone);
+                    addField(ownerDetails, "Name:", btn.dataset.owner);
+                    addField(ownerDetails, "Email:", btn.dataset.email);
+                    addField(ownerDetails, "Phone:", btn.dataset.phone);
 
-                    addField(notesDetails, "Notes", btn.dataset.notes || "None");
+                    addField(notesDetails, "", btn.dataset.notes || "None");
                 });
             });
 
