@@ -131,7 +131,7 @@ if (!$admin) {
             </table>
         </section>
         <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] overflow-y-auto">
+            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-semibold text-m">Pet Details - <span id="petName"></span></h3>
@@ -140,14 +140,14 @@ if (!$admin) {
                     <button class="close text-xl" aria-label="Close">&times;</button>
                 </div>
                 <div class="flex flex-row justify-between space-x-2">
-                    <div id="petDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[200px]">
+                    <div id="petDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
                         <!-- row details will be populated here -->
                     </div>
-                    <div id="ownerDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[200px]">
+                    <div id="ownerDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
                         <!-- Additional details will be populated here -->
                     </div>
                 </div>
-                <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[390px]">
+                <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
                     <!-- Additional details will be populated here -->
                 </div>
             </div>
