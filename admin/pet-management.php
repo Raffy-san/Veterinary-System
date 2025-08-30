@@ -129,6 +129,7 @@ if (!$admin) {
                     </tr>
                 </tbody>
             </table>
+            <div id="pagination" class="flex justify-center space-x-2 mt-4"></div>
         </section>
         <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
@@ -164,12 +165,21 @@ if (!$admin) {
             const searchInput = document.getElementById('search');
             const filterSelect = document.getElementById('speciesFilter');
             const rows = document.querySelectorAll("#petsBody tr");
+            const tableBody = document.getElementById("petsBody");
+            const row = tableBody.querySelectorAll("tr");
+            const pagination = document.getElementById("pagination");
+            const rowsPerPage = 6;
+            let currentPage = 1;
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
 
             function applyFilters() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const filterValue = filterSelect.value.toLowerCase();
+                let visibleCount = 0;
 
                 rows.forEach(row => {
+                    if (!row.cells.length || row.id === "noResults") return;
+
                     const species = row.getAttribute('data-species') || '';
                     const name = row.cells[0].textContent.toLowerCase();
                     const speciesBreed = row.cells[1].textContent.toLowerCase();
@@ -178,9 +188,14 @@ if (!$admin) {
                     const matchesSearch = name.includes(searchTerm) || speciesBreed.includes(searchTerm) || owner.includes(searchTerm);
                     const matchesFilter = !filterValue || species === filterValue;
 
-                    row.style.display = (matchesSearch && matchesFilter) ? "" : "none";
+                    const shouldShow = matchesSearch && matchesFilter;
+                    row.style.display = shouldShow ? "" : "none";
+                    if (shouldShow) visibleCount++;
                 });
+
+                document.getElementById('noResults').classList.toggle('hidden', visibleCount > 0);
             }
+
 
             searchInput.addEventListener('input', applyFilters);
             filterSelect.addEventListener('change', applyFilters);
@@ -234,6 +249,41 @@ if (!$admin) {
                     }
                 });
             });
+            // Pagination
+            const showPage = page => {
+                currentPage = page;
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                row.forEach((row, i) => row.style.display = (i >= start && i < end) ? "" : "none");
+                renderPagination();
+            };
+
+            const renderPagination = () => {
+                pagination.innerHTML = "";
+                if (currentPage > 1) {
+                    const prev = document.createElement("button");
+                    prev.className = "text-xs px-3 py-1 bg-gray-200 rounded";
+                    prev.textContent = "Prev";
+                    prev.onclick = () => showPage(currentPage - 1);
+                    pagination.appendChild(prev);
+                }
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement("button");
+                    btn.className = `text-xs px-3 py-1 rounded ${i === currentPage ? "bg-green-500 text-white" : "bg-gray-200"}`;
+                    btn.textContent = i;
+                    btn.onclick = () => showPage(i);
+                    pagination.appendChild(btn);
+                }
+                if (currentPage < totalPages) {
+                    const next = document.createElement("button");
+                    next.className = "text-xs px-3 py-1 bg-gray-200 rounded";
+                    next.textContent = "Next";
+                    next.onclick = () => showPage(currentPage + 1);
+                    pagination.appendChild(next);
+                }
+            };
+
+            showPage(1);
         });
 
     </script>

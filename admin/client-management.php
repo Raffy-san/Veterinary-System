@@ -192,17 +192,17 @@ if (isset($_POST['update_pet'])) {
                         echo '<tr class="border-b hover:bg-green-50 text-sm text-left">';
                         echo '<td class="py-2">' . htmlspecialchars($client['name']) . '</td>';
                         echo '<td class="py-2 flex flex-col">' . '<span><i class="fa-solid fa-envelope text-green-600"></i>&nbsp;' . htmlspecialchars($client['email']) . '</span>' . '<span class="text-gray-500 text-xs"><i class="fa-solid fa-phone">&nbsp;</i>' . htmlspecialchars($client['phone']) . '</span></td>';
-                        echo '<td class="py-2">' . htmlspecialchars($client['created_at']) . '</td>';
+                        echo '<td class="py-2">' . date('Y-m-d', strtotime($client['created_at'])) . '</td>';
                         echo '<td class="py-2"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['pet_count'] . '</span></td>';
                         echo '<td class="py-2 text-right">
                                 <button 
                                     data-modal="viewModal" 
                                     data-id="' . $client['owner_id'] . '"
-                                   data-name="' . htmlspecialchars($client['name'] ?? '') . '"
+                                    data-name="' . htmlspecialchars($client['name'] ?? '') . '"
                                     data-email="' . htmlspecialchars($client['email'] ?? '') . '"
                                     data-phone="' . htmlspecialchars($client['phone'] ?? '') . '"
                                     data-emergency="' . htmlspecialchars($client['emergency'] ?? '') . '"
-                                    data-created="' . htmlspecialchars($client['created_at'] ?? '') . '"
+                                    data-created="' . date('Y-m-d', strtotime($client['created_at'])) . '"
                                     data-address="' . htmlspecialchars($client['address'] ?? '') . '"
                                     data-petcount="' . $client['pet_count'] . '"
                                     data-pets="' . htmlspecialchars($client['pets'] ?? '') . '"
@@ -300,7 +300,7 @@ if (isset($_POST['update_pet'])) {
 
         <!-- View Modal -->
         <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] overflow-y-auto">
+            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-semibold text-m">Client Details - <span id="clientName"></span></h3>
@@ -309,15 +309,14 @@ if (isset($_POST['update_pet'])) {
                     <button class="close text-xl" aria-label="Close">&times;</button>
                 </div>
                 <div class="flex flex-row justify-between space-x-2">
-                    <div id="clientDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[200px]">
+                    <div id="clientDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[220px]">
                         <!-- Client details will be populated here -->
                     </div>
-                    <div id="additionalDetails"
-                        class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[200px]">
+                    <div id="additionalDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4">
                         <!-- Additional details will be populated here -->
                     </div>
                 </div>
-                <div id="petDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 min-w-[230px]">
+                <div id="petDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4">
                     <!-- Pet details will be populated here -->
                 </div>
             </div>
@@ -842,39 +841,60 @@ if (isset($_POST['update_pet'])) {
                 const modal = document.getElementById('viewPetModal');
                 const content = document.getElementById('petDetailsContent');
 
-                content.innerHTML = '<p class="text-gray-500">Loading pets...</p>';
+                content.innerHTML = `
+            <div class="flex justify-center items-center h-32">
+                <p class="text-gray-500 animate-pulse">Loading pets...</p>
+            </div>
+        `;
 
                 fetch('../helpers/fetch-pet.php?owner_id=' + ownerId)
                     .then(response => response.json())
                     .then(pets => {
                         if (pets.length === 0) {
-                            content.innerHTML = '<p class="text-gray-500">No pets found for this client.</p>';
+                            content.innerHTML = `
+                        <div class="text-center text-gray-500 py-6">
+                            <i class="fa-solid fa-paw text-4xl mb-2 text-green-400"></i>
+                            <p>No pets found for this client.</p>
+                        </div>
+                    `;
                         } else {
                             content.innerHTML = '';
                             pets.forEach(pet => {
                                 const petCard = document.createElement('div');
-                                petCard.className = 'mb-4 bg-white border border-green-300 rounded-lg p-4 shadow-sm';
+                                petCard.className = `
+                            mb-4 bg-white border border-green-200 rounded-xl p-5 shadow-md 
+                            hover:shadow-lg transition-shadow duration-200
+                        `;
+
                                 petCard.innerHTML = `
-                            <h4 class="font-semibold text-lg text-green-700 mb-2">${pet.name}</h4>
-                            <p><span class="font-semibold">Species:</span> ${pet.species || 'N/A'}</p>
-                            <p><span class="font-semibold">Breed:</span> ${pet.breed || 'N/A'}</p>
-                            <p><span class="font-semibold">Age:</span> ${pet.age || 'N/A'} years</p>
-                            <p><span class="font-semibold">Gender:</span> ${pet.gender || 'N/A'}</p>
-                            <p><span class="font-semibold">Weight:</span> ${pet.weight || 'N/A'}</p>
-                            <p><span class="font-semibold">Color:</span> ${pet.color || 'N/A'}</p>
-                            <p><span class="font-semibold">Notes:</span> ${pet.notes || 'None'}</p>
-                            <div class="flex justify-end mt-2">
-                            <button 
-                                class="open-update-pet-modal font-semibold text-gray-700 text-sm mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-600 hover:text-white"
-                                data-id="${pet.id}">
-                                <i class="fa-solid fa-pen-alt pr-2"></i>Edit
-                            </button>
-                           <button 
-                                class="open-delete-pet-modal font-semibold text-gray-700 text-sm mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
-                                data-name="${pet.name}" 
-                                data-id="${pet.id}">
-                                <i class="fa-solid fa-trash pr-2"></i>Delete
-                            </button>
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-bold text-xl text-green-700 flex items-center gap-2">
+                                    <i class="fa-solid fa-paw text-green-500"></i> ${pet.name}
+                                </h4>
+                                <span class="px-3 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                                    ${pet.species || 'Unknown'}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                                <p><span class="font-semibold">Breed:</span> ${pet.breed || 'N/A'}</p>
+                                <p><span class="font-semibold">Age:</span> ${pet.age || 'N/A'} yrs</p>
+                                <p><span class="font-semibold">Gender:</span> ${pet.gender || 'N/A'}</p>
+                                <p><span class="font-semibold">Weight:</span> ${pet.weight || 'N/A'}</p>
+                                <p><span class="font-semibold">Color:</span> ${pet.color || 'N/A'}</p>
+                            </div>
+                            <p class="mt-2 text-gray-600 text-sm"><span class="font-semibold">Notes:</span> ${pet.notes || 'None'}</p>
+                            <div class="flex justify-end gap-2 mt-4">
+                                <button 
+                                    class="open-update-pet-modal flex items-center gap-1 text-green-700 text-sm font-semibold px-3 py-1.5 bg-green-100 rounded-lg hover:bg-green-600 hover:text-white transition"
+                                    data-id="${pet.id}">
+                                    <i class="fa-solid fa-pen-alt"></i> Edit
+                                </button>
+                                <button 
+                                    class="open-delete-pet-modal flex items-center gap-1 text-red-600 text-sm font-semibold px-3 py-1.5 bg-red-100 rounded-lg hover:bg-red-500 hover:text-white transition"
+                                    data-name="${pet.name}" 
+                                    data-id="${pet.id}">
+                                    <i class="fa-solid fa-trash"></i> Delete
+                                </button>
                             </div>
                         `;
                                 // Attach delete listener **here**
@@ -902,7 +922,7 @@ if (isset($_POST['update_pet'])) {
                                     fetch(`../Get/get-pet.php?id=${petId}`)
                                         .then(res => res.json())
                                         .then(pet => {
-                                            
+
                                             document.getElementById('updatePetId').value = pet.id;
                                             document.getElementById('updatePetName').value = pet.name;
                                             document.getElementById('updatePetSpecies').value = pet.species;
