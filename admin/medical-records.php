@@ -35,6 +35,30 @@ if (isset($_POST['submit'])) {
     }
 }
 
+if (isset($_POST['update_record'])) {
+    $data = [
+        'medical_record_id' => $_POST['record_id'],
+        'pet_id' => $_POST['pet_name'],
+        'visit_date' => $_POST['visit_date'],
+        'visit_type' => $_POST['visit_type'],
+        'weight' => $_POST['weight'],
+        'temperature' => $_POST['temperature'],
+        'diagnosis' => $_POST['diagnosis'],
+        'treatment' => $_POST['treatment'],
+        'medications' => $_POST['medications'],
+        'notes' => $_POST['notes'],
+        'follow_up_date' => $_POST['follow_up_date']
+    ];
+
+    if (updateMedicalRecord($pdo, $data)) {
+        header("Location: medical-records.php?updated=1");
+        exit;
+    } else {
+        header("Location: medical-records.php?updated=0");
+        exit;
+    }
+}
+
 if (isset($_GET['delete_id'])) {
     $recordId = $_GET['delete_id'];
 
@@ -323,6 +347,7 @@ if (isset($_GET['delete_id'])) {
                     </div>
                     <form class="flex flex-wrap items-center justify-between" method="POST"
                         action="medical-records.php">
+                        <input type="hidden" name="record_id" id="updateRecordId">
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
                             <input type="text" name="pet_name" id="updatePetName"
@@ -398,7 +423,7 @@ if (isset($_GET['delete_id'])) {
                             <button type="btn"
                                 class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">
                                 Cancel</button>
-                            <button type="submit" name="submit"
+                            <button type="submit" name="update_record"
                                 class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-xs">Update
                                 Record</button>
                         </div>
@@ -566,12 +591,34 @@ if (isset($_GET['delete_id'])) {
                 updateBodyScroll();
             });
         });
-        
+
         document.querySelectorAll(".open-edit-modal").forEach(btn => {
             btn.addEventListener("click", () => {
-                
-            })
-        })
+                const modal = document.getElementById("updateMedicalRecordModal");
+                const medicalRecordid = btn.dataset.id;
+
+                fetch(`../Get/get-record.php?id=${medicalRecordid}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate fields correctly
+                        document.getElementById("updateRecordId").value = data.id;
+                        document.getElementById("updateVisitDate").value = data.visit_date ? data.visit_date : "";
+                        document.getElementById("updatePetName").value = data.pet_name;
+                        document.getElementById("updateVisitType").value = data.visit_type;
+                        document.getElementById("updateWeight").value = data.weight;
+                        document.getElementById("updateTemperature").value = data.temperature;
+                        document.getElementById("updateDiagnosis").value = data.diagnosis;
+                        document.getElementById("updateTreatment").value = data.treatment;
+                        document.getElementById("updateMedications").value = data.medications;
+                        document.getElementById("updateNotes").value = data.notes;
+                        document.getElementById("updateFollowUpDate").value = data.follow_up_date ? data.follow_up_date : "";
+                    })
+                    .catch(error => console.error("Error fetching record:", error));
+
+                modal.classList.remove("hidden");
+                updateBodyScroll();
+            });
+        });
 
     </script>
 </body>
