@@ -131,10 +131,9 @@ function addMedicalRecord($pdo, $data)
 function updateMedicalRecord($pdo, $data)
 {
     $stmt = $pdo->prepare("
-        UPDATE medical_records SET pet_id = ?, visit_date = ?, visit_type = ?, weight = ?, temperature = ?, diagnosis = ?, treatment = ?, medications = ?, notes = ?, follow_up_date = ? WHERE id = ?
+        UPDATE medical_records SET visit_date = ?, visit_type = ?, weight = ?, temperature = ?, diagnosis = ?, treatment = ?, medications = ?, notes = ?, follow_up_date = ? WHERE id = ?
     ");
     return $stmt->execute([
-        $data['pet_id'],
         $data['visit_date'],
         $data['visit_type'],
         $data['weight'],
