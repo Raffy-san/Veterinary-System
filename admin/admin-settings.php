@@ -2,6 +2,7 @@
 include_once '../config/config.php';
 require_once '../functions/session.php';
 require_once '../helpers/fetch.php';
+require_once '../functions/crud.php';
 SessionManager::requireLogin();
 SessionManager::requireRole('admin');
 
@@ -9,6 +10,24 @@ $admin = SessionManager::getUser($pdo);
 
 if (!$admin) {
     SessionManager::logout('../login.php');
+}
+
+if (isset($_POST['update'])) {
+    $data = [
+        'admin_id' => $_POST['admin_id'],
+        'username' => $_POST['username'],
+        'password' => $_POST['password']
+    ];
+
+    if (
+        updateAdmin($pdo, $data)
+    ) {
+       header("Location:admin-settings.php?updated=1");
+       exit();
+    } else {
+       header("Location:admin-settings.php?updated=0");
+       exit();
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -41,14 +60,15 @@ if (!$admin) {
                 <p class="text-gray-600">Manage your admin settings here.</p>
             </div>
 
-            <form class="space-y-6" onsubmit="handleSubmit(event)">
+            <form class="space-y-6" method="POST" action="admin-settings.php">
+                <input type="text" name="admin_id" value="<?php echo $admin['user_id']; ?>" hidden>
                 <!-- Username Field -->
                 <div class="space-y-2">
                     <label for="username" class="block text-sm font-medium text-gray-700 flex items-center gap-2">
                         <i class="fas fa-user text-green-500 w-4"></i>
                         Change Username
                     </label>
-                    <input type="text" id="username" placeholder="New Username"
+                    <input type="text" id="username" placeholder="New Username" name="username" required
                         class="border border-gray-300 rounded-lg p-3 mt-1 w-full focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
                 </div>
 
@@ -59,7 +79,7 @@ if (!$admin) {
                         Change Password
                     </label>
                     <div class="relative">
-                        <input type="password" id="password" placeholder="New Password"
+                        <input type="password" id="password" placeholder="New Password" name="password" required
                             class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
                         <button type="button" onclick="togglePassword()"
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-500 transition-colors">
@@ -70,7 +90,7 @@ if (!$admin) {
 
                 <!-- Action Buttons -->
                 <div class="flex gap-4 pt-6">
-                    <button type="submit"
+                    <button type="submit" name="update"
                         class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
                         <i class="fas fa-save"></i>
                         Save Changes
@@ -99,19 +119,6 @@ if (!$admin) {
                 toggleIcon.classList.remove('fa-eye-slash');
                 toggleIcon.classList.add('fa-eye');
             }
-        }
-
-        function handleSubmit(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (!username && !password) {
-                alert('Please enter at least one field to update.');
-                return;
-            }
-
-            showSuccess();
         }
 
         function resetForm() {
