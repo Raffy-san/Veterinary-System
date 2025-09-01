@@ -152,3 +152,12 @@ function deleteMedicalRecord($pdo, $id)
     $stmt = $pdo->prepare("DELETE FROM medical_records WHERE id = ?");
     return $stmt->execute([$id]);
 }
+
+function updateAdmin($pdo, $data)
+{
+    $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare("
+        UPDATE users SET username = ?, password = ? WHERE id = ?
+    ");
+    return $stmt->execute([$data['username'], $hashedPassword, $data['admin_id']]);
+}
