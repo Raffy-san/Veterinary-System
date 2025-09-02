@@ -20,6 +20,7 @@ if (SessionManager::isLoggedIn()) {
     <link rel="icon" type="image/png" href="assets/img/green-paw.png">
     <title>Login - Medical Record System</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/js/script.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
@@ -83,7 +84,17 @@ if (SessionManager::isLoggedIn()) {
                 Sign in
             </button>
         </form>
-
+        <!-- Error Modal -->
+        <div id="errorModal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+                <h3 class="text-lg font-semibold text-red-600 mb-4">Login Failed</h3>
+                <p id="errorMessage" class="text-gray-700 mb-4"></p>
+                <button id="closeModal"
+                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
     </section>
     <script>
         // Descriptions and icons for each option
@@ -131,9 +142,6 @@ if (SessionManager::isLoggedIn()) {
         document.getElementById('desc-icon').outerHTML = descriptions[selectedValue].icon.replace('">', '" id="desc-icon">');
         document.getElementById('desc-text').textContent = descriptions[selectedValue].text;
         document.getElementById('desc-description').textContent = descriptions[selectedValue].description;
-    </script>
-
-    <script>
         document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
@@ -155,16 +163,33 @@ if (SessionManager::isLoggedIn()) {
                         }
                         window.location.href = path;
                     } else {
-                        alert(data.message || 'Login failed');
+                        // ✅ Remove alert and show modal instead
+                        document.getElementById('errorMessage').textContent = data.message || 'Login failed';
+                        document.getElementById('errorModal').classList.remove('hidden');
+                        updateBodyScroll();
                     }
                 })
                 .catch(err => {
-                    alert('An error occurred. Please try again.');
+                    document.getElementById('errorMessage').textContent = 'An error occurred. Please try again.';
+                    document.getElementById('errorModal').classList.remove('hidden');
+                    updateBodyScroll();
                     console.error(err);
                 });
         });
-    </script>
-    <script>
+
+        document.getElementById('closeModal').addEventListener('click', function () {
+            document.getElementById('errorModal').classList.add('hidden');
+            updateBodyScroll();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('errorModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+                updateBodyScroll();
+            }
+        });
+
         document.getElementById('togglePassword').addEventListener('click', function () {
             const passwordInput = document.getElementById('password');
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';

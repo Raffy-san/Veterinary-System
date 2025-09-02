@@ -51,6 +51,7 @@ foreach ($pet as $p) {
     $speciesCount[$species] = ($speciesCount[$species] ?? 0) + 1;
 }
 
+$Uppercase = ucfirst($client['status']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -153,7 +154,7 @@ foreach ($pet as $p) {
                         <span class="text-xs md:text-sm text-gray-600">Account Type:</span>
                         <span
                             class="text-xs md:text-sm font-medium text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">
-                            <?= htmlspecialchars($client['status']) ?> Owner
+                            <?= htmlspecialchars($Uppercase) ?> Owner
                         </span>
                     </div>
                     <div class="flex items-center justify-between">
@@ -191,7 +192,8 @@ foreach ($pet as $p) {
                         <div class="min-w-0 flex-1">
                             <p class="text-xs md:text-sm text-gray-500">Email Address</p>
                             <p class="font-medium text-gray-800 text-sm md:text-base truncate">
-                                <?= htmlspecialchars($client['email']); ?></p>
+                                <?= htmlspecialchars($client['email']); ?>
+                            </p>
                         </div>
                     </div>
 
@@ -203,7 +205,8 @@ foreach ($pet as $p) {
                         <div class="min-w-0 flex-1">
                             <p class="text-xs md:text-sm text-gray-500">Phone Number</p>
                             <p class="font-medium text-gray-800 text-sm md:text-base">
-                                <?= htmlspecialchars($client['phone']); ?></p>
+                                <?= htmlspecialchars($client['phone']); ?>
+                            </p>
                         </div>
                     </div>
 
@@ -215,7 +218,8 @@ foreach ($pet as $p) {
                         <div class="min-w-0 flex-1">
                             <p class="text-xs md:text-sm text-gray-500">Address</p>
                             <p class="font-medium text-gray-800 text-sm md:text-base">
-                                <?= htmlspecialchars($client['address']); ?></p>
+                                <?= htmlspecialchars($client['address']); ?>
+                            </p>
                         </div>
                     </div>
                 </div>
