@@ -46,9 +46,19 @@ class SessionManager
      */
     private static function redirect(string $url): void
     {
+        if (
+            !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+        ) {
+            header('Content-Type: application/json');
+            echo json_encode(["status" => "error", "message" => "Unauthorized access."]);
+            exit();
+        }
+
         header("Location: $url");
         exit();
     }
+
 
     /**
      * Get logged-in user info from database.

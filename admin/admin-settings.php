@@ -11,24 +11,6 @@ $admin = SessionManager::getUser($pdo);
 if (!$admin) {
     SessionManager::logout('../login.php');
 }
-
-if (isset($_POST['update'])) {
-    $data = [
-        'admin_id' => $_POST['admin_id'],
-        'username' => $_POST['username'],
-        'password' => $_POST['password']
-    ];
-
-    if (
-        updateAdmin($pdo, $data)
-    ) {
-       header("Location:admin-settings.php?updated=1");
-       exit();
-    } else {
-       header("Location:admin-settings.php?updated=0");
-       exit();
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,6 +19,7 @@ if (isset($_POST['update'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
+    <script src="../assets/js/script.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Admin Settings</title>
@@ -79,7 +62,7 @@ if (isset($_POST['update'])) {
                         Change Password
                     </label>
                     <div class="relative">
-                        <input type="password" id="password" placeholder="New Password" name="password" required
+                        <input type="password" id="password" placeholder="New Password" name="password"
                             class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
                         <button type="button" onclick="togglePassword()"
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-500 transition-colors">
@@ -102,6 +85,17 @@ if (isset($_POST['update'])) {
                     </button>
                 </div>
             </form>
+            <!-- Universal Message Modal -->
+            <div id="messageModal"
+                class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+                <div class="bg-white rounded-lg p-6 max-w-md w-full text-center">
+                    <h3 id="messageTitle" class="text-lg font-semibold mb-2"></h3>
+                    <p id="messageText" class="text-gray-600 mb-4"></p>
+                    <button id="closeMessageBtn"
+                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">OK</button>
+                </div>
+            </div>
+
         </section>
     </main>
 
@@ -125,6 +119,61 @@ if (isset($_POST['update'])) {
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
         }
+
+        function showMessage(title, message, type = "success") {
+            const modal = document.getElementById("messageModal");
+            const titleElement = document.getElementById("messageTitle");
+            const textElement = document.getElementById("messageText");
+
+            titleElement.textContent = title;
+            textElement.textContent = message;
+
+            if (type === "success") {
+                titleElement.classList.remove("text-red-600");
+                titleElement.classList.add("text-green-600");
+            } else {
+                titleElement.classList.remove("text-green-600");
+                titleElement.classList.add("text-red-600");
+            }
+
+            modal.classList.remove("hidden");
+            updateBodyScroll();
+
+            document.getElementById("closeMessageBtn").onclick = () => {
+                modal.classList.add("hidden");
+                updateBodyScroll();
+                if (type === "success") {
+                    location.reload(); // Reload after success
+                }
+            };
+        }
+
+        // Handle Add Client Form (AJAX)
+        document.querySelector('form[action="admin-settings.php"]').addEventListener("submit", function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("../php/update-admin.php", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        showMessage("Success", data.message, "success");
+                    } else {
+                        showMessage("Error", data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    showMessage("Error", "Something went wrong!", "error");
+                    console.error("Fetch Error:", error);
+                });
+        });
+
     </script>
 </body>
 
