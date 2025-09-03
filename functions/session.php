@@ -86,7 +86,7 @@ class SessionManager
         } else {
             // Fetch only from users for admin or other roles
             $stmt = $pdo->prepare("
-            SELECT id AS user_id, username, access_type
+            SELECT id AS user_id, username, password, access_type
             FROM users
             WHERE id = ?
         ");

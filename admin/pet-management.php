@@ -36,23 +36,25 @@ if (!$admin) {
                     <h3 class="font-semibold text-lg">Pet Management</h3>
                     <h4 class="text-gray-600">Manage Pet information</h4>
                 </div>
-                <div class="relative inline-block mt-4">
-                    <label for="speciesFilter" class="sr-only">Filter by Species</label>
-                    <select id="speciesFilter"
-                        class="appearance-none w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
-               bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
-               hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
-                        <option value="">Show All</option>
-                        <option value="Dog">Dog</option>
-                        <option value="Cat">Cat</option>
-                        <option value="Bird">Bird</option>
-                        <option value="Rabbit">Rabbit</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <!-- Dropdown Icon -->
-                    <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                        <i class="fa-solid fa-chevron-down text-green-600"></i>
-                    </span>
+                <div class="flex justify-between items-center space-x-4">
+                    <h3 class="relative inline-block mt-4 font-semibold">Filter By Species:</h3>
+                    <div class="relative inline-block mt-4">
+                        <select id="speciesFilter"
+                            class="appearance-none w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
+                        bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
+                        hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+                            <option value="">Show All</option>
+                            <option value="Dog">Dog</option>
+                            <option value="Cat">Cat</option>
+                            <option value="Bird">Bird</option>
+                            <option value="Rabbit">Rabbit</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <!-- Dropdown Icon -->
+                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <i class="fa-solid fa-chevron-down text-green-600"></i>
+                        </span>
+                    </div>
                 </div>
             </div>
 

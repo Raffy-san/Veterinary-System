@@ -209,25 +209,39 @@ function updateAdmin($pdo, $data)
             return json_encode(["status" => "error", "message" => "Username cannot be empty"]);
         }
 
-        // If password is provided, update both username and password
+        // Fetch current user info
+        $stmt = $pdo->prepare("SELECT username FROM users WHERE id = ?");
+        $stmt->execute([$data['admin_id']]);
+        $currentUsername = $stmt->fetchColumn();
+
+        if (!$currentUsername) {
+            return json_encode(["status" => "error", "message" => "Admin not found"]);
+        }
+
+        // If no changes, return success
+        if ($currentUsername === $data['username'] && empty($data['password'])) {
+            return json_encode(["status" => "success", "message" => "No changes were made"]);
+        }
+
+        // Build update query dynamically
         if (!empty($data['password'])) {
             $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("UPDATE users SET username = ?, password = ? WHERE id = ?");
             $stmt->execute([$data['username'], $hashedPassword, $data['admin_id']]);
         } else {
-            // Only update username
             $stmt = $pdo->prepare("UPDATE users SET username = ? WHERE id = ?");
             $stmt->execute([$data['username'], $data['admin_id']]);
         }
 
-        if ($stmt->rowCount() > 0) {
-            return json_encode(["status" => "success", "message" => "Admin updated successfully"]);
-        } else {
-            return json_encode(["status" => "error", "message" => "No changes were made"]);
-        }
+        // ✅ Refresh session data after update
+        $_SESSION['username'] = $data['username'];
 
+        return json_encode(["status" => "success", "message" => "Admin updated successfully"]);
     } catch (PDOException $e) {
-        return json_encode(["status" => "error", "message" => "Error updating admin: " . $e->getMessage()]);
+        // Log actual error instead of exposing it
+        error_log("UpdateAdmin Error: " . $e->getMessage());
+        return json_encode(["status" => "error", "message" => "An error occurred while updating admin"]);
     }
 }
+
 
