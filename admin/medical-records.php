@@ -38,7 +38,6 @@ if (isset($_POST['submit'])) {
 if (isset($_POST['update_record'])) {
     $data = [
         'medical_record_id' => $_POST['record_id'],
-        'pet_id' => $_POST['pet_name'],
         'visit_date' => $_POST['visit_date'],
         'visit_type' => $_POST['visit_type'],
         'weight' => $_POST['weight'],
@@ -214,9 +213,31 @@ if (isset($_GET['delete_id'])) {
                     <h3 class="font-semibold text-lg">Medical Records</h3>
                     <h4 class="text-gray-600">Track treatments, medications, and medical history</h4>
                 </div>
-                <button data-modal="addNewRecord"
-                    class="open-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700"><i
-                        class="fa-solid fa-plus mr-2"></i>New Record</button>
+                <div class="flex flex-row items-center space-x-4">
+                    <div class="flex justify-between items-center space-x-4">
+                        <h3 class="relative inline-block mt-4 font-semibold">Filter By Visit Type:</h3>
+                        <div class="relative inline-block mt-4">
+                            <select id="typeFilter"
+                                class="appearance-none w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
+                                bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
+                                hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+                                <option value="">Show All</option>
+                                <option value="Routine Checkup">Routine Checkup</option>
+                                <option value="Vaccination">Vaccination</option>
+                                <option value="Treatment">Treatment</option>
+                                <option value="Emergency">Emergency</option>
+                                <option value="Surgery">Surgery</option>
+                            </select>
+                            <!-- Dropdown Icon -->
+                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <i class="fa-solid fa-chevron-down text-green-600"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <button data-modal="addNewRecord"
+                        class="open-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700"><i
+                            class="fa-solid fa-plus mr-2"></i>New Record</button>
+                </div>
             </div>
             <div class="mb-4">
                 <form>
@@ -258,7 +279,7 @@ if (isset($_GET['delete_id'])) {
                         $Type = $record['visit_type'];
                         $typeinfo = $visitType[$Type] ?? ['icon' => 'fa-solid fa-question', 'color' => 'text-gray-700', 'bg' => 'bg-gray-200'];
 
-                        echo '<tr class="border-b hover:bg-green-50 text-sm">';
+                        echo '<tr class="border-b hover:bg-green-50 text-sm" data-type="' . htmlspecialchars($record['visit_type']) . '">';
                         echo '<td class="py-2">' . htmlspecialchars($record['visit_date']) . '</td>';
                         echo "<td class='py-2'>
                                 <span class='font-medium'>" . htmlspecialchars($record['patient_name']) . "</span><br>
@@ -276,7 +297,8 @@ if (isset($_GET['delete_id'])) {
                                 <button  
                                     data-modal = "viewModal"
                                     data-id="' . $record['medical_record_id'] . '"
-                                    data-date="' . htmlspecialchars($record['visit_date'] ?? '') . '"                  data-type="' . htmlspecialchars($record['visit_type'] ?? '') . '" 
+                                    data-date="' . htmlspecialchars($record['visit_date'] ?? '') . '"                  
+                                    data-type="' . htmlspecialchars($record['visit_type'] ?? '') . '" 
                                     data-type-bg="' . htmlspecialchars($typeinfo['bg']) . '"
                                     data-type-color="' . htmlspecialchars($typeinfo['color']) . '"
                                     data-type-icon="' . htmlspecialchars($typeinfo['icon']) . '"
@@ -351,8 +373,8 @@ if (isset($_GET['delete_id'])) {
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
                         <input type="text" name="pet_name" id="updatePetName"
-                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            required>
+                            class="w-44 bg-white border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-100"
+                            readonly>
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Date</label>
@@ -460,8 +482,10 @@ if (isset($_GET['delete_id'])) {
             const notesDetails = document.getElementById('notesDetails');
             const petName = document.getElementById('petName');
             const recordDate = document.getElementById('recordDate');
+            const searchInput = document.getElementById('search');
             const tableBody = document.getElementById("recordsBody");
-            const rows = tableBody.querySelectorAll("tr");
+            const filterSelect = document.getElementById('typeFilter');
+            const rows = document.querySelectorAll("#recordsBody tr");
             const pagination = document.getElementById("pagination");
             const rowsPerPage = 6;
             let currentPage = 1;
@@ -558,28 +582,33 @@ if (isset($_GET['delete_id'])) {
             }
 
             // Search functionality
-            const records = document.querySelectorAll("tbody tr:not(#noResults)"); 
-            const noResults = document.getElementById("noResults");
-            const searchInput = document.getElementById("search");
+            function applyFilters() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filterValue = filterSelect.value.toLowerCase();
+                let visibleCount = 0;
 
-            searchInput.addEventListener("input", function () {
-                const term = this.value.toLowerCase();
-                let hasResults = false;
+                rows.forEach(row => {
+                    if (!row.cells.length || row.id === "noResults") return;
 
-                records.forEach(record => {
-                    const text = record.textContent.toLowerCase();
-                    if (text.includes(term)) {
-                        record.style.display = "";
-                        hasResults = true;
-                    } else {
-                        record.style.display = "none";
-                    }
+                    const visitType = row.getAttribute('data-type') || '';
+                    const date = row.cells[0].textContent.toLowerCase();
+                    const patient = row.cells[1].textContent.toLowerCase();
+                    const diagnosis = row.cells[3].textContent.toLowerCase();
+
+                    const matchesSearch = date.includes(searchTerm) || patient.includes(searchTerm) || diagnosis.includes(searchTerm);
+                    const matchesFilter = !filterValue || visitType.toLowerCase() === filterValue;
+
+                    const shouldShow = matchesSearch && matchesFilter;
+                    row.style.display = shouldShow ? "" : "none";
+                    if (shouldShow) visibleCount++;
                 });
 
-                // Show or hide "No Results" row
-                noResults.style.display = hasResults ? "none" : "";
+                document.getElementById('noResults').classList.toggle('hidden', visibleCount > 0);
+            }
 
-            });
+            // Add event listeners
+            searchInput.addEventListener('input', applyFilters);
+            filterSelect.addEventListener('change', applyFilters);
 
 
             // Pagination

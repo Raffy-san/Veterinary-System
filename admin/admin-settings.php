@@ -11,6 +11,12 @@ $admin = SessionManager::getUser($pdo);
 if (!$admin) {
     SessionManager::logout('../login.php');
 }
+
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,6 +29,49 @@ if (!$admin) {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Admin Settings</title>
+    <style>
+        .password-strength-meter {
+            height: 5px;
+            margin-top: 8px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .password-weak {
+            background-color: #e53e3e;
+            width: 33%;
+        }
+
+        .password-medium {
+            background-color: #dd6b20;
+            width: 66%;
+        }
+
+        .password-strong {
+            background-color: #38a169;
+            width: 100%;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .success-message {
+            color: #38a169;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        input.error {
+            border-color: #e53e3e;
+        }
+
+        input.success {
+            border-color: #38a169;
+        }
+    </style>
 </head>
 
 <body class="w-full bg-green-100 min-h-screen overflow-y-auto">
@@ -40,45 +89,91 @@ if (!$admin) {
                     </div>
                     <h3 class="text-2xl font-semibold text-gray-800">Admin Settings</h3>
                 </div>
-                <p class="text-gray-600">Manage your admin settings here.</p>
+                <p class="text-gray-600">Manage your admin account settings here.</p>
             </div>
 
-            <form class="space-y-6" method="POST" action="admin-settings.php">
-                <input type="text" name="admin_id" value="<?php echo $admin['user_id']; ?>" hidden>
+            <form class="space-y-6" method="POST" id="adminSettingsForm">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                <input type="hidden" name="admin_id" value="<?php echo $admin['user_id']; ?>">
+
+                <!-- Current Password Field (for verification) -->
+                <div class="space-y-2">
+                    <label for="current_password"
+                        class="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                        <i class="fas fa-lock text-green-500 w-4"></i>
+                        Current Password (for verification)
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="current_password" placeholder="Enter your current password"
+                            name="current_password" required
+                            class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
+                        <button type="button" onclick="togglePassword('current_password', 'current_toggleIcon')"
+                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-500 transition-colors">
+                            <i class="fas fa-eye" id="current_toggleIcon"></i>
+                        </button>
+                    </div>
+                    <div id="current_password_error" class="error-message"></div>
+                </div>
+
                 <!-- Username Field -->
                 <div class="space-y-2">
                     <label for="username" class="block text-sm font-medium text-gray-700 flex items-center gap-2">
                         <i class="fas fa-user text-green-500 w-4"></i>
                         Change Username
                     </label>
-                    <input type="text" id="username" placeholder="New Username" name="username" required
+                    <input type="text" id="username" placeholder="New Username" name="username"
+                        value="<?php echo htmlspecialchars($admin['username']); ?>"
                         class="border border-gray-300 rounded-lg p-3 mt-1 w-full focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
+                    <div id="username_error" class="error-message"></div>
                 </div>
 
-                <!-- Password Field -->
+                <!-- New Password Field -->
                 <div class="space-y-2">
                     <label for="password" class="block text-sm font-medium text-gray-700 flex items-center gap-2">
                         <i class="fas fa-lock text-green-500 w-4"></i>
-                        Change Password
+                        New Password (leave blank to keep current)
                     </label>
                     <div class="relative">
                         <input type="password" id="password" placeholder="New Password" name="password"
                             class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
-                        <button type="button" onclick="togglePassword()"
+                        <button type="button" onclick="togglePassword('password', 'toggleIcon')"
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-500 transition-colors">
                             <i class="fas fa-eye" id="toggleIcon"></i>
                         </button>
                     </div>
+                    <div id="password_strength" class="password-strength-meter"></div>
+                    <div id="password_error" class="error-message"></div>
+                    <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters and include uppercase,
+                        lowercase, number, and special character.</p>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="space-y-2" id="confirm_password_container" style="display: none;">
+                    <label for="confirm_password"
+                        class="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                        <i class="fas fa-lock text-green-500 w-4"></i>
+                        Confirm New Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="confirm_password" placeholder="Confirm New Password"
+                            name="confirm_password"
+                            class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
+                        <button type="button" onclick="togglePassword('confirm_password', 'confirm_toggleIcon')"
+                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-500 transition-colors">
+                            <i class="fas fa-eye" id="confirm_toggleIcon"></i>
+                        </button>
+                    </div>
+                    <div id="confirm_password_error" class="error-message"></div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="flex gap-4 pt-6">
-                    <button type="submit" name="update"
+                    <button type="submit" name="update" id="submitButton"
                         class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
                         <i class="fas fa-save"></i>
                         Save Changes
                     </button>
-                    <button type="button" onclick="resetForm()"
+                    <button type="button" onclick="resetToOriginalValues()"
                         class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2">
                         <i class="fas fa-undo"></i>
                         Reset
@@ -100,9 +195,13 @@ if (!$admin) {
     </main>
 
     <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggleIcon');
+        // Store original values for reset functionality
+        const originalUsername = "<?php echo htmlspecialchars($admin['username']); ?>";
+        let originalPassword = "";
+
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(iconId);
 
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
@@ -115,9 +214,118 @@ if (!$admin) {
             }
         }
 
-        function resetForm() {
-            document.getElementById('username').value = '';
+        function resetToOriginalValues() {
+            document.getElementById('username').value = originalUsername;
             document.getElementById('password').value = '';
+            document.getElementById('confirm_password').value = '';
+            document.getElementById('current_password').value = '';
+
+            // Clear error messages
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            document.querySelectorAll('input').forEach(input => {
+                input.classList.remove('error');
+                input.classList.remove('success');
+            });
+
+            // Hide confirm password if not needed
+            document.getElementById('confirm_password_container').style.display = 'none';
+            document.getElementById('password_strength').className = 'password-strength-meter';
+        }
+
+        function validatePassword(password) {
+            // At least 8 characters, one uppercase, one lowercase, one number, one special character
+            const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            const mediumRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+            if (password.length === 0) {
+                return { strength: 'none', message: '' };
+            } else if (strongRegex.test(password)) {
+                return { strength: 'strong', message: 'Strong password' };
+            } else if (mediumRegex.test(password)) {
+                return { strength: 'medium', message: 'Medium strength password. Add a special character for better security.' };
+            } else if (password.length >= 8) {
+                return { strength: 'weak', message: 'Weak password. Include uppercase, lowercase, and numbers.' };
+            } else {
+                return { strength: 'weak', message: 'Password must be at least 8 characters' };
+            }
+        }
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const errorElement = document.getElementById('confirm_password_error');
+
+            if (password && confirmPassword && password !== confirmPassword) {
+                errorElement.textContent = 'Passwords do not match';
+                document.getElementById('confirm_password').classList.add('error');
+                document.getElementById('confirm_password').classList.remove('success');
+                return false;
+            } else if (password && confirmPassword && password === confirmPassword) {
+                errorElement.textContent = '';
+                document.getElementById('confirm_password').classList.remove('error');
+                document.getElementById('confirm_password').classList.add('success');
+                return true;
+            }
+
+            errorElement.textContent = '';
+            return true;
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            // Validate current password
+            const currentPassword = document.getElementById('current_password').value;
+            if (!currentPassword) {
+                document.getElementById('current_password_error').textContent = 'Current password is required';
+                document.getElementById('current_password').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('current_password_error').textContent = '';
+                document.getElementById('current_password').classList.remove('error');
+            }
+
+            // Validate username
+            const username = document.getElementById('username').value;
+            const usernameRegex = /^[a-zA-Z0-9_-]{3,50}$/;
+            if (!username) {
+                document.getElementById('username_error').textContent = 'Username is required';
+                document.getElementById('username').classList.add('error');
+                isValid = false;
+            } else if (username.length < 3) {
+                document.getElementById('username_error').textContent = 'Username must be at least 3 characters';
+                document.getElementById('username').classList.add('error');
+                isValid = false;
+            } else if (!usernameRegex.test(username)) {
+                document.getElementById('username_error').textContent = 'Username can only contain letters, numbers, underscores, and hyphens';
+                document.getElementById('username').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('username_error').textContent = '';
+                document.getElementById('username').classList.remove('error');
+            }
+
+            // Validate password if provided
+            const password = document.getElementById('password').value;
+            if (password) {
+                const passwordValidation = validatePassword(password);
+
+                if (passwordValidation.strength === 'weak') {
+                    document.getElementById('password_error').textContent = passwordValidation.message;
+                    document.getElementById('password').classList.add('error');
+                    isValid = false;
+                } else {
+                    document.getElementById('password_error').textContent = '';
+                    document.getElementById('password').classList.remove('error');
+                }
+
+                // Check password match
+                if (!checkPasswordMatch()) {
+                    isValid = false;
+                }
+            }
+
+            return isValid;
         }
 
         function showMessage(title, message, type = "success") {
@@ -147,11 +355,85 @@ if (!$admin) {
                 }
             };
         }
+        
+        document.getElementById('username').addEventListener('input', function () {
+            const username = this.value;
+            const usernameRegex = /^[a-zA-Z0-9_-]{3,50}$/;
+            const errorElement = document.getElementById('username_error');
+
+            if (username && !usernameRegex.test(username)) {
+                errorElement.textContent = 'Username can only contain letters, numbers, underscores, and hyphens';
+                this.classList.add('error');
+                this.classList.remove('success');
+            } else if (username && username.length < 3) {
+                errorElement.textContent = 'Username must be at least 3 characters';
+                this.classList.add('error');
+                this.classList.remove('success');
+            } else if (username) {
+                errorElement.textContent = '';
+                this.classList.remove('error');
+                this.classList.add('success');
+            } else {
+                errorElement.textContent = '';
+                this.classList.remove('error');
+                this.classList.remove('success');
+            }
+        });
+
+        // Event listeners
+        document.getElementById('password').addEventListener('input', function () {
+            const password = this.value;
+            const strengthMeter = document.getElementById('password_strength');
+            const confirmContainer = document.getElementById('confirm_password_container');
+
+            if (password) {
+                confirmContainer.style.display = 'block';
+                const validation = validatePassword(password);
+
+                strengthMeter.className = 'password-strength-meter';
+                if (validation.strength !== 'none') {
+                    strengthMeter.classList.add(`password-${validation.strength}`);
+                }
+
+                document.getElementById('password_error').textContent = validation.message;
+                if (validation.strength === 'weak') {
+                    this.classList.add('error');
+                    this.classList.remove('success');
+                } else {
+                    this.classList.remove('error');
+                    this.classList.add('success');
+                }
+            } else {
+                confirmContainer.style.display = 'none';
+                strengthMeter.className = 'password-strength-meter';
+                document.getElementById('password_error').textContent = '';
+                this.classList.remove('error');
+                this.classList.remove('success');
+            }
+
+            // Check password match if confirm field has value
+            if (document.getElementById('confirm_password').value) {
+                checkPasswordMatch();
+            }
+        });
+
+        document.getElementById('confirm_password').addEventListener('input', checkPasswordMatch);
 
         // Handle Add Client Form (AJAX)
-        document.querySelector('form[action="admin-settings.php"]').addEventListener("submit", function (e) {
+        document.getElementById("adminSettingsForm").addEventListener("submit", function (e) {
             e.preventDefault();
+
+            if (!validateForm()) {
+                showMessage("Validation Error", "Please fix the errors in the form.", "error");
+                return;
+            }
+
             const formData = new FormData(this);
+            const submitButton = document.getElementById('submitButton');
+
+            // Disable button to prevent multiple submissions
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
             fetch("../php/update-admin.php", {
                 method: "POST",
@@ -171,9 +453,17 @@ if (!$admin) {
                 .catch(error => {
                     showMessage("Error", "Something went wrong!", "error");
                     console.error("Fetch Error:", error);
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-save"></i> Save Changes';
                 });
         });
 
+        function updateBodyScroll() {
+            // Implementation depends on your existing code
+            // This would typically add/remove overflow-hidden from body
+        }
     </script>
 </body>
 
