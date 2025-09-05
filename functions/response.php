@@ -1,10 +1,15 @@
 <?php
 // ✅ Helper function
+
 function jsonResponse($status, $message, $extra = [])
 {
-    echo json_encode(array_merge([
+    header('Content-Type: application/json');
+
+    $response = array_merge([
         "status" => $status,
         "message" => $message
-    ], $extra));
-    exit;
+    ], $extra);
+
+    echo json_encode($response);
+    exit; // 🔑 ensures nothing else is sent
 }

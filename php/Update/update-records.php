@@ -4,10 +4,11 @@ ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 ini_set('error_log', 'C:\xampp\htdocs\Veterinary-System\logs\php_errors.log');
 
-include_once '../config/config.php';
-require_once '../functions/session.php';
-require_once '../functions/crud.php';
-require_once '../functions/response.php';
+include_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../functions/session.php';
+require_once __DIR__ . '/../../helpers/fetch.php';
+require_once __DIR__ . '/../../functions/crud.php';
+require_once __DIR__ . '/../../functions/response.php';
 
 SessionManager::requireLogin();
 SessionManager::requireRole('admin');
