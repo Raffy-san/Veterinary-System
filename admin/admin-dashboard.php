@@ -40,11 +40,11 @@ WHERE visit_date = CURDATE()");
     <title>Veterinary Clinic - Dashboard Overview</title>
 </head>
 
-<body class="bg-green-100 w-full h-screen overflow-y-auto">
+<body class="bg-green-100 w-full min-h-screen overflow-y-auto">
     <?php
     include_once '../includes/admin-header.php';
     ?>
-    <main class="pb-10">
+    <main class="pb-10 max-w-[1400px] mx-auto">
         <!-- Statistics Cards Section -->
         <section class="p-6 md:p-10">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
@@ -81,7 +81,8 @@ WHERE visit_date = CURDATE()");
                     </div>
                     <div>
                         <h2 class="text-3xl font-bold text-gray-800">
-                            <?php echo $totalRecords['total_transactions_today']; ?></h2>
+                            <?php echo $totalRecords['total_transactions_today']; ?>
+                        </h2>
                         <span
                             class="bg-green-50 text-green-700 text-xs font-medium px-2 py-1 rounded-full mt-2 inline-block">
                             Visits

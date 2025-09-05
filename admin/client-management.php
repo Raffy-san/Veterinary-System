@@ -135,10 +135,10 @@ if (isset($_POST['update_pet'])) {
     <title>Client Management</title>
 </head>
 
-<body class="bg-green-100 w-full h-screen overflow-y-auto">
+<body class="bg-green-100 w-full min-h-screen overflow-y-auto">
     <?php include_once '../includes/admin-header.php'; ?>
 
-    <main class="p-10">
+    <main class="p-10 max-w-[1400px] mx-auto">
         <!-- Main Client Table -->
         <section class="p-10 bg-white rounded-lg shadow-md">
             <div class="mb-4 flex items-center justify-between">

@@ -12,64 +12,10 @@ if (!$admin) {
     SessionManager::logout('../login.php');
 }
 
-if (isset($_POST['submit'])) {
-    $data = [
-        'pet_id' => $_POST['patient'],
-        'visit_date' => $_POST['visit_date'],
-        'visit_type' => $_POST['visit_type'],
-        'weight' => $_POST['weight'],
-        'temperature' => $_POST['temperature'],
-        'diagnosis' => $_POST['diagnosis'],
-        'treatment' => $_POST['treatment'],
-        'medications' => $_POST['medications'],
-        'notes' => $_POST['notes'],
-        'follow_up_date' => $_POST['follow_up_date']
-    ];
-
-    if (addMedicalRecord($pdo, $data)) {
-        header("Location: medical-records.php?added=1");
-        exit;
-    } else {
-        header("Location: medical-records.php?added=0");
-        exit;
-    }
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
-
-if (isset($_POST['update_record'])) {
-    $data = [
-        'medical_record_id' => $_POST['record_id'],
-        'visit_date' => $_POST['visit_date'],
-        'visit_type' => $_POST['visit_type'],
-        'weight' => $_POST['weight'],
-        'temperature' => $_POST['temperature'],
-        'diagnosis' => $_POST['diagnosis'],
-        'treatment' => $_POST['treatment'],
-        'medications' => $_POST['medications'],
-        'notes' => $_POST['notes'],
-        'follow_up_date' => $_POST['follow_up_date']
-    ];
-
-    if (updateMedicalRecord($pdo, $data)) {
-        header("Location: medical-records.php?updated=1");
-        exit;
-    } else {
-        header("Location: medical-records.php?updated=0");
-        exit;
-    }
-}
-
-if (isset($_GET['delete_id'])) {
-    $recordId = $_GET['delete_id'];
-
-    if (deleteMedicalRecord($pdo, $recordId)) {
-        header("Location: medical-records.php?deleted=1");
-        exit;
-    } else {
-        header("Location: medical-records.php?deleted=0");
-        exit;
-    }
-}
-
+$csrf_token = $_SESSION['csrf_token'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -85,11 +31,11 @@ if (isset($_GET['delete_id'])) {
     <title>Medical Records</title>
 </head>
 
-<body class="w-full bg-green-100 h-screen overflow-y-auto">
+<body class="w-full bg-green-100 min-h-screen overflow-y-auto">
     <?php
     include_once '../includes/admin-header.php';
     ?>
-    <main class="p-10">
+    <main class="p-10 max-w-[1400px] mx-auto">
         <div id="addNewRecord"
             class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
             <div
@@ -101,7 +47,9 @@ if (isset($_GET['delete_id'])) {
                     </div>
                     <button class="close text-xl">&times;</button>
                 </div>
-                <form class="flex flex-wrap items-center justify-between" method="POST" action="medical-records.php">
+                <form id="addRecordForm" class="flex flex-wrap items-center justify-between" method="POST"
+                    action="medical-records.php">
+                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
                         <select
@@ -246,7 +194,7 @@ if (isset($_GET['delete_id'])) {
                         class="bg-gray-100 rounded px-3 py-2 mb-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-green-500">
                 </form>
             </div>
-            <table class="w-full table-collapse">
+            <table id="recordsTable" class="w-full table-collapse">
                 <thead>
                     <tr class="text-sm text-left border-b">
                         <th class="font-semibold py-2">Date</th>
@@ -262,9 +210,10 @@ if (isset($_GET['delete_id'])) {
                     $records = fetchAllData(
                         $pdo,
                         "SELECT m.id AS medical_record_id, m.visit_date, m.weight, m.temperature, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes, m.follow_up_date
-                        FROM medical_records m
+                        FROM medical_records m 
                         JOIN pets p ON m.pet_id = p.id
-                        JOIN owners o ON p.owner_id = o.id"
+                        JOIN owners o ON p.owner_id = o.id
+                        ORDER BY m.created_at DESC"
                     );
 
                     $visitType = [
@@ -279,7 +228,10 @@ if (isset($_GET['delete_id'])) {
                         $Type = $record['visit_type'];
                         $typeinfo = $visitType[$Type] ?? ['icon' => 'fa-solid fa-question', 'color' => 'text-gray-700', 'bg' => 'bg-gray-200'];
 
-                        echo '<tr class="border-b hover:bg-green-50 text-sm" data-type="' . htmlspecialchars($record['visit_type']) . '">';
+                        echo '<tr 
+                            data-id="' . htmlspecialchars($record['medical_record_id']) . '" 
+                            data-type="' . htmlspecialchars($record['visit_type']) . '" 
+                            class="border-b hover:bg-green-50 text-sm">';
                         echo '<td class="py-2">' . htmlspecialchars($record['visit_date']) . '</td>';
                         echo "<td class='py-2'>
                                 <span class='font-medium'>" . htmlspecialchars($record['patient_name']) . "</span><br>
@@ -313,7 +265,7 @@ if (isset($_GET['delete_id'])) {
                                     data-notes="' . htmlspecialchars($record['notes'] ?? '') . '" 
                                     class="open-modal fa-solid fa-eye text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                                 <button class="open-edit-modal fa-solid fa-pencil text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
-                                <button class="open-delete-modal fa-solid fa-trash text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button class="open-delete-modal fa-solid fa-trash text-gray-700 bg-green-100 p-2 rounded hover:bg-red-400" data-id="' . $record['medical_record_id'] . '"></button>
                             </td>';
                         echo '</tr>';
                     }
@@ -369,6 +321,7 @@ if (isset($_GET['delete_id'])) {
                     <button class="close text-xl">&times;</button>
                 </div>
                 <form class="flex flex-wrap items-center justify-between" method="POST" action="medical-records.php">
+                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <input type="hidden" name="record_id" id="updateRecordId">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
@@ -468,6 +421,15 @@ if (isset($_GET['delete_id'])) {
                         Delete
                     </a>
                 </div>
+            </div>
+        </div>
+        <div id="messageModal"
+            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full text-center">
+                <h3 id="messageTitle" class="text-lg font-semibold mb-2"></h3>
+                <p id="messageText" class="text-gray-600 mb-4"></p>
+                <button id="closeMessageBtn"
+                    class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">OK</button>
             </div>
         </div>
     </main>
@@ -648,19 +610,45 @@ if (isset($_GET['delete_id'])) {
             showPage(1);
         });
 
+        document.getElementById("addRecordForm").addEventListener("submit", function (e) {
+            e.preventDefault();
 
-        document.querySelectorAll(".open-delete-modal").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const modal = document.getElementById("deleteModal");
-                const medicalRecordid = btn.dataset.id;
+            const form = this;
 
-                document.getElementById("deleteMessage").textContent =
-                    `Are you sure you want to delete this medical record? This action cannot be undone.`;
-                document.getElementById("confirmDeleteBtn").href = `medical-records.php?delete_id=${medicalRecordid}`;
+            // Always refresh the CSRF token in the hidden input (if global var exists)
+            if (window.csrfToken) {
+                const csrfInput = form.querySelector("input[name='csrf_token']");
+                if (csrfInput) {
+                    csrfInput.value = window.csrfToken;
+                }
+            }
 
-                modal.classList.remove("hidden");
-                updateBodyScroll();
-            });
+            const formData = new FormData(form); // ✅ now has latest token
+
+            fetch("../php/add-records.php", {
+                method: "POST",
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const msgModal = document.getElementById("messageModal");
+                    const msgTitle = document.getElementById("messageTitle");
+                    const msgText = document.getElementById("messageText");
+
+                    msgTitle.textContent = data.status === "success" ? "Success" : "Error";
+                    msgText.textContent = data.message;
+                    msgModal.classList.remove("hidden");
+                    updateBodyScroll();
+
+                    if (data.status === "success") {
+                        location.reload();
+                    }
+
+                })
+                .catch(err => {
+                    console.error("Add record failed:", err);
+                    showMessage("Error", "An error occurred while adding the record.");
+                });
         });
 
         document.querySelectorAll(".open-edit-modal").forEach(btn => {
@@ -671,26 +659,173 @@ if (isset($_GET['delete_id'])) {
                 fetch(`../Get/get-record.php?id=${medicalRecordid}`)
                     .then(response => response.json())
                     .then(data => {
-                        // Populate fields correctly
-                        document.getElementById("updateRecordId").value = data.id;
-                        document.getElementById("updateVisitDate").value = data.visit_date ? data.visit_date : "";
-                        document.getElementById("updatePetName").value = data.pet_name;
-                        document.getElementById("updateVisitType").value = data.visit_type;
-                        document.getElementById("updateWeight").value = data.weight;
-                        document.getElementById("updateTemperature").value = data.temperature;
-                        document.getElementById("updateDiagnosis").value = data.diagnosis;
-                        document.getElementById("updateTreatment").value = data.treatment;
-                        document.getElementById("updateMedications").value = data.medications;
-                        document.getElementById("updateNotes").value = data.notes;
-                        document.getElementById("updateFollowUpDate").value = data.follow_up_date ? data.follow_up_date : "";
-                    })
-                    .catch(error => console.error("Error fetching record:", error));
+                        if (data.error) {
+                            alert(data.error);
+                            return;
+                        }
 
-                modal.classList.remove("hidden");
-                updateBodyScroll();
+                        document.getElementById("updateRecordId").value = data.id;
+                        document.getElementById("updatePetName").value = data.pet_name;
+                        document.getElementById("updateVisitDate").value = data.visit_date || "";
+                        document.getElementById("updateVisitType").value = data.visit_type || "";
+                        document.getElementById("updateWeight").value = data.weight || "";
+                        document.getElementById("updateTemperature").value = data.temperature || "";
+                        document.getElementById("updateDiagnosis").value = data.diagnosis || "";
+                        document.getElementById("updateTreatment").value = data.treatment || "";
+                        document.getElementById("updateMedications").value = data.medications || "";
+                        document.getElementById("updateNotes").value = data.notes || "";
+                        document.getElementById("updateFollowUpDate").value = data.follow_up_date || "";
+
+                        modal.classList.remove("hidden");
+                        updateBodyScroll();
+                    })
+                    .catch(err => {
+                        console.error("Error fetching record:", err);
+                        alert("Could not fetch record details.");
+                    });
             });
         });
 
+        document.querySelector("#updateMedicalRecordModal form")
+            .addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const form = this;
+
+                // Always refresh the CSRF token in the hidden input (if global var exists)
+                if (window.csrfToken) {
+                    const csrfInput = form.querySelector("input[name='csrf_token']");
+                    if (csrfInput) {
+                        csrfInput.value = window.csrfToken;
+                    }
+                }
+
+                const formData = new FormData(form); // ✅ now has latest token
+
+                fetch("../php/update-records.php", {
+                    method: "POST",
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.status === "success") {
+                            showMessage("Success", result.message);
+                            updateBodyScroll();
+
+                            // 🔑 Save fresh token globally
+                            if (result.csrf_token) {
+                                window.csrfToken = result.csrf_token;
+
+                                // also update hidden input so UI form matches
+                                const csrfInput = form.querySelector("input[name='csrf_token']");
+                                if (csrfInput) {
+                                    csrfInput.value = result.csrf_token;
+                                }
+                            }
+
+                            // Update row in table without reloading
+                            const row = document.querySelector(`tr[data-id="${formData.get("record_id")}"]`);
+                            if (row) {
+                                row.querySelector("td:nth-child(1)").textContent = formData.get("visit_date");
+                                row.querySelector("td:nth-child(3) span").textContent = formData.get("visit_type");
+                                row.querySelector("td:nth-child(4)").textContent = formData.get("diagnosis");
+                                row.querySelector("td:nth-child(5)").textContent = formData.get("follow_up_date");
+                            }
+
+                            // Close modal
+                            document.getElementById("updateMedicalRecordModal").classList.add("hidden");
+                            updateBodyScroll();
+                        } else {
+                            showMessage("Error", result.message);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Error updating record:", err);
+                        showMessage("Error", "Update failed. Try again.");
+                    });
+            });
+
+        // Define a global csrfToken variable
+        let csrfToken = "<?= $csrf_token ?>";
+
+        // ================= Delete Record =================
+        document.querySelectorAll(".open-delete-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const recordId = btn.dataset.id;
+
+                const modal = document.getElementById("deleteModal");
+                modal.classList.remove("hidden");
+                updateBodyScroll();
+
+                const confirmBtn = document.getElementById("confirmDeleteBtn");
+                confirmBtn.dataset.id = recordId;
+
+                document.getElementById("deleteMessage").textContent =
+                    `Are you sure you want to delete medical record #${recordId}?`;
+            });
+        });
+
+        // Confirm Delete button
+        document.getElementById("confirmDeleteBtn").addEventListener("click", (e) => {
+            e.preventDefault();
+            const recordId = e.target.dataset.id;
+
+            e.target.textContent = "Deleting...";
+            e.target.disabled = true;
+
+            fetch("../php/delete-records.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({
+                    record_id: recordId,
+                    csrf_token: csrfToken // 🔑 use latest token
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        const row = document.querySelector(`tr[data-id="${recordId}"]`);
+                        if (row) {
+                            row.style.transition = "opacity 0.5s";
+                            row.style.opacity = "0";
+                            setTimeout(() => row.remove(), 100);
+                        }
+
+                        document.getElementById("deleteModal").classList.add("hidden");
+                        updateBodyScroll();
+
+                        showMessage("Success", data.message);
+
+                        // 🔑 update CSRF token for next request
+                        if (data.csrf_token) {
+                            csrfToken = data.csrf_token;
+                        }
+                    } else {
+                        showMessage("Error", data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showMessage("Error", "Something went wrong while deleting.");
+                })
+                .finally(() => {
+                    e.target.textContent = "Delete";
+                    e.target.disabled = false;
+                });
+        });
+
+
+        // Helper function to show the message modal
+        function showMessage(title, text) {
+            document.getElementById("messageTitle").textContent = title;
+            document.getElementById("messageText").textContent = text;
+            document.getElementById("messageModal").classList.remove("hidden");
+        }
+
+        // Close message modal
+        document.getElementById("closeMessageBtn").addEventListener("click", () => {
+            document.getElementById("messageModal").classList.add("hidden");
+        });
 
 
     </script>
