@@ -41,8 +41,8 @@ if (!$admin) {
                     <div class="relative inline-block mt-4">
                         <select id="speciesFilter"
                             class="appearance-none w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
-                        bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
-                        hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+                                    bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
+                                    hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
                             <option value="">Show All</option>
                             <option value="Dog">Dog</option>
                             <option value="Cat">Cat</option>
@@ -59,12 +59,17 @@ if (!$admin) {
             </div>
 
             <!-- Search -->
-            <div class="mb-4">
-                <form>
-                    <i class="fa-solid fa-search text-sm"></i>
-                    <input type="search" id="search" placeholder="Search Pets..."
-                        class="bg-gray-100 rounded px-3 py-2 mb-4 text-sm w-64">
-                </form>
+            <div class="flex justify-between items-center">
+                <div class="mb-4">
+                    <form>
+                        <i class="fa-solid fa-search text-sm"></i>
+                        <input type="search" id="search" placeholder="Search Pets..."
+                            class="bg-gray-100 rounded px-3 py-2 mb-4 text-sm w-64">
+                    </form>
+                </div>
+                <div class="mb-4">
+                    <h3 class="font-semibold"></h3>
+                </div>
             </div>
 
             <!-- Table -->
@@ -160,6 +165,7 @@ if (!$admin) {
     <!-- JS -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            const speciesCountDiv = document.querySelector('.flex.justify-between.items-center .mb-4 h3.font-semibold');
             const petDetails = document.getElementById("petDetails");
             const ownerDetails = document.getElementById("ownerDetails");
             const notesDetails = document.getElementById("notesDetails");
@@ -173,7 +179,6 @@ if (!$admin) {
             const rowsPerPage = 6;
             let currentPage = 1;
             const totalPages = Math.ceil(rows.length / rowsPerPage);
-
             function applyFilters() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const filterValue = filterSelect.value.toLowerCase();
@@ -192,10 +197,16 @@ if (!$admin) {
 
                     const shouldShow = matchesSearch && matchesFilter;
                     row.style.display = shouldShow ? "" : "none";
-                    if (shouldShow) visibleCount++;
+
+                    if (shouldShow) {
+                        visibleCount++; // just count all visible pets
+                    }
                 });
 
                 document.getElementById('noResults').classList.toggle('hidden', visibleCount > 0);
+
+                // Update species count display to total visible pets
+                speciesCountDiv.textContent = `Total Pets: ${visibleCount}`;
             }
 
 
@@ -286,6 +297,8 @@ if (!$admin) {
             };
 
             showPage(1);
+
+            applyFilters();
         });
 
     </script>
