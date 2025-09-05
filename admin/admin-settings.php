@@ -79,7 +79,7 @@ $csrf_token = $_SESSION['csrf_token'];
     include '../includes/admin-header.php';
     ?>
 
-    <main class="p-10">
+    <main class="p-10 max-w-[1400px] mx-auto">
         <section class="w-full bg-white shadow-lg rounded-xl p-8">
             <!-- Header -->
             <div class="mb-8 border-b border-gray-200 pb-6">

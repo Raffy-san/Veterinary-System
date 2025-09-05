@@ -142,7 +142,8 @@ function addMedicalRecord($pdo, $data)
 {
     try {
         $stmt = $pdo->prepare("
-            INSERT INTO medical_records (pet_id, visit_date, visit_type, weight, temperature, diagnosis, treatment, medications, notes, follow_up_date) 
+            INSERT INTO medical_records 
+                (pet_id, visit_date, visit_type, weight, temperature, diagnosis, treatment, medications, notes, follow_up_date) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
@@ -157,12 +158,24 @@ function addMedicalRecord($pdo, $data)
             $data['notes'],
             $data['follow_up_date']
         ]);
-        return json_encode(["status" => "success", "message" => "Medical record added successfully"]);
+
+        // ✅ get the new record id
+        $newId = $pdo->lastInsertId();
+
+        return json_encode([
+            "status" => "success",
+            "message" => "Medical record added successfully",
+            "id" => $newId // send back new medical_records.id
+        ]);
 
     } catch (PDOException $e) {
-        return json_encode(["status" => "error", "message" => "Error adding medical record: " . $e->getMessage()]);
+        return json_encode([
+            "status" => "error",
+            "message" => "Error adding medical record: " . $e->getMessage()
+        ]);
     }
 }
+
 
 function updateMedicalRecord($pdo, $data)
 {
@@ -180,7 +193,7 @@ function updateMedicalRecord($pdo, $data)
             $data['medications'],
             $data['notes'],
             $data['follow_up_date'],
-            $data['medical_record_id']
+            $data['record_id']
         ]);
         return json_encode(["status" => "success", "message" => "Medical record updated successfully"]);
 
