@@ -625,7 +625,7 @@ $csrf_token = $_SESSION['csrf_token'];
 
             const formData = new FormData(form); // ✅ now has latest token
 
-            fetch("../php/add-records.php", {
+            fetch("../php/Add/add-records.php", {
                 method: "POST",
                 body: formData
             })
@@ -702,7 +702,7 @@ $csrf_token = $_SESSION['csrf_token'];
 
                 const formData = new FormData(form); // ✅ now has latest token
 
-                fetch("../php/update-records.php", {
+                fetch("../php/Update/update-records.php", {
                     method: "POST",
                     body: formData
                 })
@@ -773,7 +773,7 @@ $csrf_token = $_SESSION['csrf_token'];
             e.target.textContent = "Deleting...";
             e.target.disabled = true;
 
-            fetch("../php/delete-records.php", {
+            fetch("../php/Delete/delete-records.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: new URLSearchParams({

@@ -435,7 +435,7 @@ $csrf_token = $_SESSION['csrf_token'];
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
-            fetch("../php/update-admin.php", {
+            fetch("../php/Update/update-admin.php", {
                 method: "POST",
                 body: formData,
                 headers: {
