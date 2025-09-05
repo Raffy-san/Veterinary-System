@@ -1,8 +1,8 @@
 <?php
-include_once '../config/config.php';
-require_once '../functions/session.php';
-require_once '../helpers/fetch.php';
-require_once '../functions/crud.php';
+include_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../functions/session.php';
+require_once __DIR__ . '/../helpers/fetch.php';
+require_once __DIR__ . '/../functions/crud.php';
 SessionManager::requireLogin();
 SessionManager::requireRole('admin');
 
@@ -320,7 +320,8 @@ $csrf_token = $_SESSION['csrf_token'];
                     </div>
                     <button class="close text-xl">&times;</button>
                 </div>
-                <form class="flex flex-wrap items-center justify-between" method="POST" action="medical-records.php">
+                <form id="updateMedicalRecordForm" class="flex flex-wrap items-center justify-between" method="POST"
+                    action="medical-records.php">
                     <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <input type="hidden" name="record_id" id="updateRecordId">
                     <div class="mb-4 w-auto">
@@ -610,47 +611,6 @@ $csrf_token = $_SESSION['csrf_token'];
             showPage(1);
         });
 
-        document.getElementById("addRecordForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const form = this;
-
-            // Always refresh the CSRF token in the hidden input (if global var exists)
-            if (window.csrfToken) {
-                const csrfInput = form.querySelector("input[name='csrf_token']");
-                if (csrfInput) {
-                    csrfInput.value = window.csrfToken;
-                }
-            }
-
-            const formData = new FormData(form); // ✅ now has latest token
-
-            fetch("../php/Add/add-records.php", {
-                method: "POST",
-                body: formData
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const msgModal = document.getElementById("messageModal");
-                    const msgTitle = document.getElementById("messageTitle");
-                    const msgText = document.getElementById("messageText");
-
-                    msgTitle.textContent = data.status === "success" ? "Success" : "Error";
-                    msgText.textContent = data.message;
-                    msgModal.classList.remove("hidden");
-                    updateBodyScroll();
-
-                    if (data.status === "success") {
-                        location.reload();
-                    }
-
-                })
-                .catch(err => {
-                    console.error("Add record failed:", err);
-                    showMessage("Error", "An error occurred while adding the record.");
-                });
-        });
-
         document.querySelectorAll(".open-edit-modal").forEach(btn => {
             btn.addEventListener("click", () => {
                 const modal = document.getElementById("updateMedicalRecordModal");
@@ -686,148 +646,128 @@ $csrf_token = $_SESSION['csrf_token'];
             });
         });
 
-        document.querySelector("#updateMedicalRecordModal form")
-            .addEventListener("submit", function (e) {
-                e.preventDefault();
+        let csrfToken = "<?= $csrf_token ?>";
 
-                const form = this;
+        document.addEventListener('DOMContentLoaded', () => {
 
-                // Always refresh the CSRF token in the hidden input (if global var exists)
-                if (window.csrfToken) {
-                    const csrfInput = form.querySelector("input[name='csrf_token']");
-                    if (csrfInput) {
-                        csrfInput.value = window.csrfToken;
-                    }
-                }
+            // =================== Helper: Show message modal ===================
+            function showMessage(title, text, callback) {
+                const msgModal = document.getElementById("messageModal");
+                const msgTitle = document.getElementById("messageTitle");
+                const msgText = document.getElementById("messageText");
+                const okBtn = document.getElementById("closeMessageBtn");
 
-                const formData = new FormData(form); // ✅ now has latest token
+                msgTitle.textContent = title;
+                msgText.textContent = text;
+                msgModal.classList.remove("hidden");
+                updateBodyScroll();
 
-                fetch("../php/Update/update-records.php", {
-                    method: "POST",
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.status === "success") {
-                            showMessage("Success", result.message);
-                            updateBodyScroll();
+                // Remove previous listeners
+                okBtn.replaceWith(okBtn.cloneNode(true));
+                const newOkBtn = document.getElementById("closeMessageBtn");
 
-                            // 🔑 Save fresh token globally
-                            if (result.csrf_token) {
-                                window.csrfToken = result.csrf_token;
+                newOkBtn.addEventListener("click", () => {
+                    msgModal.classList.add("hidden");
+                    updateBodyScroll();
+                    if (typeof callback === "function") callback();
+                });
+            }
 
-                                // also update hidden input so UI form matches
-                                const csrfInput = form.querySelector("input[name='csrf_token']");
-                                if (csrfInput) {
-                                    csrfInput.value = result.csrf_token;
+            // =================== Add Record ===================
+            const addForm = document.getElementById("addRecordForm");
+            if (addForm) {
+                addForm.addEventListener("submit", e => {
+                    e.preventDefault();
+                    const formData = new FormData(addForm);
+                    formData.set("csrf_token", csrfToken);
+
+                    fetch("../php/Add/add-records.php", { method: "POST", body: formData })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.csrf_token) csrfToken = data.csrf_token; // update global CSRF
+
+                            showMessage(data.status === "success" ? "Success" : "Error", data.message, () => {
+                                if (data.status === "success") location.reload(); // optional reload
+                            });
+                        })
+                        .catch(err => showMessage("Error", "Add failed. See console for details."));
+                });
+            }
+
+            // =================== Update Record ===================
+            const updateForm = document.querySelector("#updateMedicalRecordForm");
+            if (updateForm) {
+                updateForm.addEventListener("submit", e => {
+                    e.preventDefault();
+                    const formData = new FormData(updateForm);
+                    formData.set("csrf_token", csrfToken);
+
+                    fetch("../php/Update/update-records.php", { method: "POST", body: formData })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.csrf_token) csrfToken = data.csrf_token; // update global CSRF
+
+                            showMessage(data.status === "success" ? "Success" : "Error", data.message, () => {
+                                if (data.status === "success") {
+                                    // Update row dynamically
+                                    const row = document.querySelector(`tr[data-id="${formData.get("record_id")}"]`);
+                                    if (row) {
+                                        row.querySelector("td:nth-child(1)").textContent = formData.get("visit_date");
+                                        row.querySelector("td:nth-child(3) span").textContent = formData.get("visit_type");
+                                        row.querySelector("td:nth-child(4)").textContent = formData.get("diagnosis");
+                                        row.querySelector("td:nth-child(5)").textContent = formData.get("follow_up_date");
+                                    }
+                                    updateForm.closest(".modal").classList.add("hidden");
                                 }
-                            }
+                            });
+                        })
+                        .catch(err => showMessage("Error", "Update failed. See console for details."));
+                });
+            }
 
-                            // Update row in table without reloading
-                            const row = document.querySelector(`tr[data-id="${formData.get("record_id")}"]`);
-                            if (row) {
-                                row.querySelector("td:nth-child(1)").textContent = formData.get("visit_date");
-                                row.querySelector("td:nth-child(3) span").textContent = formData.get("visit_type");
-                                row.querySelector("td:nth-child(4)").textContent = formData.get("diagnosis");
-                                row.querySelector("td:nth-child(5)").textContent = formData.get("follow_up_date");
-                            }
+            // =================== Delete Record ===================
+            document.querySelectorAll(".open-delete-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const recordId = btn.dataset.id;
+                    const modal = document.getElementById("deleteModal");
+                    modal.classList.remove("hidden");
+                    updateBodyScroll();
 
-                            // Close modal
-                            document.getElementById("updateMedicalRecordModal").classList.add("hidden");
-                            updateBodyScroll();
-                        } else {
-                            showMessage("Error", result.message);
-                        }
+                    document.getElementById("confirmDeleteBtn").dataset.id = recordId;
+                    document.getElementById("deleteMessage").textContent =
+                        `Are you sure you want to delete medical record #${recordId}?`;
+                });
+            });
+
+            document.getElementById("confirmDeleteBtn").addEventListener("click", e => {
+                e.preventDefault();
+                const recordId = e.target.dataset.id;
+                e.target.textContent = "Deleting...";
+                e.target.disabled = true;
+
+                fetch("../php/Delete/delete-records.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({ record_id: recordId, csrf_token: csrfToken })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.csrf_token) csrfToken = data.csrf_token; // update global CSRF
+
+                        showMessage(data.status === "success" ? "Success" : "Error", data.message, () => {
+                            if (data.status === "success") {
+                                location.reload(); // ensures CSRF consistency
+                            }
+                        });
                     })
-                    .catch(err => {
-                        console.error("Error updating record:", err);
-                        showMessage("Error", "Update failed. Try again.");
+                    .catch(err => showMessage("Error", "Delete failed. See console for details."))
+                    .finally(() => {
+                        e.target.textContent = "Delete";
+                        e.target.disabled = false;
                     });
             });
 
-        // Define a global csrfToken variable
-        let csrfToken = "<?= $csrf_token ?>";
-
-        // ================= Delete Record =================
-        document.querySelectorAll(".open-delete-modal").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const recordId = btn.dataset.id;
-
-                const modal = document.getElementById("deleteModal");
-                modal.classList.remove("hidden");
-                updateBodyScroll();
-
-                const confirmBtn = document.getElementById("confirmDeleteBtn");
-                confirmBtn.dataset.id = recordId;
-
-                document.getElementById("deleteMessage").textContent =
-                    `Are you sure you want to delete medical record #${recordId}?`;
-            });
         });
-
-        // Confirm Delete button
-        document.getElementById("confirmDeleteBtn").addEventListener("click", (e) => {
-            e.preventDefault();
-            const recordId = e.target.dataset.id;
-
-            e.target.textContent = "Deleting...";
-            e.target.disabled = true;
-
-            fetch("../php/Delete/delete-records.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams({
-                    record_id: recordId,
-                    csrf_token: csrfToken // 🔑 use latest token
-                })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        const row = document.querySelector(`tr[data-id="${recordId}"]`);
-                        if (row) {
-                            row.style.transition = "opacity 0.5s";
-                            row.style.opacity = "0";
-                            setTimeout(() => row.remove(), 100);
-                        }
-
-                        document.getElementById("deleteModal").classList.add("hidden");
-                        updateBodyScroll();
-
-                        showMessage("Success", data.message);
-
-                        // 🔑 update CSRF token for next request
-                        if (data.csrf_token) {
-                            csrfToken = data.csrf_token;
-                        }
-                    } else {
-                        showMessage("Error", data.message);
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    showMessage("Error", "Something went wrong while deleting.");
-                })
-                .finally(() => {
-                    e.target.textContent = "Delete";
-                    e.target.disabled = false;
-                });
-        });
-
-
-        // Helper function to show the message modal
-        function showMessage(title, text) {
-            document.getElementById("messageTitle").textContent = title;
-            document.getElementById("messageText").textContent = text;
-            document.getElementById("messageModal").classList.remove("hidden");
-        }
-
-        // Close message modal
-        document.getElementById("closeMessageBtn").addEventListener("click", () => {
-            document.getElementById("messageModal").classList.add("hidden");
-        });
-
-
     </script>
 </body>
 

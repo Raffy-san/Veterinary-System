@@ -1,13 +1,15 @@
 <?php
 ob_start();
-ini_set('display_errors', 0);
+ini_set('display_errors', 0); // don't show errors to browser
 ini_set('log_errors', 1);
-ini_set('error_log', 'C:\xampp\htdocs\Veterinary-System\logs\php_errors.log');
+ini_set('error_log', __DIR__ . '/../../logs/php_errors.log'); // adjust path to logs
 
-include_once '../config/config.php';
-require_once '../functions/session.php';
-require_once '../functions/crud.php';
-require_once '../functions/response.php';
+include_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../functions/session.php';
+require_once __DIR__ . '/../../helpers/fetch.php';
+require_once __DIR__ . '/../../functions/crud.php';
+require_once __DIR__ . '/../../functions/response.php';
+
 
 SessionManager::requireLogin();
 SessionManager::requireRole('admin');
@@ -34,19 +36,16 @@ if (!$recordID) {
 }
 
 try {
-    $result = deleteMedicalRecord($pdo, $recordID);
-    $resultData = json_decode($result, true);
+    $deleted = deleteMedicalRecord($pdo, $recordID);
 
-    if ($resultData && $resultData['status'] === "success") {
-        // Rotate CSRF token for security
-        unset($_SESSION['csrf_token']);
+    if ($deleted) {
+        // regenerate CSRF token for next request
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
         jsonResponse("success", "Medical record deleted successfully", [
             "csrf_token" => $_SESSION['csrf_token']
         ]);
     } else {
-        jsonResponse("error", $resultData['message'] ?? "Failed to delete record");
+        jsonResponse("error", "Record not found or could not be deleted");
     }
 } catch (Exception $e) {
     error_log("Delete record failed: " . $e->getMessage());
