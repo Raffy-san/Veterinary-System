@@ -179,6 +179,7 @@ if (!$admin) {
             const rowsPerPage = 6;
             let currentPage = 1;
             const totalPages = Math.ceil(rows.length / rowsPerPage);
+            
             function applyFilters() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const filterValue = filterSelect.value.toLowerCase();

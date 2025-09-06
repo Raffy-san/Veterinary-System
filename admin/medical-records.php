@@ -183,7 +183,7 @@ $csrf_token = $_SESSION['csrf_token'];
                         </div>
                     </div>
                     <button data-modal="addNewRecord"
-                        class="open-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700"><i
+                        class="open-add-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700"><i
                             class="fa-solid fa-plus mr-2"></i>New Record</button>
                 </div>
             </div>
@@ -279,7 +279,8 @@ $csrf_token = $_SESSION['csrf_token'];
             <div id="pagination" class="flex justify-center space-x-2 mt-4"></div>
         </section>
         <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
+            <div
+                class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] min-w-[400px] max-w-[450px] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-semibold text-m">Medical Record - <span id="petName"></span></h3>
@@ -461,52 +462,91 @@ $csrf_token = $_SESSION['csrf_token'];
             };
 
             // Modal Open/Close
-            document.querySelectorAll(".open-modal").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const modalId = btn.dataset.modal;
-                    document.getElementById(modalId).classList.remove("hidden");
+            document.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.open-modal');
+                if (!btn) return;
+
+                const modalId = btn.dataset.modal;
+                const modal = document.getElementById(modalId);
+
+                // Clear/reset sections before inserting data
+                medicalDetails.innerHTML = "<h3 class='font-semibold mb-4'><i class='fa-solid fa-stethoscope mr-2 text-green-600'></i>Visit information</h3>";
+                followUpDetail.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-calendar mr-2 text-green-600'></i>Follow-up date</h4>";
+                diagnosisDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-notes-medical mr-2 text-green-600'></i>Diagnosis</h4>";
+                treatmentDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-syringe mr-2 text-green-600'></i>Treatment</h4>";
+                medicationsDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-pills mr-2 text-green-600'></i>Medications</h4>";
+                notesDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-comment mr-2 text-green-600'></i>Notes</h4>";
+
+                try {
+                    const id = btn.dataset.id; // make sure button has data-id="{{ record.id }}"
+                    const res = await fetch(`../Get/get-record.php?id=${id}&t=${Date.now()}`, { cache: "no-store" });
+                    const record = await res.json();
+
+                    if (record.error) throw new Error(record.error);
+
+                    // Fill modal with latest DB values
+                    petName.textContent = record.pet_name || '';
+                    recordDate.textContent = record.visit_date || '';
+
+                    addField(medicalDetails, "Date:", record.visit_date || '');
+
+                    const visitTypeHTML = `
+                        <div class="bg-green-100 text-green-800 rounded-lg px-2 py-1 inline-flex items-center">
+                            <span class="text-xs">${record.visit_type || 'N/A'}</span>
+                        </div>
+                        `;
+                    medicalDetails.insertAdjacentHTML('beforeend', `
+                        <div>
+                            <span class="font-semibold">Visit Type:</span>
+                            ${visitTypeHTML}
+                        </div>
+                        `);
+
+                    addField(medicalDetails, "Patient:", record.pet_name || '');
+                    addField(medicalDetails, "Weight:", record.weight || '');
+                    addField(medicalDetails, "Temperature:", record.temperature || '');
+
+                    addField(followUpDetail, "", record.follow_up_date || '');
+                    addField(diagnosisDetails, "", record.diagnosis || '');
+                    addField(treatmentDetails, "", record.treatment || '');
+                    addField(medicationsDetails, "", record.medications || '');
+                    addField(notesDetails, "", record.notes || '');
+
+                    // Open modal
+                    modal.classList.remove('hidden');
                     updateBodyScroll();
 
-                    medicalDetails.innerHTML = "<h3 class='font-semibold mb-4'><i class='fa-solid fa-stethoscope mr-2 text-green-600'></i>Visit information</h3>";
-                    followUpDetail.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-calendar mr-2 text-green-600'></i>Follow-up date</h4>";
-                    diagnosisDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-notes-medical mr-2 text-green-600'></i>Diagnosis</h4>";
-                    treatmentDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-syringe mr-2 text-green-600'></i>Treatment</h4>";
-                    medicationsDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-pills mr-2 text-green-600'></i>Medications</h4>";
-                    notesDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-comment mr-2 text-green-600'></i>Notes</h4>";
-                    petName.textContent = btn.dataset.patient;
-                    recordDate.textContent = btn.dataset.date;
-
-
-                    addField(medicalDetails, "Date:", btn.dataset.date);
-                    const visitTypeHTML = `
-                            <div class="${btn.dataset.typeBg} ${btn.dataset.typeColor} rounded-lg px-2 py-1 inline-flex items-center">
-                                <span class="text-xs">${btn.dataset.type}</span>
-                            </div>
-                        `;
-
-                    medicalDetails.insertAdjacentHTML('beforeend', `
-                                <div>
-                                    <span class="font-semibold">Visit Type:</span>
-                                    ${visitTypeHTML}
-                                </div>
-                            `);
-
-                    addField(medicalDetails, "Patient:", btn.dataset.patient);
-                    addField(medicalDetails, "Weight:", btn.dataset.weight);
-                    addField(medicalDetails, "Temperature:", btn.dataset.temperature);
-                    addField(medicalDetails, "Owner:", btn.dataset.owner);
-
-                    addField(followUpDetail, "", btn.dataset.follow);
-
-                    addField(diagnosisDetails, "", btn.dataset.diagnosis);
-
-                    addField(treatmentDetails, "", btn.dataset.treatment);
-
-                    addField(medicationsDetails, "", btn.dataset.medications);
-
-                    addField(notesDetails, "", btn.dataset.notes);
-                });
+                } catch (err) {
+                    console.error("Error fetching record:", err.message);
+                    alert("Unable to load latest data.");
+                }
             });
+
+            // Function to open "Add New Record" modal
+            function openAddModal() {
+                const modal = document.getElementById("addNewRecord");
+
+                if (!modal) {
+                    console.error("Add New Record modal not found");
+                    return;
+                }
+
+                // Reset form inside the modal if it exists
+                const form = modal.querySelector("form");
+                if (form) form.reset();
+
+                // Open modal
+                modal.classList.remove("hidden");
+                updateBodyScroll();
+            }
+
+            // Attach event listener to the button
+            document.addEventListener("click", (e) => {
+                const btn = e.target.closest(".open-add-modal");
+                if (!btn) return;
+                openAddModal();
+            });
+
 
             document.querySelectorAll(".modal .close").forEach(closeBtn => {
                 closeBtn.addEventListener("click", () => {

@@ -62,7 +62,7 @@ $petCount = fetchOneData(
     <?php
     include_once '../includes/owner-header.php';
     ?>
-    <main class="w-full px-4 md:px-8 lg:px-16 py-8">
+    <main class="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-16 py-8">
         <div class="space-y-4 md:space-y-6">
             <?php
             $pets = fetchAllData(

@@ -53,7 +53,7 @@ $medicalRecordCount = fetchOneData(
 <body class="w-full bg-green-100">
     <?php include_once '../includes/owner-header.php'; ?>
 
-    <main class="w-full px-4 md:px-6 lg:px-8 py-4 md:py-8">
+    <main class="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8">
         <section class="w-full bg-white rounded-2xl shadow-lg p-4 md:p-8">
             <!-- Header Section -->
             <div class="mb-8">

@@ -1,8 +1,8 @@
 <?php
-include_once '../config/config.php';
-require_once '../functions/session.php';
-require_once '../helpers/fetch.php';
-require_once '../functions/crud.php';
+include_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../functions/session.php';
+require_once __DIR__ . '/../helpers/fetch.php';
+require_once __DIR__ . '/../functions/crud.php';
 SessionManager::requireLogin();
 SessionManager::requireRole('admin');
 
@@ -12,27 +12,11 @@ if (!$admin) {
     SessionManager::logout('../login.php');
 }
 
-if (isset($_GET['delete_id'])) {
-    $user_id = intval($_GET['delete_id']);
-    if (deleteClient($pdo, $user_id)) {
-        header("Location: client-management.php?deleted=1");
-        exit;
-    } else {
-        header("Location: client-management.php?deleted=0");
-        exit;
-    }
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-if (isset($_GET['delete_pet_id'])) {
-    $pet_id = intval($_GET['delete_pet_id']);
-    if (deletePet($pdo, $pet_id)) {
-        header("Location: client-management.php?pet_deleted=1");
-        exit;
-    } else {
-        header("Location: client-management.php?error=not_found");
-        exit;
-    }
-}
+$csrf_token = $_SESSION['csrf_token'];
 
 
 if (isset($_POST['submit'])) {
@@ -205,7 +189,6 @@ if (isset($_POST['update_pet'])) {
                                     data-created="' . date('Y-m-d', strtotime($client['created_at'])) . '"
                                     data-address="' . htmlspecialchars($client['address'] ?? '') . '"
                                     data-petcount="' . $client['pet_count'] . '"
-                                    data-pets="' . htmlspecialchars($client['pets'] ?? '') . '"
                                     class="open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
                                 </button>
                                 <button class="open-update-modal fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300" data-id="' . $client['owner_id'] . '"></button>
@@ -316,9 +299,6 @@ if (isset($_POST['update_pet'])) {
                         <!-- Additional details will be populated here -->
                     </div>
                 </div>
-                <div id="petDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4">
-                    <!-- Pet details will be populated here -->
-                </div>
             </div>
         </div>
 
@@ -395,7 +375,6 @@ if (isset($_POST['update_pet'])) {
                 </form>
             </div>
         </div>
-
 
         <!-- Delete Confirmation Modal -->
         <div id="deleteModal"
@@ -525,6 +504,7 @@ if (isset($_POST['update_pet'])) {
                     <button class="close text-xl">&times;</button>
                 </div>
                 <form class="flex flex-wrap items-center justify-between" method="POST" action="client-management.php">
+                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <input type="hidden" name="pet_id" id="updatePetId">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Pet Name</label>
@@ -641,38 +621,76 @@ if (isset($_POST['update_pet'])) {
             </div>
         </div>
 
+        <div id="messageModal"
+            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full text-center">
+                <h3 id="messageTitle" class="text-lg font-semibold mb-2"></h3>
+                <p id="messageText" class="text-gray-600 mb-4"></p>
+                <button id="closeMessageBtn"
+                    class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">OK</button>
+            </div>
+        </div>
+
 
     </main>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // ===================== GLOBAL VARIABLES =====================
             const clientDetails = document.getElementById("clientDetails");
             const additionalDetails = document.getElementById("additionalDetails");
-            const petDetails = document.getElementById("petDetails");
             const clientNameSpan = document.getElementById("clientName");
             const tableBody = document.getElementById("clientsBody");
-            const rows = tableBody.querySelectorAll("tr");
             const pagination = document.getElementById("pagination");
+            const rows = tableBody.querySelectorAll("tr");
             const rowsPerPage = 6;
             let currentPage = 1;
+            let csrfToken = "<?= $csrf_token ?>";
             const totalPages = Math.ceil(rows.length / rowsPerPage);
 
-
-            // Utility to add fields
+            // ===================== HELPERS =====================
             const addField = (container, label, value) => {
                 const p = document.createElement("p");
                 p.innerHTML = `<span class="font-semibold">${label}:</span> ${value || "N/A"}`;
                 container.appendChild(p);
             };
 
-            // Open View Modal
+            const openModal = (modal) => {
+                modal.classList.remove("hidden");
+                updateBodyScroll();
+            };
+
+            const closeModal = (modal) => {
+                modal.classList.add("hidden");
+                updateBodyScroll();
+            };
+
+            function showMessage(title, message, type = "success", callback = null) {
+                const modal = document.getElementById("messageModal");
+                const titleElement = document.getElementById("messageTitle");
+                const textElement = document.getElementById("messageText");
+
+                titleElement.textContent = title;
+                textElement.textContent = message;
+
+                titleElement.classList.toggle("text-green-600", type === "success");
+                titleElement.classList.toggle("text-red-600", type !== "success");
+
+                openModal(modal);
+
+                document.getElementById("closeMessageBtn").onclick = () => {
+                    closeModal(modal);
+                    if (callback) callback();
+                };
+            }
+
+            // ===================== CLIENT MODALS =====================
             document.querySelectorAll(".open-modal").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const modal = document.getElementById(btn.dataset.modal);
                     clientDetails.innerHTML = "<h3 class='font-semibold mb-4'>Contact information</h3>";
                     additionalDetails.innerHTML = "<h4 class='font-semibold mb-4'>Additional information</h4>";
                     clientNameSpan.textContent = btn.dataset.name;
-
 
                     addField(clientDetails, "Name", btn.dataset.name);
                     addField(clientDetails, "Email", btn.dataset.email);
@@ -683,96 +701,163 @@ if (isset($_POST['update_pet'])) {
                     addField(additionalDetails, "Join Date", btn.dataset.created);
                     addField(additionalDetails, "Pet Count", btn.dataset.petcount);
 
-                    fetch(`../helpers/fetch-pet.php?owner_id=${btn.dataset.id}`)
-                        .then(res => res.json())
-                        .then(pets => {
-                            petDetails.innerHTML = "<h3 class='font-semibold font-sm mb-4'>Registered Pets</h3>";
-                            if (pets.length === 0) {
-                                petDetails.innerHTML = "<p class='font-semibold'>No pets found</p>";
-                            } else {
-                                pets.forEach((pet, i) => {
-                                    const petDiv = document.createElement("div");
-                                    petDiv.className = "mb-2 p-2 border rounded bg-green-50";
-                                    petDiv.innerHTML = `
-                                      <div class="bg-white border border-green-300 rounded-lg shadow-sm p-3">
-                                        <div class="flex flex-row mb-2 space-x-2">
-                                            <h4 class="font-bold">${pet.name}</h4>
-                                            <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
-                                                ${pet.species || "Unknown"}
-                                            </span>
-                                        </div>
-                                        <ul class="text-sm space-x-2 text-gray-500 flex flex-row">
-                                            <li>${pet.breed || "N/A"}</li>
-                                            <li>•</li>
-                                            <li>${pet.age || "N/A"}<span>&nbspYears</span></li>
-                                            <li>•</li>
-                                            <li>${pet.gender || "N/A"}</li>
-                                        </ul>
-                                        <span class="text-sm text-gray-500">Registered:&nbsp${pet.registered_at}</span>
-                                    </div>
-                                `;
-                                    petDetails.appendChild(petDiv);
-                                });
-                            }
-                        })
-
-                    modal.classList.remove("hidden");
-                    updateBodyScroll();
+                    openModal(modal);
                 });
             });
 
             document.querySelectorAll(".open-update-modal").forEach(btn => {
                 btn.addEventListener("click", () => {
-                    const modal = document.getElementById("updateClientModal");
-                    const clientId = btn.dataset.id;
-
-                    fetch(`../Get/get-owner.php?id=${clientId}`)
+                    fetch(`../Get/get-owner.php?id=${btn.dataset.id}`)
                         .then(res => res.json())
                         .then(client => {
-                            document.getElementById("updateClientId").value = client.id;         // Owner ID
+                            document.getElementById("updateClientId").value = client.id;
                             document.getElementById("updateClientName").value = client.name;
                             document.getElementById("updateClientUsername").value = client.username;
-                            document.getElementById("updateClientPassword").value = ''; // Leave blank
+                            document.getElementById("updateClientPassword").value = ""; // blank
                             document.getElementById("updateClientEmail").value = client.email;
                             document.getElementById("updateClientPhone").value = client.phone;
-                            document.getElementById("updateClientEmergency").value = client.emergency || '';
+                            document.getElementById("updateClientEmergency").value = client.emergency || "";
                             document.getElementById("updateClientAddress").value = client.address;
                         });
 
-
-                    modal.classList.remove("hidden");
-                    updateBodyScroll();
+                    openModal(document.getElementById("updateClientModal"));
                 });
             });
 
             document.querySelectorAll(".open-pet-modal").forEach(btn => {
                 btn.addEventListener("click", () => {
-                    const ownerId = btn.dataset.owner;
-                    document.getElementById("modal_owner_id").value = ownerId;
-                    document.getElementById("addPetModal").classList.remove("hidden");
-                    updateBodyScroll();
+                    document.getElementById("modal_owner_id").value = btn.dataset.owner;
+                    openModal(document.getElementById("addPetModal"));
                 });
             });
 
-            // Close modal
-            document.querySelectorAll(".modal .close").forEach(btn => {
+            // ===================== PET MODAL (VIEW/EDIT/DELETE) =====================
+            document.querySelectorAll('.open-modal[data-modal="viewPetModal"]').forEach(btn => {
                 btn.addEventListener("click", () => {
-                    btn.closest(".modal").classList.add("hidden");
-                    updateBodyScroll();
+                    const ownerId = btn.dataset.owner;
+                    const modal = document.getElementById("viewPetModal");
+                    const content = document.getElementById("petDetailsContent");
+
+                    content.innerHTML = `
+                <div class="flex justify-center items-center h-32">
+                    <p class="text-gray-500 animate-pulse">Loading pets...</p>
+                </div>
+            `;
+
+                    fetch("../helpers/fetch-pet.php?owner_id=" + ownerId)
+                        .then(res => res.json())
+                        .then(pets => {
+                            if (!pets.length) {
+                                content.innerHTML = `
+                            <div class="text-center text-gray-500 py-6">
+                                <i class="fa-solid fa-paw text-4xl mb-2 text-green-400"></i>
+                                <p>No pets found for this client.</p>
+                            </div>
+                        `;
+                                return;
+                            }
+
+                            content.innerHTML = "";
+                            pets.forEach(pet => {
+                                const card = document.createElement("div");
+                                card.className = "mb-4 bg-white border border-green-200 rounded-xl p-5 shadow-md hover:shadow-lg transition";
+
+                                card.innerHTML = `
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-bold text-xl text-green-700 flex items-center gap-2">
+                                    <i class="fa-solid fa-paw text-green-500"></i> ${pet.name}
+                                </h4>
+                                <span class="px-3 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                                    ${pet.species || "Unknown"}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                                <p><span class="font-semibold">Breed:</span> ${pet.breed || "N/A"}</p>
+                                <p><span class="font-semibold">Age:</span> ${pet.age || "N/A"} yrs</p>
+                                <p><span class="font-semibold">Gender:</span> ${pet.gender || "N/A"}</p>
+                                <p><span class="font-semibold">Weight:</span> ${pet.weight || "N/A"}</p>
+                                <p><span class="font-semibold">Color:</span> ${pet.color || "N/A"}</p>
+                            </div>
+                            <p class="mt-2 text-gray-600 text-sm">
+                                <span class="font-semibold">Notes:</span> ${pet.notes || "None"}
+                            </p>
+                            <div class="flex justify-end gap-2 mt-4">
+                                <button class="edit-pet-btn flex items-center gap-1 text-green-700 text-sm font-semibold px-3 py-1.5 bg-green-100 rounded-lg hover:bg-green-600 hover:text-white transition" data-id="${pet.id}">
+                                    <i class="fa-solid fa-pen-alt"></i> Edit
+                                </button>
+                                <button class="delete-pet-btn flex items-center gap-1 text-red-600 text-sm font-semibold px-3 py-1.5 bg-red-100 rounded-lg hover:bg-red-500 hover:text-white transition" data-id="${pet.id}" data-name="${pet.name}">
+                                    <i class="fa-solid fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        `;
+                                content.append(card);
+
+                                // Edit Pet
+                                card.querySelector(".edit-pet-btn").addEventListener("click", () => {
+                                    fetch(`../Get/get-pet.php?id=${pet.id}`)
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            document.getElementById("updatePetId").value = data.id;
+                                            document.getElementById("updatePetName").value = data.name;
+                                            document.getElementById("updatePetSpecies").value = data.species;
+                                            document.getElementById("updatePetBreed").value = data.breed || "";
+                                            document.getElementById("updatePetAge").value = data.age || "";
+                                            document.getElementById("updatePetGender").value = data.gender;
+                                            document.getElementById("updatePetWeight").value = data.weight || "";
+                                            document.getElementById("updatePetColor").value = data.color || "";
+                                            document.getElementById("updatePetNotes").value = data.notes || "";
+                                        });
+                                    openModal(document.getElementById("updatePetModal"));
+                                });
+
+                                // Delete Pet
+                                card.querySelector(".delete-pet-btn").addEventListener("click", () => {
+                                    const modal = document.getElementById("deletePetModal");
+                                    document.getElementById("deletePetMessage").textContent =
+                                        `Are you sure you want to delete "${pet.name}"?`;
+                                    document.getElementById("confirmDeleteBtnPet").dataset.id = pet.id;
+                                    openModal(modal);
+                                });
+                            });
+                        })
+                        .catch(() => content.innerHTML = "<p class='text-red-500'>Failed to load pet data.</p>");
+
+                    openModal(modal);
                 });
             });
 
-            // Close modal by clicking outside
-            document.querySelectorAll(".modal").forEach(modal => {
-                modal.addEventListener("click", e => {
-                    if (e.target === modal) {
-                        modal.classList.add("hidden");
-                        updateBodyScroll();
-                    }
-                });
+            // Confirm Delete Pet
+            document.getElementById("confirmDeleteBtnPet").addEventListener("click", e => {
+                e.preventDefault();
+                const btn = e.target;
+                const petId = btn.dataset.id;
+
+                btn.textContent = "Deleting...";
+                btn.disabled = true;
+
+                fetch("../php/Delete/delete-pet.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({ pet_id: petId, csrf_token: csrfToken })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.csrf_token) csrfToken = data.csrf_token;
+                        showMessage(
+                            data.status === "success" ? "Success" : "Error",
+                            data.message,
+                            data.status,
+                            () => location.reload()
+                        );
+                    })
+                    .catch(() => showMessage("Error", "Delete failed."))
+                    .finally(() => {
+                        btn.textContent = "Delete";
+                        btn.disabled = false;
+                    });
             });
 
-            // Search functionality
+            // ===================== SEARCH & PAGINATION =====================
             document.getElementById("search").addEventListener("input", function () {
                 const term = this.value.toLowerCase();
                 rows.forEach(row => {
@@ -782,7 +867,6 @@ if (isset($_POST['update_pet'])) {
                 });
             });
 
-            // Pagination
             const showPage = page => {
                 currentPage = page;
                 const start = (page - 1) * rowsPerPage;
@@ -795,21 +879,19 @@ if (isset($_POST['update_pet'])) {
                 pagination.innerHTML = "";
                 if (currentPage > 1) {
                     const prev = document.createElement("button");
-                    prev.className = "text-xs px-3 py-1 bg-gray-200 rounded";
                     prev.textContent = "Prev";
                     prev.onclick = () => showPage(currentPage - 1);
                     pagination.appendChild(prev);
                 }
                 for (let i = 1; i <= totalPages; i++) {
                     const btn = document.createElement("button");
-                    btn.className = `text-xs px-3 py-1 rounded ${i === currentPage ? "bg-green-500 text-white" : "bg-gray-200"}`;
                     btn.textContent = i;
+                    btn.className = i === currentPage ? "bg-green-500 text-white py-1 px-2 rounded-lg" : "bg-gray-200";
                     btn.onclick = () => showPage(i);
                     pagination.appendChild(btn);
                 }
                 if (currentPage < totalPages) {
                     const next = document.createElement("button");
-                    next.className = "text-xs px-3 py-1 bg-gray-200 rounded";
                     next.textContent = "Next";
                     next.onclick = () => showPage(currentPage + 1);
                     pagination.appendChild(next);
@@ -818,138 +900,63 @@ if (isset($_POST['update_pet'])) {
 
             showPage(1);
 
-            // Delete Modal Logic
+            // ===================== DELETE CLIENT =====================
             document.querySelectorAll(".open-delete-modal").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const modal = document.getElementById("deleteModal");
                     const clientName = btn.dataset.name;
-                    const userId = btn.dataset.id;
+                    const clientId = btn.dataset.id;
 
                     document.getElementById("deleteMessage").textContent =
-                        `Are you sure you want to delete "${clientName}" and their account? This action cannot be undone and will remove all associated pets and medical records.`;
-                    document.getElementById("confirmDeleteBtn").href = `client-management.php?delete_id=${userId}`;
+                        `Are you sure you want to delete "${clientName}" and their account? This will remove all pets and records.`;
+                    document.getElementById("confirmDeleteBtn").dataset.id = clientId;
 
-                    modal.classList.remove("hidden");
-                    updateBodyScroll();
+                    openModal(modal);
                 });
             });
-        });
 
-        document.querySelectorAll('.open-modal[data-modal="viewPetModal"]').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const ownerId = this.getAttribute('data-owner');
-                const modal = document.getElementById('viewPetModal');
-                const content = document.getElementById('petDetailsContent');
+            // Confirm Delete Client
+            document.getElementById("confirmDeleteBtn").addEventListener("click", e => {
+                e.preventDefault();
+                const btn = e.target;
+                const clientID = btn.dataset.id;
 
-                content.innerHTML = `
-            <div class="flex justify-center items-center h-32">
-                <p class="text-gray-500 animate-pulse">Loading pets...</p>
-            </div>
-        `;
+                btn.textContent = "Deleting...";
+                btn.disabled = true;
 
-                fetch('../helpers/fetch-pet.php?owner_id=' + ownerId)
-                    .then(response => response.json())
-                    .then(pets => {
-                        if (pets.length === 0) {
-                            content.innerHTML = `
-                        <div class="text-center text-gray-500 py-6">
-                            <i class="fa-solid fa-paw text-4xl mb-2 text-green-400"></i>
-                            <p>No pets found for this client.</p>
-                        </div>
-                    `;
-                        } else {
-                            content.innerHTML = '';
-                            pets.forEach(pet => {
-                                const petCard = document.createElement('div');
-                                petCard.className = `
-                            mb-4 bg-white border border-green-200 rounded-xl p-5 shadow-md 
-                            hover:shadow-lg transition-shadow duration-200
-                        `;
-
-                                petCard.innerHTML = `
-                            <div class="flex justify-between items-center mb-3">
-                                <h4 class="font-bold text-xl text-green-700 flex items-center gap-2">
-                                    <i class="fa-solid fa-paw text-green-500"></i> ${pet.name}
-                                </h4>
-                                <span class="px-3 py-1 text-xs bg-green-100 text-green-700 rounded-full">
-                                    ${pet.species || 'Unknown'}
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-sm text-gray-700">
-                                <p><span class="font-semibold">Breed:</span> ${pet.breed || 'N/A'}</p>
-                                <p><span class="font-semibold">Age:</span> ${pet.age || 'N/A'} yrs</p>
-                                <p><span class="font-semibold">Gender:</span> ${pet.gender || 'N/A'}</p>
-                                <p><span class="font-semibold">Weight:</span> ${pet.weight || 'N/A'}</p>
-                                <p><span class="font-semibold">Color:</span> ${pet.color || 'N/A'}</p>
-                            </div>
-                            <p class="mt-2 text-gray-600 text-sm"><span class="font-semibold">Notes:</span> ${pet.notes || 'None'}</p>
-                            <div class="flex justify-end gap-2 mt-4">
-                                <button 
-                                    class="open-update-pet-modal flex items-center gap-1 text-green-700 text-sm font-semibold px-3 py-1.5 bg-green-100 rounded-lg hover:bg-green-600 hover:text-white transition"
-                                    data-id="${pet.id}">
-                                    <i class="fa-solid fa-pen-alt"></i> Edit
-                                </button>
-                                <button 
-                                    class="open-delete-pet-modal flex items-center gap-1 text-red-600 text-sm font-semibold px-3 py-1.5 bg-red-100 rounded-lg hover:bg-red-500 hover:text-white transition"
-                                    data-name="${pet.name}" 
-                                    data-id="${pet.id}">
-                                    <i class="fa-solid fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        `;
-                                // Attach delete listener **here**
-                                petCard.querySelector('.open-delete-pet-modal').addEventListener('click', function () {
-                                    const modal = document.getElementById("deletePetModal");
-                                    const petName = this.dataset.name;
-                                    const petId = this.dataset.id;
-
-                                    document.getElementById("deletePetMessage").textContent =
-                                        `Are you sure you want to delete "${petName}"? This action cannot be undone.`;
-                                    document.getElementById("confirmDeleteBtnPet").href = `client-management.php?delete_pet_id=${petId}`;
-
-                                    modal.classList.remove("hidden");
-                                    updateBodyScroll();
-                                });
-
-                                content.appendChild(petCard);
-                            });
-
-                            document.querySelectorAll(".open-update-pet-modal").forEach(btn => {
-                                btn.addEventListener("click", () => {
-                                    const modal = document.getElementById("updatePetModal");
-                                    const petId = btn.dataset.id;
-
-                                    fetch(`../Get/get-pet.php?id=${petId}`)
-                                        .then(res => res.json())
-                                        .then(pet => {
-
-                                            document.getElementById('updatePetId').value = pet.id;
-                                            document.getElementById('updatePetName').value = pet.name;
-                                            document.getElementById('updatePetSpecies').value = pet.species;
-                                            document.getElementById('updatePetBreed').value = pet.breed || '';
-                                            document.getElementById('updatePetAge').value = pet.age || '';
-                                            document.getElementById('updatePetGender').value = pet.gender;
-                                            document.getElementById('updatePetWeight').value = pet.weight || '';
-                                            document.getElementById('updatePetColor').value = pet.color || '';
-                                            document.getElementById('updatePetNotes').value = pet.notes || '';
-
-                                        });
-
-                                    modal.classList.remove("hidden");
-                                    updateBodyScroll();
-                                });
-                            });
-                        }
+                fetch("../php/Delete/delete-client.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({ client_id: clientID, csrf_token: csrfToken })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.csrf_token) csrfToken = data.csrf_token;
+                        showMessage(
+                            data.status === "success" ? "Success" : "Error",
+                            data.message,
+                            data.status,
+                            () => location.reload()
+                        );
                     })
-                    .catch(() => {
-                        content.innerHTML = '<p class="text-red-500">Failed to load pet data.</p>';
+                    .catch(() => showMessage("Error", "Delete failed."))
+                    .finally(() => {
+                        btn.textContent = "Delete";
+                        btn.disabled = false;
                     });
+            });
 
-                modal.classList.remove('hidden');
-                updateBodyScroll();
+
+            // ===================== GENERIC MODAL CLOSE =====================
+            document.querySelectorAll(".modal .close").forEach(btn => {
+                btn.addEventListener("click", () => closeModal(btn.closest(".modal")));
+            });
+            document.querySelectorAll(".modal").forEach(modal => {
+                modal.addEventListener("click", e => { if (e.target === modal) closeModal(modal); });
             });
         });
     </script>
+
 </body>
 
 </html>

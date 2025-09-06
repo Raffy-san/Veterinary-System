@@ -1,4 +1,4 @@
-<header>
+<header class="max-w-[1400px] mx-auto">
     <section
         class="p-4 md:p-10 w-full flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0">
         <div class="w-full md:w-auto">
