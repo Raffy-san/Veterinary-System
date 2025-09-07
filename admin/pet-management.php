@@ -179,7 +179,7 @@ if (!$admin) {
             const rowsPerPage = 6;
             let currentPage = 1;
             const totalPages = Math.ceil(rows.length / rowsPerPage);
-            
+
             function applyFilters() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const filterValue = filterSelect.value.toLowerCase();
@@ -276,21 +276,21 @@ if (!$admin) {
                 pagination.innerHTML = "";
                 if (currentPage > 1) {
                     const prev = document.createElement("button");
-                    prev.className = "text-xs px-3 py-1 bg-gray-200 rounded";
+                    prev.className = "bg-blue-400 text-xs text-white py-1 px-2 rounded-lg";
                     prev.textContent = "Prev";
                     prev.onclick = () => showPage(currentPage - 1);
                     pagination.appendChild(prev);
                 }
                 for (let i = 1; i <= totalPages; i++) {
                     const btn = document.createElement("button");
-                    btn.className = `text-xs px-3 py-1 rounded ${i === currentPage ? "bg-green-500 text-white" : "bg-gray-200"}`;
+                    btn.className = `text-xs py-1 px-2 rounded-lg ${i === currentPage ? "bg-green-500 text-white" : "bg-gray-200"}`;
                     btn.textContent = i;
                     btn.onclick = () => showPage(i);
                     pagination.appendChild(btn);
                 }
                 if (currentPage < totalPages) {
                     const next = document.createElement("button");
-                    next.className = "text-xs px-3 py-1 bg-gray-200 rounded";
+                    next.className = "bg-blue-400 text-xs text-white py-1 px-2 rounded-lg";
                     next.textContent = "Next";
                     next.onclick = () => showPage(currentPage + 1);
                     pagination.appendChild(next);

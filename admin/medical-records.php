@@ -12,10 +12,7 @@ if (!$admin) {
     SessionManager::logout('../login.php');
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-$csrf_token = $_SESSION['csrf_token'];
+$csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -478,7 +475,7 @@ $csrf_token = $_SESSION['csrf_token'];
                 notesDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-comment mr-2 text-green-600'></i>Notes</h4>";
 
                 try {
-                    const id = btn.dataset.id; // make sure button has data-id="{{ record.id }}"
+                    const id = btn.dataset.id;
                     const res = await fetch(`../Get/get-record.php?id=${id}&t=${Date.now()}`, { cache: "no-store" });
                     const record = await res.json();
 
@@ -491,9 +488,10 @@ $csrf_token = $_SESSION['csrf_token'];
                     addField(medicalDetails, "Date:", record.visit_date || '');
 
                     const visitTypeHTML = `
-                        <div class="bg-green-100 text-green-800 rounded-lg px-2 py-1 inline-flex items-center">
-                            <span class="text-xs">${record.visit_type || 'N/A'}</span>
-                        </div>
+                            <div class="${btn.dataset.typeBg} ${btn.dataset.typeColor} rounded-lg px-2 py-1 inline-flex items-center gap-1">
+                                <i class="${btn.dataset.typeIcon}"></i>
+                                <span class="text-xs">${btn.dataset.type || "N/A"}</span>
+                            </div>
                         `;
                     medicalDetails.insertAdjacentHTML('beforeend', `
                         <div>
@@ -627,21 +625,21 @@ $csrf_token = $_SESSION['csrf_token'];
                 pagination.innerHTML = "";
                 if (currentPage > 1) {
                     const prev = document.createElement("button");
-                    prev.className = "text-xs px-3 py-1 bg-gray-200 rounded";
+                    prev.className = "bg-blue-400 text-xs text-white py-1 px-2 rounded-lg";
                     prev.textContent = "Prev";
                     prev.onclick = () => showPage(currentPage - 1);
                     pagination.appendChild(prev);
                 }
                 for (let i = 1; i <= totalPages; i++) {
                     const btn = document.createElement("button");
-                    btn.className = `text-xs px-3 py-1 rounded ${i === currentPage ? "bg-green-500 text-white" : "bg-gray-200"}`;
+                    btn.className = `text-xs py-1 px-2 rounded-lg ${i === currentPage ? "bg-green-500 text-white" : "bg-gray-200"}`;
                     btn.textContent = i;
                     btn.onclick = () => showPage(i);
                     pagination.appendChild(btn);
                 }
                 if (currentPage < totalPages) {
                     const next = document.createElement("button");
-                    next.className = "text-xs px-3 py-1 bg-gray-200 rounded";
+                    next.className = "bg-blue-400 text-xs text-white py-1 px-2 rounded-lg";
                     next.textContent = "Next";
                     next.onclick = () => showPage(currentPage + 1);
                     pagination.appendChild(next);
@@ -775,7 +773,7 @@ $csrf_token = $_SESSION['csrf_token'];
 
                     document.getElementById("confirmDeleteBtn").dataset.id = recordId;
                     document.getElementById("deleteMessage").textContent =
-                        `Are you sure you want to delete medical record #${recordId}?`;
+                        `Are you sure you want to delete this medical record? It cannot be undone.`;
                 });
             });
 

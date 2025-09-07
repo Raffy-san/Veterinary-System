@@ -75,7 +75,7 @@ try {
     }
 } catch (Exception $e) {
     error_log("Update record failed: " . $e->getMessage());
-    jsonResponse("error", "An error occured while adding medical record");
+    jsonResponse("error", "An error occurred while adding medical record");
 }
 
 ob_end_flush();

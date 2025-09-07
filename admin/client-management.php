@@ -12,97 +12,7 @@ if (!$admin) {
     SessionManager::logout('../login.php');
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-$csrf_token = $_SESSION['csrf_token'];
-
-
-if (isset($_POST['submit'])) {
-    $data = [
-        'name' => $_POST['name'],
-        'username' => $_POST['username'],
-        'password' => $_POST['password'],
-        'email' => $_POST['email'],
-        'phone' => $_POST['phone'],
-        'emergency' => $_POST['emergency'],
-        'address' => $_POST['address']
-    ];
-
-    if (addClient($pdo, $data)) {
-        header("Location: client-management.php?added=1");
-        exit;
-    } else {
-        header("Location: client-management.php?added=0");
-        exit;
-    }
-}
-
-if (isset($_POST['update_client'])) {
-    $data = [
-        'owner_id' => $_POST['owner_id'],
-        'name' => $_POST['name'],
-        'username' => $_POST['username'],
-        'password' => $_POST['password'],
-        'email' => $_POST['email'],
-        'phone' => $_POST['phone'],
-        'emergency_contact' => $_POST['emergency'],
-        'address' => $_POST['address']
-    ];
-
-    if (updateClient($pdo, $data)) {
-        header("Location: client-management.php?updated=1");
-        exit;
-    } else {
-        header("Location: client-management.php?updated=0");
-        exit;
-    }
-}
-
-if (isset($_POST['add_pet'])) {
-    $data = [
-        'name' => $_POST['name'],
-        'species' => $_POST['species'],
-        'breed' => $_POST['breed'],
-        'age' => $_POST['age'],
-        'gender' => $_POST['gender'],
-        'weight' => $_POST['weight'],
-        'color' => $_POST['color'],
-        'owner_id' => $_POST['owner_id'],
-        'notes' => $_POST['notes']
-    ];
-
-    if (addPet($pdo, $data)) {
-        header("Location: client-management.php?pet_added=1");
-        exit;
-    } else {
-        header("Location: client-management.php?pet_added=0");
-        exit;
-    }
-}
-
-if (isset($_POST['update_pet'])) {
-    $data = [
-        'pet_id' => $_POST['pet_id'],
-        'name' => $_POST['name'],
-        'species' => $_POST['species'],
-        'breed' => $_POST['breed'],
-        'age' => $_POST['age'],
-        'gender' => $_POST['gender'],
-        'weight' => $_POST['weight'],
-        'color' => $_POST['color'],
-        'notes' => $_POST['notes']
-    ];
-
-    if (updatePet($pdo, $data)) {
-        header("Location: client-management.php?pet_updated=1");
-        exit;
-    } else {
-        header("Location: client-management.php?pet_updated=0");
-        exit;
-    }
-}
+$csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
 ?>
 <!DOCTYPE html>
@@ -227,7 +137,9 @@ if (isset($_POST['update_pet'])) {
                     </div>
                     <button class="close text-xl" aria-label="Close">&times;</button>
                 </div>
-                <form class="flex flex-wrap items-center justify-between" method="POST" action="client-management.php">
+                <form id="addClientForm" class="flex flex-wrap items-center justify-between" method="POST"
+                    action="client-management.php">
+                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Name</label>
                         <input type="text" name="name" required
@@ -273,7 +185,7 @@ if (isset($_POST['update_pet'])) {
                     <div class="flex justify-end w-full">
                         <button type="button"
                             class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
-                        <button type="submit" name="submit"
+                        <button type="submit" name="submit" id="addClient"
                             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Create
                             Account</button>
                     </div>
@@ -287,7 +199,7 @@ if (isset($_POST['update_pet'])) {
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-semibold text-m">Client Details - <span id="clientName"></span></h3>
-                        <h4 class="text-gray-500 text-sm">Complete client and pet information</h4>
+                        <h4 class="text-gray-500 text-sm">Complete client information</h4>
                     </div>
                     <button class="close text-xl" aria-label="Close">&times;</button>
                 </div>
@@ -316,6 +228,7 @@ if (isset($_POST['update_pet'])) {
                     action="client-management.php">
                     <!-- Owner ID -->
                     <input type="hidden" name="owner_id" id="updateClientId">
+                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
 
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Name</label>
@@ -369,7 +282,7 @@ if (isset($_POST['update_pet'])) {
                     <div class="flex justify-end w-full">
                         <button type="button"
                             class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
-                        <button type="submit" name="update_client"
+                        <button type="submit" name="update_client" id="updateButton"
                             class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Update</button>
                     </div>
                 </form>
@@ -407,7 +320,9 @@ if (isset($_POST['update_pet'])) {
                     </div>
                     <button class="close text-xl">&times;</button>
                 </div>
-                <form class="flex flex-wrap items-center justify-between" method="POST" action="client-management.php">
+                <form id="addPetForm" class="flex flex-wrap items-center justify-between" method="POST"
+                    action="client-management.php">
+                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Pet Name</label>
                         <input type="text" name="name"
@@ -484,7 +399,7 @@ if (isset($_POST['update_pet'])) {
                     <div class="flex justify-end w-full">
                         <button type="button"
                             class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
-                        <button type="submit" name="add_pet"
+                        <button type="submit" name="add_pet" id="addPet"
                             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Add
                             Pet</button>
                     </div>
@@ -503,7 +418,8 @@ if (isset($_POST['update_pet'])) {
                     </div>
                     <button class="close text-xl">&times;</button>
                 </div>
-                <form class="flex flex-wrap items-center justify-between" method="POST" action="client-management.php">
+                <form id="updatePetForm" class="flex flex-wrap items-center justify-between" method="POST"
+                    action="client-management.php">
                     <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <input type="hidden" name="pet_id" id="updatePetId">
                     <div class="mb-4 w-auto">
@@ -548,8 +464,8 @@ if (isset($_POST['update_pet'])) {
                                 class="w-auto border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                                 name="gender" id="updatePetGender" required>
                                 <option value="" disabled selected>Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
                             </select>
                         </div>
                     </div>
@@ -578,7 +494,7 @@ if (isset($_POST['update_pet'])) {
                     <div class="flex justify-end w-full">
                         <button type="button"
                             class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
-                        <button type="submit" name="update_pet"
+                        <button type="submit" name="update_pet" id="submitButton"
                             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Update
                             Pet</button>
                     </div>
@@ -612,7 +528,7 @@ if (isset($_POST['update_pet'])) {
                 class="custom-scrollbar bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[70vh] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h3 class="text-m font-semibold">Patient Details</h3>
+                        <h3 class="text-m font-semibold">Pet Details</h3>
                         <h4 class="text-sm text-gray-600">All pets linked to this client</h4>
                     </div>
                     <button class="close text-xl">&times;</button>
@@ -643,7 +559,7 @@ if (isset($_POST['update_pet'])) {
             const tableBody = document.getElementById("clientsBody");
             const pagination = document.getElementById("pagination");
             const rows = tableBody.querySelectorAll("tr");
-            const rowsPerPage = 6;
+            const rowsPerPage = 5;
             let currentPage = 1;
             let csrfToken = "<?= $csrf_token ?>";
             const totalPages = Math.ceil(rows.length / rowsPerPage);
@@ -684,6 +600,40 @@ if (isset($_POST['update_pet'])) {
                 };
             }
 
+            // ===================== ADD CLIENT =====================
+            document.getElementById("addClientForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                formData.append("csrf_token", csrfToken); // ✅ include CSRF token
+
+                const addClient = document.getElementById('addClient');
+                addClient.disabled = true;
+                addClient.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+                fetch('../php/Add/add-client.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.csrf_token) csrfToken = data.csrf_token; // ✅ update token if refreshed
+                        if (data.status === "success") {
+                            showMessage("Success", data.message, "success", () => location.reload());
+                        } else {
+                            showMessage("Error", data.message, "error");
+                        }
+                    })
+                    .catch(() => showMessage("Error", "Update failed."))
+                    .finally(() => {
+                        addClient.disabled = false;
+                        addClient.innerHTML = "Update";
+                    });
+            });
+
             // ===================== CLIENT MODALS =====================
             document.querySelectorAll(".open-modal").forEach(btn => {
                 btn.addEventListener("click", () => {
@@ -711,17 +661,51 @@ if (isset($_POST['update_pet'])) {
                         .then(res => res.json())
                         .then(client => {
                             document.getElementById("updateClientId").value = client.id;
-                            document.getElementById("updateClientName").value = client.name;
-                            document.getElementById("updateClientUsername").value = client.username;
+                            document.getElementById("updateClientName").value = client.name || "";
+                            document.getElementById("updateClientUsername").value = client.username || "";
                             document.getElementById("updateClientPassword").value = ""; // blank
-                            document.getElementById("updateClientEmail").value = client.email;
-                            document.getElementById("updateClientPhone").value = client.phone;
+                            document.getElementById("updateClientEmail").value = client.email || "";
+                            document.getElementById("updateClientPhone").value = client.phone || "";
                             document.getElementById("updateClientEmergency").value = client.emergency || "";
-                            document.getElementById("updateClientAddress").value = client.address;
+                            document.getElementById("updateClientAddress").value = client.address || "";
+
                         });
 
                     openModal(document.getElementById("updateClientModal"));
                 });
+            });
+
+            document.getElementById("updateClientForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                formData.append("csrf_token", csrfToken); // ✅ include CSRF token
+
+                const updateButton = document.getElementById('updateButton');
+                updateButton.disabled = true;
+                updateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+                fetch('../php/Update/update-client.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.csrf_token) csrfToken = data.csrf_token; // ✅ update token if refreshed
+                        if (data.status === "success") {
+                            showMessage("Success", data.message, "success", () => location.reload());
+                        } else {
+                            showMessage("Error", data.message, "error");
+                        }
+                    })
+                    .catch(() => showMessage("Error", "Update failed."))
+                    .finally(() => {
+                        updateButton.disabled = false;
+                        updateButton.innerHTML = "Update";
+                    });
             });
 
             document.querySelectorAll(".open-pet-modal").forEach(btn => {
@@ -729,6 +713,40 @@ if (isset($_POST['update_pet'])) {
                     document.getElementById("modal_owner_id").value = btn.dataset.owner;
                     openModal(document.getElementById("addPetModal"));
                 });
+            });
+
+            // ===================== ADD PET =====================
+            document.getElementById("addPetForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                formData.append("csrf_token", csrfToken); // ✅ include CSRF token
+
+                const addPet = document.getElementById('addPet');
+                addPet.disabled = true;
+                addPet.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+                fetch('../php/Add/add-pet.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.csrf_token) csrfToken = data.csrf_token; // ✅ update token if refreshed
+                        if (data.status === "success") {
+                            showMessage("Success", data.message, "success", () => location.reload());
+                        } else {
+                            showMessage("Error", data.message, "error");
+                        }
+                    })
+                    .catch(() => showMessage("Error", "Update failed."))
+                    .finally(() => {
+                        addPet.disabled = false;
+                        addPet.innerHTML = "Update";
+                    });
             });
 
             // ===================== PET MODAL (VIEW/EDIT/DELETE) =====================
@@ -742,7 +760,7 @@ if (isset($_POST['update_pet'])) {
                 <div class="flex justify-center items-center h-32">
                     <p class="text-gray-500 animate-pulse">Loading pets...</p>
                 </div>
-            `;
+                `;
 
                     fetch("../helpers/fetch-pet.php?owner_id=" + ownerId)
                         .then(res => res.json())
@@ -826,6 +844,40 @@ if (isset($_POST['update_pet'])) {
                 });
             });
 
+            document.getElementById("updatePetForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                formData.append("csrf_token", csrfToken); // ✅ include CSRF token
+
+                const submitButton = document.getElementById('submitButton');
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+                fetch('../php/Update/update-pet.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.csrf_token) csrfToken = data.csrf_token; // ✅ update token if refreshed
+                        if (data.status === "success") {
+                            showMessage("Success", data.message, "success", () => location.reload());
+                        } else {
+                            showMessage("Error", data.message, "error");
+                        }
+                    })
+                    .catch(() => showMessage("Error", "Update failed."))
+                    .finally(() => {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = "Update";
+                    });
+            });
+
+
             // Confirm Delete Pet
             document.getElementById("confirmDeleteBtnPet").addEventListener("click", e => {
                 e.preventDefault();
@@ -879,6 +931,7 @@ if (isset($_POST['update_pet'])) {
                 pagination.innerHTML = "";
                 if (currentPage > 1) {
                     const prev = document.createElement("button");
+                    prev.className = "bg-blue-400 text-xs text-white py-1 px-2 rounded-lg";
                     prev.textContent = "Prev";
                     prev.onclick = () => showPage(currentPage - 1);
                     pagination.appendChild(prev);
@@ -886,12 +939,13 @@ if (isset($_POST['update_pet'])) {
                 for (let i = 1; i <= totalPages; i++) {
                     const btn = document.createElement("button");
                     btn.textContent = i;
-                    btn.className = i === currentPage ? "bg-green-500 text-white py-1 px-2 rounded-lg" : "bg-gray-200";
+                    btn.className = i === currentPage ? "bg-green-500 text-xs text-white py-1 px-2 rounded-lg" : "bg-gray-200 text-xs py-1 px-2 rounded-lg";
                     btn.onclick = () => showPage(i);
                     pagination.appendChild(btn);
                 }
                 if (currentPage < totalPages) {
                     const next = document.createElement("button");
+                    next.className = "bg-blue-400 text-xs text-white py-1 px-2 rounded-lg";
                     next.textContent = "Next";
                     next.onclick = () => showPage(currentPage + 1);
                     pagination.appendChild(next);

@@ -6,66 +6,141 @@ function addClient($pdo, $data)
         $access_type = 'owner';
         $status = 1;
 
+        // Check for existing username
+        $check = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+        $check->execute([$data['username']]);
+        if ($check->fetchColumn() > 0) {
+            return json_encode(["status" => "error", "message" => "Username already exists"]);
+        }
+
+        // Check for existing email
+        $check = $pdo->prepare("SELECT COUNT(*) FROM owners WHERE email = ?");
+        $check->execute([$data['email']]);
+        if ($check->fetchColumn() > 0) {
+            return json_encode(["status" => "error", "message" => "Email already exists"]);
+        }
+
         $pdo->beginTransaction();
 
         // Insert into users table
-        $stmt = $pdo->prepare("INSERT INTO users (username, password, access_type, status) VALUES (?, ?, ?, ?)");
+        $stmt = $pdo->prepare("
+            INSERT INTO users (username, password, access_type, status) 
+            VALUES (?, ?, ?, ?)
+        ");
         $stmt->execute([$data['username'], $hashedPassword, $access_type, $status]);
         $user_id = $pdo->lastInsertId();
 
         // Insert into owners table
-        $stmt = $pdo->prepare("INSERT INTO owners (user_id, name, email, phone, emergency, address, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$user_id, $data['name'], $data['email'], $data['phone'], $data['emergency'], $data['address'], $status]);
+        $stmt = $pdo->prepare("
+            INSERT INTO owners (user_id, name, email, phone, emergency, address, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $user_id,
+            $data['name'],
+            $data['email'],
+            $data['phone'],
+            $data['emergency'],
+            $data['address'],
+            $status
+        ]);
 
         $pdo->commit();
         return json_encode(["status" => "success", "message" => "Client added successfully"]);
 
     } catch (PDOException $e) {
         $pdo->rollBack();
-        return json_encode(["status" => "error", "message" => "Error adding client: " . $e->getMessage()]);
+        error_log("AddClient failed: " . $e->getMessage());
+        return json_encode(["status" => "error", "message" => "Unable to add client. Please try again."]);
     }
 }
+
 
 function updateClient($pdo, $data)
 {
     try {
         $pdo->beginTransaction();
 
-        // Update owners table
-        $stmt = $pdo->prepare("UPDATE owners SET name = ?, email = ?, phone = ?, emergency = ?, address = ? WHERE id = ?");
-        $stmt->execute([
-            $data['name'],
-            $data['email'],
-            $data['phone'],
-            $data['emergency_contact'],
-            $data['address'],
-            $data['owner_id']
-        ]);
+        // -----------------------
+        // 1. Update owners table
+        // -----------------------
+        $ownerFields = [];
+        $ownerValues = [];
 
-        // Get user_id linked to this owner
+        if (isset($data['name'])) {
+            $ownerFields[] = "name = ?";
+            $ownerValues[] = $data['name'];
+        }
+        if (isset($data['email'])) {
+            $ownerFields[] = "email = ?";
+            $ownerValues[] = $data['email'];
+        }
+        if (isset($data['phone'])) {
+            $ownerFields[] = "phone = ?";
+            $ownerValues[] = $data['phone'];
+        }
+        if (isset($data['emergency_contact'])) {
+            $ownerFields[] = "emergency = ?";
+            $ownerValues[] = $data['emergency_contact'];
+        }
+        if (isset($data['address'])) {
+            $ownerFields[] = "address = ?";
+            $ownerValues[] = $data['address'];
+        }
+
+        if (!empty($ownerFields)) {
+            $ownerValues[] = $data['owner_id'];
+            $sql = "UPDATE owners SET " . implode(", ", $ownerFields) . " WHERE id = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($ownerValues);
+        }
+
+        // -----------------------
+        // 2. Get linked user_id
+        // -----------------------
         $stmt = $pdo->prepare("SELECT user_id FROM owners WHERE id = ?");
         $stmt->execute([$data['owner_id']]);
         $user_id = $stmt->fetchColumn();
 
         if (!$user_id) {
+            $pdo->rollBack();
             return json_encode(["status" => "error", "message" => "User not found for this owner"]);
         }
 
-        // Check duplicate username
-        $checkStmt = $pdo->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
-        $checkStmt->execute([$data['username'], $user_id]);
-        if ($checkStmt->fetch()) {
-            return json_encode(["status" => "error", "message" => "Username already exists"]);
+        // -----------------------
+        // 3. Update users table
+        // -----------------------
+        $userFields = [];
+        $userValues = [];
+
+        if (!empty($data['username'])) {
+            // check duplicate username
+            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
+            $checkStmt->execute([$data['username'], $user_id]);
+            if ($checkStmt->fetch()) {
+                return json_encode(["status" => "error", "message" => "Username already exists"]);
+            }
+
+            if (!empty($data['password'])) {
+                $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("UPDATE users SET username = ?, password = ? WHERE id = ?");
+                $stmt->execute([$data['username'], $hashedPassword, $user_id]);
+            } else {
+                $stmt = $pdo->prepare("UPDATE users SET username = ? WHERE id = ?");
+                $stmt->execute([$data['username'], $user_id]);
+            }
+        } elseif (!empty($data['password'])) {
+            // update only password
+            $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+            $stmt->execute([$hashedPassword, $user_id]);
         }
 
-        // Update users table
-        if (!empty($data['password'])) {
-            $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("UPDATE users SET username = ?, password = ? WHERE id = ?");
-            $stmt->execute([$data['username'], $hashedPassword, $user_id]);
-        } else {
-            $stmt = $pdo->prepare("UPDATE users SET username = ? WHERE id = ?");
-            $stmt->execute([$data['username'], $user_id]);
+        if (!empty($userFields)) {
+            $userValues[] = $user_id;
+            $sql = "UPDATE users SET " . implode(", ", $userFields) . " WHERE id = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($userValues);
         }
 
         $pdo->commit();
