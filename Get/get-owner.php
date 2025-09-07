@@ -12,8 +12,7 @@ if (isset($_GET['id'])) {
             o.emergency,
             o.address,
             u.id AS user_id,
-            u.username,
-            u.password
+            u.username
         FROM owners o
         INNER JOIN users u ON o.user_id = u.id
         WHERE o.id = ?
@@ -21,5 +20,9 @@ if (isset($_GET['id'])) {
     $stmt->execute([$id]);
     $client = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    echo json_encode($client);
+    if ($client) {
+        echo json_encode($client);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Client not found"]);
+    }
 }
