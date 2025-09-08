@@ -224,6 +224,9 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     foreach ($records as $record) {
                         $Type = $record['visit_type'];
                         $typeinfo = $visitType[$Type] ?? ['icon' => 'fa-solid fa-question', 'color' => 'text-gray-700', 'bg' => 'bg-gray-200'];
+                        $dataFollow = (!empty($record['follow_up_date']) && $record['follow_up_date'] !== '0000-00-00')
+                            ? $record['follow_up_date']
+                            : '';
 
                         echo '<tr 
                             data-id="' . htmlspecialchars($record['medical_record_id']) . '" 
@@ -241,7 +244,12 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                 </div>
                             </td>';
                         echo '<td class="py-2">' . htmlspecialchars($record['diagnosis']) . '</td>';
-                        echo '<td class="py-2">' . htmlspecialchars($record['follow_up_date'] ?? 'No Follow-up date') . '</td>';
+                        echo '<td>' . (
+                            !empty($record['follow_up_date']) && $record['follow_up_date'] !== '0000-00-00'
+                            ? htmlspecialchars($record['follow_up_date'])
+                            : 'No Follow-up date'
+                        ) . '</td>';
+
                         echo '<td class="py-2 text-right space-x-1">
                                 <button  
                                     data-modal = "viewModal"
@@ -258,7 +266,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                     data-diagnosis="' . htmlspecialchars($record['diagnosis'] ?? '') . '" 
                                     data-treatment="' . htmlspecialchars($record['treatment'] ?? '') . '" 
                                     data-medications="' . htmlspecialchars($record['medications'] ?? '') . '" 
-                                    data-follow="' . htmlspecialchars($record['follow_up_date'] ?? 'No Follow-up date') . '" 
+                                    data-follow="' . htmlspecialchars($dataFollow) . '" 
                                     data-notes="' . htmlspecialchars($record['notes'] ?? '') . '" 
                                     class="open-modal fa-solid fa-eye text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                                 <button class="open-edit-modal fa-solid fa-pencil text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
@@ -432,7 +440,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             </div>
         </div>
     </main>
-
+    <script src="../assets/js/script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const medicalDetails = document.getElementById('medicalDetails');
@@ -478,6 +486,9 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     const id = btn.dataset.id;
                     const res = await fetch(`../Get/get-record.php?id=${id}&t=${Date.now()}`, { cache: "no-store" });
                     const record = await res.json();
+                    const followUpDate = (record.follow_up_date && record.follow_up_date !== "0000-00-00")
+                        ? record.follow_up_date
+                        : "No follow-up date";
 
                     if (record.error) throw new Error(record.error);
 
@@ -504,11 +515,11 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     addField(medicalDetails, "Weight:", record.weight || '');
                     addField(medicalDetails, "Temperature:", record.temperature || '');
 
-                    addField(followUpDetail, "", record.follow_up_date || '');
+                    addField(followUpDetail, "", followUpDate);
                     addField(diagnosisDetails, "", record.diagnosis || '');
                     addField(treatmentDetails, "", record.treatment || '');
                     addField(medicationsDetails, "", record.medications || '');
-                    addField(notesDetails, "", record.notes || '');
+                    addField(notesDetails, "", record.notes || 'No Additional Notes');
 
                     // Open modal
                     modal.classList.remove('hidden');
@@ -516,7 +527,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
                 } catch (err) {
                     console.error("Error fetching record:", err.message);
-                    alert("Unable to load latest data.");
+                    showMessage("Error", "Unable to load latest data.");
                 }
             });
 
@@ -543,6 +554,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                 const btn = e.target.closest(".open-add-modal");
                 if (!btn) return;
                 openAddModal();
+                updateBodyScroll();
             });
 
 
@@ -559,6 +571,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             document.querySelectorAll(".modal").forEach(modal => {
                 modal.addEventListener("click", e => {
                     if (e.target === modal) modal.classList.add("hidden");
+                    updateBodyScroll();
+
                 });
             });
 
@@ -753,9 +767,11 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                         row.querySelector("td:nth-child(1)").textContent = formData.get("visit_date");
                                         row.querySelector("td:nth-child(3) span").textContent = formData.get("visit_type");
                                         row.querySelector("td:nth-child(4)").textContent = formData.get("diagnosis");
-                                        row.querySelector("td:nth-child(5)").textContent = formData.get("follow_up_date");
+                                        row.querySelector("td:nth-child(5)").textContent = formData.get("follow_up_date") || "No follow-up date";
                                     }
                                     updateForm.closest(".modal").classList.add("hidden");
+                                    updateBodyScroll();
+
                                 }
                             });
                         })
@@ -806,6 +822,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             });
 
         });
+
     </script>
 </body>
 
