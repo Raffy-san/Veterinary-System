@@ -216,11 +216,15 @@ function deletePet($pdo, $id)
 function addMedicalRecord($pdo, $data)
 {
     try {
+        // ✅ If follow_up_date is empty, store NULL instead of 0000-00-00
+        $follow_up_date = !empty($data['follow_up_date']) ? $data['follow_up_date'] : null;
+
         $stmt = $pdo->prepare("
             INSERT INTO medical_records 
                 (pet_id, visit_date, visit_type, weight, temperature, diagnosis, treatment, medications, notes, follow_up_date) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
+
         $stmt->execute([
             $data['pet_id'],
             $data['visit_date'],
@@ -231,7 +235,7 @@ function addMedicalRecord($pdo, $data)
             $data['treatment'],
             $data['medications'],
             $data['notes'],
-            $data['follow_up_date']
+            $follow_up_date // ✅ use the normalized variable
         ]);
 
         // ✅ get the new record id
@@ -240,7 +244,7 @@ function addMedicalRecord($pdo, $data)
         return json_encode([
             "status" => "success",
             "message" => "Medical record added successfully",
-            "id" => $newId // send back new medical_records.id
+            "id" => $newId
         ]);
 
     } catch (PDOException $e) {
@@ -252,12 +256,27 @@ function addMedicalRecord($pdo, $data)
 }
 
 
+
 function updateMedicalRecord($pdo, $data)
 {
     try {
+        // ✅ Normalize follow_up_date (NULL if empty)
+        $follow_up_date = !empty($data['follow_up_date']) ? $data['follow_up_date'] : null;
+
         $stmt = $pdo->prepare("
-            UPDATE medical_records SET visit_date = ?, visit_type = ?, weight = ?, temperature = ?, diagnosis = ?, treatment = ?, medications = ?, notes = ?, follow_up_date = ? WHERE id = ?
+            UPDATE medical_records 
+            SET visit_date = ?, 
+                visit_type = ?, 
+                weight = ?, 
+                temperature = ?, 
+                diagnosis = ?, 
+                treatment = ?, 
+                medications = ?, 
+                notes = ?, 
+                follow_up_date = ?
+            WHERE id = ?
         ");
+
         $stmt->execute([
             $data['visit_date'],
             $data['visit_type'],
@@ -267,15 +286,23 @@ function updateMedicalRecord($pdo, $data)
             $data['treatment'],
             $data['medications'],
             $data['notes'],
-            $data['follow_up_date'],
+            $follow_up_date,        // ✅ use normalized value
             $data['record_id']
         ]);
-        return json_encode(["status" => "success", "message" => "Medical record updated successfully"]);
+
+        return json_encode([
+            "status" => "success",
+            "message" => "Medical record updated successfully"
+        ]);
 
     } catch (PDOException $e) {
-        return json_encode(["status" => "error", "message" => "Error updating medical record: " . $e->getMessage()]);
+        return json_encode([
+            "status" => "error",
+            "message" => "Error updating medical record: " . $e->getMessage()
+        ]);
     }
 }
+
 
 function deleteMedicalRecord($pdo, $id)
 {
