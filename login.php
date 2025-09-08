@@ -24,23 +24,33 @@ if (SessionManager::isLoggedIn()) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
-<body class="bg-green-100 flex items-center justify-center min-h-screen">
-    <section class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <div class="w-full max-w-md flex justify-center mb-2">
-            <i class="fa-solid fa-paw text-6xl text-green-500 rotate-45"></i>
+<body class="bg-green-100 flex items-center justify-center min-h-screen px-4">
+    <section class="w-full max-w-md bg-white rounded-lg shadow-md p-6 sm:p-8">
+        <!-- Icon -->
+        <div class="w-full flex justify-center mb-2">
+            <i class="fa-solid fa-paw text-5xl sm:text-6xl text-green-500 rotate-45"></i>
         </div>
-        <h2 class="text-2xl font-normal text-center text-gray-800">Veterinary System</h2>
-        <h3 class="text-xl font-light mb-4 text-center text-gray-700">Sign in to access your dashboard</h3>
+
+        <!-- Headings -->
+        <h2 class="text-xl sm:text-2xl font-normal text-center text-gray-800">
+            Veterinary System
+        </h2>
+        <h3 class="text-lg sm:text-xl font-light mb-4 text-center text-gray-700">
+            Sign in to access your dashboard
+        </h3>
+
+        <!-- Login Form -->
         <form id="loginForm">
-            <div class="mb-2">
-                <label class="font-bold block text-gray-700 mb-2">Access Type</label>
-                <div class="relative inline-block w-full">
-                    <div class="bg-white border border-gray-300 rounded-md p-2 cursor-pointer"
+            <!-- Access Type -->
+            <div class="mb-3">
+                <label class="font-bold block text-gray-700 mb-2 text-sm sm:text-base">Access Type</label>
+                <div class="relative w-full">
+                    <div class="bg-white border border-gray-300 rounded-md p-2 text-sm sm:text-base cursor-pointer flex items-center"
                         id="custom-select-trigger" tabindex="0">
                         <i class="fa-solid fa-paw mr-2 text-green-500 rotate-45"></i>
                         <span>Owner Login</span>
                     </div>
-                    <ul class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 hidden"
+                    <ul class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 hidden text-sm sm:text-base"
                         id="custom-select-options">
                         <li class="group p-2 hover:bg-green-500 hover:text-white cursor-pointer flex items-center"
                             data-value="admin">
@@ -54,8 +64,10 @@ if (SessionManager::isLoggedIn()) {
                         </li>
                     </ul>
                 </div>
+
+                <!-- Description -->
                 <div id="access-description"
-                    class="mt-2 text-gray-600 text-sm border rounded-md px-2 py-4 flex gap-2 flex-col">
+                    class="mt-2 text-gray-600 text-xs sm:text-sm border rounded-md px-2 py-3 flex gap-2 flex-col">
                     <div class="flex items-center gap-2">
                         <i id="desc-icon" class="fa-solid fa-paw text-green-500 rotate-45"></i>
                         <span id="desc-text" class="font-semibold">Pet Owner</span>
@@ -64,36 +76,32 @@ if (SessionManager::isLoggedIn()) {
                 </div>
             </div>
 
-            <div class="mb-2">
-                <label class="font-bold block text-gray-700 mb-2" for="username">Username</label>
-                <input class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            <!-- Username -->
+            <div class="mb-3">
+                <label class="font-bold block text-gray-700 mb-2 text-sm sm:text-base" for="username">Username</label>
+                <input
+                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
                     type="text" id="username" name="username" placeholder="Enter Your Username" required>
             </div>
-            <div class="mb-2 relative">
-                <label class="font-bold block text-gray-700 mb-2" for="password">Password</label>
-                <input class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+
+            <!-- Password -->
+            <div class="mb-3 relative">
+                <label class="font-bold block text-gray-700 mb-2 text-sm sm:text-base" for="password">Password</label>
+                <input
+                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
                     type="password" id="password" name="password" placeholder="Enter Your Password" required>
-                <i id="togglePassword" class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-3 text-gray-600">
+                <i id="togglePassword"
+                    class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-2 text-gray-600 text-sm sm:text-base">
                 </i>
             </div>
 
+            <!-- Button -->
             <button
-                class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700 transition-colors font-semibold"
+                class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700 transition-colors font-semibold text-sm sm:text-base"
                 type="submit">
                 Sign in
             </button>
         </form>
-        <!-- Error Modal -->
-        <div id="errorModal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
-                <h3 class="text-lg font-semibold text-red-600 mb-4">Login Failed</h3>
-                <p id="errorMessage" class="text-gray-700 mb-4"></p>
-                <button id="closeModal"
-                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors">
-                    Close
-                </button>
-            </div>
-        </div>
     </section>
     <script>
         // Descriptions and icons for each option
