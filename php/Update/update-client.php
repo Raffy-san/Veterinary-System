@@ -44,14 +44,6 @@ if (!empty($_POST['name'])) {
     $data['name'] = trim($_POST['name']);
 }
 
-// Optional updates (only add if not empty)
-if (!empty($_POST['username'])) {
-    if (strlen(trim($_POST['username'])) < 3) {
-        jsonResponse("error", "Username must be at least 3 characters long");
-    }
-    $data['username'] = trim($_POST['username']);
-}
-
 if (!empty($_POST['password'])) {
     $password = trim($_POST['password']);
     $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
