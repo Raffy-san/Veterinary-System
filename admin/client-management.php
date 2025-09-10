@@ -343,7 +343,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
                             <input type="number" name="age"
                                 class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                placeholder="Years">
+                                placeholder="Years" min="0">
                         </div>
 
                         <div class="mb-4 w-auto">
@@ -442,7 +442,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
                             <input type="number" name="age" id="updatePetAge"
                                 class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                placeholder="Years">
+                                placeholder="Years" min="0">
                         </div>
 
                         <div class="mb-4 w-auto">
@@ -649,8 +649,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         .then(client => {
                             document.getElementById("updateClientId").value = client.id;
                             document.getElementById("updateClientName").value = client.name || "";
-                            document.getElementById("updateClientPassword").value = ""; // blank
                             document.getElementById("updateClientEmail").value = client.email || "";
+                            document.getElementById("updateClientPassword").value = ""; // blank
                             document.getElementById("updateClientPhone").value = client.phone || "";
                             document.getElementById("updateClientEmergency").value = client.emergency || "";
                             document.getElementById("updateClientAddress").value = client.address || "";
