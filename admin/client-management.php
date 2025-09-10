@@ -147,22 +147,16 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             placeholder="Client Name">
                     </div>
                     <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm">Username</label>
-                        <input type="text" name="username" required
+                        <label class="block text-gray-700 mb-1 text-sm">Email</label>
+                        <input type="email" name="email"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Username">
+                            placeholder="Client Email">
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Password</label>
                         <input type="password" name="password" required
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Password">
-                    </div>
-                    <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm">Email</label>
-                        <input type="email" name="email"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Email">
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Phone</label>
@@ -238,10 +232,10 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     </div>
 
                     <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm">Username</label>
-                        <input type="text" name="username" id="updateClientUsername" required
+                        <label class="block text-gray-700 mb-1 text-sm">Email</label>
+                        <input type="email" name="email" id="updateClientEmail"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Username">
+                            placeholder="Client Email">
                     </div>
 
                     <div class="mb-4 w-auto">
@@ -249,13 +243,6 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <input type="password" name="password" id="updateClientPassword"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Leave blank to keep current password">
-                    </div>
-
-                    <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm">Email</label>
-                        <input type="email" name="email" id="updateClientEmail"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Client Email">
                     </div>
 
                     <div class="mb-4 w-auto">
@@ -662,7 +649,6 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         .then(client => {
                             document.getElementById("updateClientId").value = client.id;
                             document.getElementById("updateClientName").value = client.name || "";
-                            document.getElementById("updateClientUsername").value = client.username || "";
                             document.getElementById("updateClientPassword").value = ""; // blank
                             document.getElementById("updateClientEmail").value = client.email || "";
                             document.getElementById("updateClientPhone").value = client.phone || "";

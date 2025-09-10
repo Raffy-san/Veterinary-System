@@ -6,15 +6,8 @@ function addClient($pdo, $data)
         $access_type = 'owner';
         $status = 1;
 
-        // Check for existing username
-        $check = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
-        $check->execute([$data['username']]);
-        if ($check->fetchColumn() > 0) {
-            return json_encode(["status" => "error", "message" => "Username already exists"]);
-        }
-
-        // Check for existing email
-        $check = $pdo->prepare("SELECT COUNT(*) FROM owners WHERE email = ?");
+        // Check for existing email in users table
+        $check = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
         $check->execute([$data['email']]);
         if ($check->fetchColumn() > 0) {
             return json_encode(["status" => "error", "message" => "Email already exists"]);
@@ -22,12 +15,12 @@ function addClient($pdo, $data)
 
         $pdo->beginTransaction();
 
-        // Insert into users table
+        // Insert into users table (no username, use email)
         $stmt = $pdo->prepare("
-            INSERT INTO users (username, password, access_type, status) 
+            INSERT INTO users (email, password, access_type, status) 
             VALUES (?, ?, ?, ?)
         ");
-        $stmt->execute([$data['username'], $hashedPassword, $access_type, $status]);
+        $stmt->execute([$data['email'], $hashedPassword, $access_type, $status]);
         $user_id = $pdo->lastInsertId();
 
         // Insert into owners table
@@ -110,37 +103,27 @@ function updateClient($pdo, $data)
         // -----------------------
         // 3. Update users table
         // -----------------------
-        $userFields = [];
-        $userValues = [];
-
-        if (!empty($data['username'])) {
-            // check duplicate username
-            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
-            $checkStmt->execute([$data['username'], $user_id]);
+        if (!empty($data['email'])) {
+            // check duplicate email
+            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+            $checkStmt->execute([$data['email'], $user_id]);
             if ($checkStmt->fetch()) {
-                return json_encode(["status" => "error", "message" => "Username already exists"]);
+                return json_encode(["status" => "error", "message" => "Email already exists"]);
             }
 
             if (!empty($data['password'])) {
                 $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("UPDATE users SET username = ?, password = ? WHERE id = ?");
-                $stmt->execute([$data['username'], $hashedPassword, $user_id]);
+                $stmt = $pdo->prepare("UPDATE users SET email = ?, password = ? WHERE id = ?");
+                $stmt->execute([$data['email'], $hashedPassword, $user_id]);
             } else {
-                $stmt = $pdo->prepare("UPDATE users SET username = ? WHERE id = ?");
-                $stmt->execute([$data['username'], $user_id]);
+                $stmt = $pdo->prepare("UPDATE users SET email = ? WHERE id = ?");
+                $stmt->execute([$data['email'], $user_id]);
             }
         } elseif (!empty($data['password'])) {
             // update only password
             $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
             $stmt->execute([$hashedPassword, $user_id]);
-        }
-
-        if (!empty($userFields)) {
-            $userValues[] = $user_id;
-            $sql = "UPDATE users SET " . implode(", ", $userFields) . " WHERE id = ?";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($userValues);
         }
 
         $pdo->commit();
@@ -319,37 +302,37 @@ function deleteMedicalRecord($pdo, $id)
 function updateAdmin($pdo, $data)
 {
     try {
-        // Validate username
-        if (empty($data['username'])) {
-            return json_encode(["status" => "error", "message" => "Username cannot be empty"]);
+        // Validate email
+        if (empty($data['email'])) {
+            return json_encode(["status" => "error", "message" => "Email cannot be empty"]);
         }
 
         // Fetch current user info
-        $stmt = $pdo->prepare("SELECT username FROM users WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
         $stmt->execute([$data['admin_id']]);
-        $currentUsername = $stmt->fetchColumn();
+        $currentEmail = $stmt->fetchColumn();
 
-        if (!$currentUsername) {
+        if (!$currentEmail) {
             return json_encode(["status" => "error", "message" => "Admin not found"]);
         }
 
         // If no changes, return success
-        if ($currentUsername === $data['username'] && empty($data['password'])) {
+        if ($currentEmail === $data['email'] && empty($data['password'])) {
             return json_encode(["status" => "success", "message" => "No changes were made"]);
         }
 
         // Build update query dynamically
         if (!empty($data['password'])) {
             $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("UPDATE users SET username = ?, password = ? WHERE id = ?");
-            $stmt->execute([$data['username'], $hashedPassword, $data['admin_id']]);
+            $stmt = $pdo->prepare("UPDATE users SET email = ?, password = ? WHERE id = ?");
+            $stmt->execute([$data['email'], $hashedPassword, $data['admin_id']]);
         } else {
-            $stmt = $pdo->prepare("UPDATE users SET username = ? WHERE id = ?");
-            $stmt->execute([$data['username'], $data['admin_id']]);
+            $stmt = $pdo->prepare("UPDATE users SET email = ? WHERE id = ?");
+            $stmt->execute([$data['email'], $data['admin_id']]);
         }
 
         // ✅ Refresh session data after update
-        $_SESSION['username'] = $data['username'];
+        $_SESSION['email'] = $data['email'];
 
         return json_encode(["status" => "success", "message" => "Admin updated successfully"]);
     } catch (PDOException $e) {

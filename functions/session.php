@@ -76,7 +76,7 @@ class SessionManager
             // Fetch from owners + users
             $stmt = $pdo->prepare("
             SELECT o.id AS owner_id, o.name, o.email, o.phone, o.address, o.status, o.created_at,
-                   u.id AS user_id, u.username, u.access_type
+                   u.id AS user_id, u.email, u.access_type
             FROM owners o
             INNER JOIN users u ON o.user_id = u.id
             WHERE u.id = ?
@@ -86,7 +86,7 @@ class SessionManager
         } else {
             // Fetch only from users for admin or other roles
             $stmt = $pdo->prepare("
-            SELECT id AS user_id, username, password, access_type
+            SELECT id AS user_id, email, password, access_type
             FROM users
             WHERE id = ?
         ");

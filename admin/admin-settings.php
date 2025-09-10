@@ -115,16 +115,16 @@ $csrf_token = $_SESSION['csrf_token'];
                     <div id="current_password_error" class="error-message"></div>
                 </div>
 
-                <!-- Username Field -->
+                <!-- Email Field -->
                 <div class="space-y-2">
-                    <label for="username" class="block text-sm font-medium text-gray-700 flex items-center gap-2">
-                        <i class="fas fa-user text-green-500 w-4"></i>
-                        Change Username
+                    <label for="email" class="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                        <i class="fas fa-envelope text-green-500 w-4"></i>
+                        Change Email
                     </label>
-                    <input type="text" id="username" placeholder="New Username" name="username"
-                        value="<?php echo htmlspecialchars($admin['username']); ?>"
+                    <input type="email" id="email" placeholder="New Email" name="email"
+                        value="<?php echo htmlspecialchars($admin['email']); ?>"
                         class="border border-gray-300 rounded-lg p-3 mt-1 w-full focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
-                    <div id="username_error" class="error-message"></div>
+                    <div id="email_error" class="error-message"></div>
                 </div>
 
                 <!-- New Password Field -->
@@ -196,7 +196,7 @@ $csrf_token = $_SESSION['csrf_token'];
 
     <script>
         // Store original values for reset functionality
-        const originalUsername = "<?php echo htmlspecialchars($admin['username']); ?>";
+        const originalEmail = "<?php echo htmlspecialchars($admin['email']); ?>";
         let originalPassword = "";
 
         function togglePassword(inputId, iconId) {
@@ -215,7 +215,7 @@ $csrf_token = $_SESSION['csrf_token'];
         }
 
         function resetToOriginalValues() {
-            document.getElementById('username').value = originalUsername;
+            document.getElementById('email').value = originalEmail;
             document.getElementById('password').value = '';
             document.getElementById('confirm_password').value = '';
             document.getElementById('current_password').value = '';
@@ -285,24 +285,20 @@ $csrf_token = $_SESSION['csrf_token'];
                 document.getElementById('current_password').classList.remove('error');
             }
 
-            // Validate username
-            const username = document.getElementById('username').value;
-            const usernameRegex = /^[a-zA-Z0-9_-]{3,50}$/;
-            if (!username) {
-                document.getElementById('username_error').textContent = 'Username is required';
-                document.getElementById('username').classList.add('error');
+            // Validate email
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                document.getElementById('email_error').textContent = 'Email is required';
+                document.getElementById('email').classList.add('error');
                 isValid = false;
-            } else if (username.length < 3) {
-                document.getElementById('username_error').textContent = 'Username must be at least 3 characters';
-                document.getElementById('username').classList.add('error');
-                isValid = false;
-            } else if (!usernameRegex.test(username)) {
-                document.getElementById('username_error').textContent = 'Username can only contain letters, numbers, underscores, and hyphens';
-                document.getElementById('username').classList.add('error');
+            } else if (!emailRegex.test(email)) {
+                document.getElementById('email_error').textContent = 'Please enter a valid email address';
+                document.getElementById('email').classList.add('error');
                 isValid = false;
             } else {
-                document.getElementById('username_error').textContent = '';
-                document.getElementById('username').classList.remove('error');
+                document.getElementById('email_error').textContent = '';
+                document.getElementById('email').classList.remove('error');
             }
 
             // Validate password if provided
@@ -355,30 +351,6 @@ $csrf_token = $_SESSION['csrf_token'];
                 }
             };
         }
-        
-        document.getElementById('username').addEventListener('input', function () {
-            const username = this.value;
-            const usernameRegex = /^[a-zA-Z0-9_-]{3,50}$/;
-            const errorElement = document.getElementById('username_error');
-
-            if (username && !usernameRegex.test(username)) {
-                errorElement.textContent = 'Username can only contain letters, numbers, underscores, and hyphens';
-                this.classList.add('error');
-                this.classList.remove('success');
-            } else if (username && username.length < 3) {
-                errorElement.textContent = 'Username must be at least 3 characters';
-                this.classList.add('error');
-                this.classList.remove('success');
-            } else if (username) {
-                errorElement.textContent = '';
-                this.classList.remove('error');
-                this.classList.add('success');
-            } else {
-                errorElement.textContent = '';
-                this.classList.remove('error');
-                this.classList.remove('success');
-            }
-        });
 
         // Event listeners
         document.getElementById('password').addEventListener('input', function () {

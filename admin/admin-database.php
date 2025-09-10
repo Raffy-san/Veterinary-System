@@ -21,15 +21,15 @@ try {
 }
 
 // Example data (replace with your form data)
-$admin_username = 'admin123';
+$admin_email = 'admin@gmail.com';
 $admin_password = password_hash('super@dmin123', PASSWORD_DEFAULT); // Always hash passwords!
 $access_type = 'admin';
 
 // Insert query
-$sql = "INSERT INTO users (username, password, access_type) VALUES (:username, :password, :access_type)";
+$sql = "INSERT INTO users (email, password, access_type) VALUES (:email, :password, :access_type)";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([
-    ':username' => $admin_username,
+    ':email' => $admin_email,
     ':password' => $admin_password,
     ':access_type' => $access_type
 ]);

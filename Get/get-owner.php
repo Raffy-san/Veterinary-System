@@ -12,7 +12,6 @@ if (isset($_GET['id'])) {
             o.emergency,
             o.address,
             u.id AS user_id,
-            u.username
         FROM owners o
         INNER JOIN users u ON o.user_id = u.id
         WHERE o.id = ?

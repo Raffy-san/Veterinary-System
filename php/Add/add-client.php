@@ -31,7 +31,6 @@ if (
 // Collect & sanitize data
 $data = [
     'name' => ucwords(strtolower(trim($_POST['name'] ?? ''))),
-    'username' => trim($_POST['username'] ?? ''),
     'password' => trim($_POST['password'] ?? ''), // raw password, hashing handled in addClient()
     'email' => filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL),
     'phone' => isset($_POST['phone']) ? preg_replace('/\D/', '', $_POST['phone']) : '',
@@ -40,8 +39,8 @@ $data = [
 ];
 
 // Basic validation
-if (empty($data['username']) || empty($data['password']) || !$data['email']) {
-    jsonResponse("error", "Username, password, and valid email are required.");
+if (empty($data['password']) || !$data['email']) {
+    jsonResponse("error", "Valid email and password are required.");
 }
 
 try {
