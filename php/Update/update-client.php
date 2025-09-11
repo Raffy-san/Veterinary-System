@@ -44,14 +44,26 @@ if (!empty($_POST['name'])) {
     $data['name'] = trim($_POST['name']);
 }
 
-if (!empty($_POST['password'])) {
-    $password = trim($_POST['password']);
-    $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
-    if (!preg_match($passwordRegex, $password)) {
-        jsonResponse("error", "Password must be at least 8 characters and include uppercase, lowercase, number, and special character");
-    }
-    $data['password'] = $password; // hash inside updateClient
+$password = trim($_POST['password']);
+$errors = [];
+
+if (strlen($password) < 8)
+    $errors[] = 'at least 8 characters';
+if (!preg_match('/[A-Z]/', $password))
+    $errors[] = 'an uppercase letter';
+if (!preg_match('/[a-z]/', $password))
+    $errors[] = 'a lowercase letter';
+if (!preg_match('/\d/', $password))
+    $errors[] = 'a number';
+if (!preg_match('/[^A-Za-z0-9]/', $password))
+    $errors[] = 'a special character (e.g. @,#,!)';
+if (preg_match('/\s/', $password))
+    $errors[] = 'no spaces allowed';
+
+if ($errors) {
+    jsonResponse("error", "Password must include: " . implode(', ', $errors));
 }
+
 
 if (!empty($_POST['email'])) {
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);

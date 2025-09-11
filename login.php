@@ -109,17 +109,7 @@ if (SessionManager::isLoggedIn()) {
 
         </form>
 
-        <div id="messageModal"
-            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-            <div class="bg-white rounded-lg p-4 sm:p-6 w-[90%] sm:w-[400px] text-center">
-                <h3 id="messageTitle" class="text-base sm:text-lg font-semibold mb-2"></h3>
-                <p id="messageText" class="text-sm sm:text-gray-600 sm:mb-4"></p>
-                <button id="closeMessageBtn" type="button"
-                    class="px-3 py-2 sm:px-4 sm:py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm sm:text-base">
-                    OK
-                </button>
-            </div>
-        </div>
+        <?php include 'includes/message-modal.php' ?>
 
     </section>
     <script>
