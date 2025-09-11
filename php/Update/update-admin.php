@@ -28,7 +28,7 @@ if (
 
 $data = [
     'admin_id' => filter_input(INPUT_POST, 'admin_id', FILTER_VALIDATE_INT),
-    'username' => trim($_POST['username'] ?? ''),
+    'email' => trim($_POST['email'] ?? ''),
     'password' => trim($_POST['password'] ?? ''),
     'current_password' => trim($_POST['current_password'] ?? '')
 ];
@@ -54,25 +54,24 @@ if (!password_verify($data['current_password'], $admin['password'])) {
     jsonResponse("error", "Current password is incorrect");
 }
 
-// Validate username
-if (empty($data['username']) || strlen($data['username']) < 3) {
-    jsonResponse("error", "Username must be at least 3 characters long");
+// Validate email
+if (empty($data['email'])) {
+    jsonResponse("error", "Email is required");
+}
+if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+    jsonResponse("error", "Invalid email format");
 }
 
-if (!preg_match('/^[a-zA-Z0-9_-]{3,50}$/', $data['username'])) {
-    jsonResponse("error", "Username can only contain letters, numbers, underscores, and hyphens");
-}
-
-// Ensure username is unique
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? AND id != ?");
-$stmt->execute([$data['username'], $data['admin_id']]);
+// Ensure email is unique
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?");
+$stmt->execute([$data['email'], $data['admin_id']]);
 if ($stmt->fetchColumn() > 0) {
-    jsonResponse("error", "Username is already taken");
+    jsonResponse("error", "Email is already taken");
 }
 
 // Validate password only (hashing will be done inside updateAdmin)
 if (!empty($data['password'])) {
-    $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
+    $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*\s).{8,}$/';
     if (!preg_match($passwordRegex, $data['password'])) {
         jsonResponse("error", "Password must be at least 8 characters and include uppercase, lowercase, number, and special character");
     }
@@ -99,3 +98,4 @@ if ($resultData && $resultData['status'] === "success") {
 }
 
 ob_end_flush();
+

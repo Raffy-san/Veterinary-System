@@ -57,7 +57,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-    echo "If that email exists, a reset link has been sent.";
+    $message = "If that email exists, a reset link has been sent.";
+
+    echo "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('messageTitle').textContent = 'Password Reset';
+            document.getElementById('messageText').textContent = '$message';
+            document.getElementById('messageModal').classList.remove('hidden');
+        });
+      </script>";
 }
 
 ?>
@@ -68,15 +76,42 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Forgot Password</title>
 </head>
 
-<body>
-    <h2>Forgot Password</h2>
-    <form action="" method="POST">
-        <input type="email" name="email" placeholder="Enter your email" required>
-        <button type="submit">Send Reset Link</button>
-    </form>
+<body class="bg-green-100 flex items-center justify-center min-h-screen px-4">
+    <section class="w-full max-w-md bg-white rounded-lg shadow-md p-6 sm:p-8">
+        <div>
+            <h2 class="text-2xl sm:text-2xl font-bold text-center mb-4">Forgot Password</h2>
+            <form action="" method="POST">
+                <input
+                    class="w-full px-3 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                    type="email" name="email" placeholder="Enter your email" required>
+                <div class="flex flex-1 w-full gap-4">
+                    <button type="submit"
+                        class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700 transition-colors font-semibold text-sm sm:text-base">Send
+                        Reset Link</button>
+                    <button onclick="window.history.back()"
+                        class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-700 transition-colors font-semibold text-sm sm:text-base">Back
+                        To Login</button>
+                </div>
+            </form>
+        </div>
+        <?php include '../includes/message-modal.php' ?>
+    </section>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const modal = document.getElementById("messageModal");
+            const closeBtn = document.getElementById("closeMessageBtn");
+
+            closeBtn.addEventListener("click", () => {
+                modal.classList.add("hidden");
+            });
+        });
+    </script>
+
 </body>
 
 </html>
