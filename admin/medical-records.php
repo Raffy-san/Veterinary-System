@@ -79,32 +79,38 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             required>
                     </div>
-                    <div class="flex flex-record space-x-2">
-                        <div class="mb-4 w-auto">
-                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Visit Type</label>
-                            <select name="visit_type"
-                                class="w-auto border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                                <option value="" selected disabled>Select Type</option>
-                                <option value="Routine Checkup">Routine Checkup</option>
-                                <option value="Vaccination">Vaccination</option>
-                                <option value="Treatment">Treatment</option>
-                                <option value="Emergency">Emergency</option>
-                                <option value="Surgery">Surgery</option>
-                            </select>
-                        </div>
-                        <div class="mb-4 w-auto">
-                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
-                            <input type="text"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                name="weight" placeholder="e.g, 20lbs" required>
-                        </div>
-                        <div class="mb-4 w-auto">
-                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
-                            <input type="text"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                name="temperature" placeholder="e.g, 36°C" required>
-                        </div>
+
+                    <div class="mb-4 w-auto">
+                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Visit Type</label>
+                        <select name="visit_type"
+                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="" selected disabled>Select Type</option>
+                            <option value="Routine Checkup">Routine Checkup</option>
+                            <option value="Vaccination">Vaccination</option>
+                            <option value="Treatment">Treatment</option>
+                            <option value="Emergency">Emergency</option>
+                            <option value="Surgery">Surgery</option>
+                        </select>
                     </div>
+                    <div class="mb-4 w-auto">
+                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Veterinarian</label>
+                        <input type="text"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            name="veterinarian" placeholder="e.g, Dr. Will Smith" required>
+                    </div>
+                    <div class="mb-4 w-auto">
+                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
+                        <input type="text"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            name="weight" placeholder="e.g, 20lbs" required>
+                    </div>
+                    <div class="mb-4 w-auto">
+                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
+                        <input type="text"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            name="temperature" placeholder="e.g, 36°C" required>
+                    </div>
+
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Diagnosis</label>
                         <input type="text"
@@ -197,6 +203,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <th class="font-semibold py-2">Date</th>
                         <th class="font-semibold py-2">Patient</th>
                         <th class="font-semibold py-2">Type</th>
+                        <th class="font-semibold py-2">Veterinarian</th>
                         <th class="font-semibold py-2">Diagnosis</th>
                         <th class="font-semibold py-2">Follow-up-Date</th>
                         <th class="font-semibold py-2 text-right">Actions</th>
@@ -206,7 +213,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <?php
                     $records = fetchAllData(
                         $pdo,
-                        "SELECT m.id AS medical_record_id, m.visit_date, m.weight, m.temperature, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes, m.follow_up_date
+                        "SELECT m.id AS medical_record_id, m.visit_date, m.veterinarian, m.weight, m.temperature, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes, m.follow_up_date
                         FROM medical_records m 
                         JOIN pets p ON m.pet_id = p.id
                         JOIN owners o ON p.owner_id = o.id
@@ -243,6 +250,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                     <span>' . htmlspecialchars($record['visit_type']) . '</span>
                                 </div>
                             </td>';
+                        echo '<td class="py-2">' . htmlspecialchars($record['veterinarian']) . '</td>';
                         echo '<td class="py-2">' . htmlspecialchars($record['diagnosis']) . '</td>';
                         echo '<td>' . (
                             !empty($record['follow_up_date']) && $record['follow_up_date'] !== '0000-00-00'
@@ -342,31 +350,35 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             required>
                     </div>
-                    <div class="flex flex-record space-x-2">
-                        <div class="mb-4 w-auto">
-                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Visit Type</label>
-                            <select name="visit_type" id="updateVisitType"
-                                class="w-auto border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                                <option value="" selected disabled>Select Type</option>
-                                <option value="Routine Checkup">Routine Checkup</option>
-                                <option value="Vaccination">Vaccination</option>
-                                <option value="Treatment">Treatment</option>
-                                <option value="Emergency">Emergency</option>
-                                <option value="Surgery">Surgery</option>
-                            </select>
-                        </div>
-                        <div class="mb-4 w-auto">
-                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
-                            <input type="text" id="updateWeight"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                name="weight" placeholder="e.g, 20lbs" required>
-                        </div>
-                        <div class="mb-4 w-auto">
-                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
-                            <input type="text" id="updateTemperature"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                name="temperature" placeholder="e.g, 36°C" required>
-                        </div>
+                    <div class="mb-4 w-auto">
+                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Visit Type</label>
+                        <select name="visit_type" id="updateVisitType"
+                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="" selected disabled>Select Type</option>
+                            <option value="Routine Checkup">Routine Checkup</option>
+                            <option value="Vaccination">Vaccination</option>
+                            <option value="Treatment">Treatment</option>
+                            <option value="Emergency">Emergency</option>
+                            <option value="Surgery">Surgery</option>
+                        </select>
+                    </div>
+                    <div class="mb-4 w-auto">
+                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Veterinarian</label>
+                        <input type="text" id="updateVeterinarian"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            name="veterinarian" placeholder="e.g, Dr. Will Smith" required>
+                    </div>
+                    <div class="mb-4 w-auto">
+                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
+                        <input type="text" id="updateWeight"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            name="weight" placeholder="e.g, 20lbs" required>
+                    </div>
+                    <div class="mb-4 w-auto">
+                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
+                        <input type="text" id="updateTemperature"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            name="temperature" placeholder="e.g, 36°C" required>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Diagnosis</label>
@@ -503,6 +515,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         </div>
                         `);
 
+                    addField(medicalDetails, "Veterinarian:", record.veterinarian || '');
                     addField(medicalDetails, "Patient:", record.pet_name || '');
                     addField(medicalDetails, "Weight:", record.weight || '');
                     addField(medicalDetails, "Temperature:", record.temperature || '');
@@ -672,6 +685,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         document.getElementById("updatePetName").value = data.pet_name;
                         document.getElementById("updateVisitDate").value = data.visit_date || "";
                         document.getElementById("updateVisitType").value = data.visit_type || "";
+                        document.getElementById("updateVeterinarian").value = data.veterinarian || "";
                         document.getElementById("updateWeight").value = data.weight || "";
                         document.getElementById("updateTemperature").value = data.temperature || "";
                         document.getElementById("updateDiagnosis").value = data.diagnosis || "";
@@ -758,8 +772,9 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                     if (row) {
                                         row.querySelector("td:nth-child(1)").textContent = formData.get("visit_date");
                                         row.querySelector("td:nth-child(3) span").textContent = formData.get("visit_type");
-                                        row.querySelector("td:nth-child(4)").textContent = formData.get("diagnosis");
-                                        row.querySelector("td:nth-child(5)").textContent = formData.get("follow_up_date") || "No follow-up date";
+                                        row.querySelector("td:nth-child(4)").textContent = formData.get("veterinarian")
+                                        row.querySelector("td:nth-child(5)").textContent = formData.get("diagnosis");
+                                        row.querySelector("td:nth-child(6)").textContent = formData.get("follow_up_date") || "No follow-up date";
                                     }
                                     updateForm.closest(".modal").classList.add("hidden");
                                     updateBodyScroll();

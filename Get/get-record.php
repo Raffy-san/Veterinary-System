@@ -18,6 +18,7 @@ try {
             p.name AS pet_name, 
             DATE_FORMAT(m.visit_date, '%Y-%m-%d') AS visit_date, 
             m.visit_type, 
+            m.veterinarian,
             m.weight, 
             m.temperature, 
             m.diagnosis, 

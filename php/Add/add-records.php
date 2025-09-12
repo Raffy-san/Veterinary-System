@@ -32,6 +32,7 @@ $data = [
     'pet_id' => filter_input(INPUT_POST, 'patient', FILTER_VALIDATE_INT),
     'visit_date' => $_POST['visit_date'] ?? '',
     'visit_type' => trim($_POST['visit_type'] ?? ''),
+    'veterinarian' => trim(ucwords(strtolower($_POST['veterinarian'] ?? ''))),
     'weight' => trim($_POST['weight'] ?? ''),
     'temperature' => trim($_POST['temperature']),
     'diagnosis' => trim($_POST['diagnosis'] ?? ''),

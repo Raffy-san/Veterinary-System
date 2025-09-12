@@ -48,7 +48,8 @@ $medicalRecordCount = fetchOneData(
             <!-- Header Section -->
             <div class="mb-6 sm:mb-8">
                 <div class="flex items-center mb-3 sm:mb-4">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4">
+                    <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4">
                         <i class="fa-solid fa-file-medical text-blue-600 text-lg sm:text-xl"></i>
                     </div>
                     <div>
@@ -101,10 +102,13 @@ $medicalRecordCount = fetchOneData(
                             <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-3 sm:p-4 text-white">
                                 <div class="flex items-center">
                                     <div class="<?= $speciesInfo['bg'] ?> rounded-full p-2 sm:p-3 mr-3 sm:mr-4">
-                                        <i class="fas <?= $speciesInfo['icon'] ?> <?= $speciesInfo['color'] ?> text-sm sm:text-base md:text-xl"></i>
+                                        <i
+                                            class="fas <?= $speciesInfo['icon'] ?> <?= $speciesInfo['color'] ?> text-sm sm:text-base md:text-xl"></i>
                                     </div>
                                     <div>
-                                        <h4 class="text-base sm:text-lg md:text-xl font-bold"><?= htmlspecialchars($record['pet_name']) ?></h4>
+                                        <h4 class="text-base sm:text-lg md:text-xl font-bold">
+                                            <?= htmlspecialchars($record['pet_name']) ?>
+                                        </h4>
                                         <p class="text-blue-100 text-xs sm:text-sm flex items-center">
                                             <i class="fas fa-calendar mr-1 sm:mr-2"></i>
                                             <?= date('F j, Y', strtotime($record['visit_date'])) ?>
@@ -117,7 +121,7 @@ $medicalRecordCount = fetchOneData(
                             <div class="p-4 sm:p-6">
                                 <div class="record-details flex flex-col md:flex-row gap-4 sm:gap-6">
                                     <!-- Left Column -->
-                                    <div class="detail-section flex-1 space-y-3 sm:space-y-4">
+                                    <div class="detail-section w-full md:w-1/2 space-y-3 sm:space-y-4">
                                         <div class="flex items-center p-2 sm:p-3 bg-green-50 rounded-lg">
                                             <i class="fas fa-stethoscope text-green-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
                                             <div>
@@ -128,31 +132,45 @@ $medicalRecordCount = fetchOneData(
                                             </div>
                                         </div>
 
-                                        <div class="flex items-center p-2 sm:p-3 bg-blue-50 rounded-lg">
-                                            <i class="fas fa-weight text-blue-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
-                                            <div>
-                                                <p class="text-xs sm:text-sm text-blue-600 font-semibold">Weight</p>
-                                                <p class="text-gray-900 font-medium text-sm sm:text-base">
-                                                    <?= htmlspecialchars($record['weight']) ?>
+                                        <div class="flex items-start p-2 sm:p-3 bg-purple-50 rounded-lg">
+                                            <i
+                                                class="fas fa-user-md text-purple-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
+                                            <div class="flex-1">
+                                                <p class="text-xs sm:text-sm text-purple-600 font-semibold">Veterinarian</p>
+                                                <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base">
+                                                    <?= htmlspecialchars($record['veterinarian']) ?>
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <div class="flex items-center p-2 sm:p-3 bg-red-50 rounded-lg">
-                                            <i class="fas fa-thermometer-half text-red-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
-                                            <div>
-                                                <p class="text-xs sm:text-sm text-red-600 font-semibold">Temperature</p>
-                                                <p class="text-gray-900 font-medium text-sm sm:text-base">
-                                                    <?= htmlspecialchars($record['temperature']) ?>
-                                                </p>
+                                        <div class="flex flex-row sm:flex-col gap-3 sm:gap-4">
+                                            <div class="flex items-center p-2 sm:p-3 bg-blue-50 rounded-lg flex-1">
+                                                <i class="fas fa-weight text-blue-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
+                                                <div>
+                                                    <p class="text-xs sm:text-sm text-blue-600 font-semibold">Weight</p>
+                                                    <p class="text-gray-900 font-medium text-sm sm:text-base">
+                                                        <?= htmlspecialchars($record['weight']) ?>
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center p-2 sm:p-3 bg-red-50 rounded-lg flex-1">
+                                                <i
+                                                    class="fas fa-thermometer-half text-red-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
+                                                <div>
+                                                    <p class="text-xs sm:text-sm text-red-600 font-semibold">Temperature</p>
+                                                    <p class="text-gray-900 font-medium text-sm sm:text-base">
+                                                        <?= htmlspecialchars($record['temperature']) ?>
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Right Column -->
-                                    <div class="detail-section flex-1 space-y-3 sm:space-y-4">
+                                    <div class="detail-section w-full md:w-1/2 space-y-3 sm:space-y-4">
                                         <div class="flex items-start p-2 sm:p-3 bg-purple-50 rounded-lg">
-                                            <i class="fas fa-user-md text-purple-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
+                                            <i class="fas fa-medkit text-purple-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
                                             <div class="flex-1">
                                                 <p class="text-xs sm:text-sm text-purple-600 font-semibold">Treatment</p>
                                                 <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base">
@@ -198,20 +216,23 @@ $medicalRecordCount = fetchOneData(
                                 </div>
                             </div>
                         </div>
-                        <?php
+                    </div>
+                    <?php
                     }
                 } else {
                     ?>
-                    <div class="text-center py-12 sm:py-16">
-                        <div class="bg-gray-50 rounded-2xl p-8 sm:p-12 max-w-md mx-auto">
-                            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                                <i class="fas fa-file-medical text-gray-400 text-2xl sm:text-3xl"></i>
-                            </div>
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-4">No Medical Records</h3>
-                            <p class="text-gray-500 text-sm sm:text-base">No medical records have been added for your pets yet. Medical records will appear here once they are created by veterinarians.</p>
+                <div class="text-center py-12 sm:py-16">
+                    <div class="bg-gray-50 rounded-2xl p-8 sm:p-12 max-w-md mx-auto">
+                        <div
+                            class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                            <i class="fas fa-file-medical text-gray-400 text-2xl sm:text-3xl"></i>
                         </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-4">No Medical Records</h3>
+                        <p class="text-gray-500 text-sm sm:text-base">No medical records have been added for your pets
+                            yet. Medical records will appear here once they are created by veterinarians.</p>
                     </div>
-                    <?php
+                </div>
+                <?php
                 }
                 ?>
             </div>
