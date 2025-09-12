@@ -204,14 +204,15 @@ function addMedicalRecord($pdo, $data)
 
         $stmt = $pdo->prepare("
             INSERT INTO medical_records 
-                (pet_id, visit_date, visit_type, weight, temperature, diagnosis, treatment, medications, notes, follow_up_date) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (pet_id, visit_date, visit_type, veterinarian, weight, temperature, diagnosis, treatment, medications, notes, follow_up_date) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
             $data['pet_id'],
             $data['visit_date'],
             $data['visit_type'],
+            $data['veterinarian'],
             $data['weight'],
             $data['temperature'],
             $data['diagnosis'],
@@ -250,6 +251,7 @@ function updateMedicalRecord($pdo, $data)
             UPDATE medical_records 
             SET visit_date = ?, 
                 visit_type = ?, 
+                veterinarian =?,
                 weight = ?, 
                 temperature = ?, 
                 diagnosis = ?, 
@@ -263,6 +265,7 @@ function updateMedicalRecord($pdo, $data)
         $stmt->execute([
             $data['visit_date'],
             $data['visit_type'],
+            $data['veterinarian'],
             $data['weight'],
             $data['temperature'],
             $data['diagnosis'],
