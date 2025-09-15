@@ -24,8 +24,8 @@ if (SessionManager::isLoggedIn()) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
-<body class="bg-green-100 flex items-center justify-center min-h-screen px-4">
-    <section class="w-full max-w-md bg-white rounded-lg shadow-md p-6 sm:p-8">
+<body class="flex items-center justify-center min-h-screen px-4 bg-green-100">
+    <section class="w-full max-w-md bg-white rounded-lg shadow-xl p-6 sm:p-8">
         <!-- Icon -->
         <div class="w-full flex justify-center mb-2">
             <i class="fa-solid fa-paw text-5xl sm:text-6xl text-green-500 rotate-45"></i>
