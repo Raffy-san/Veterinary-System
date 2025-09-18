@@ -44,24 +44,27 @@ if (!empty($_POST['name'])) {
     $data['name'] = trim($_POST['name']);
 }
 
-$password = trim($_POST['password']);
-$errors = [];
+if (isset($_POST['password']) && trim($_POST['password']) !== '') {
+    $password = trim($_POST['password']);
+    $errors = [];
 
-if (strlen($password) < 8)
-    $errors[] = 'at least 8 characters';
-if (!preg_match('/[A-Z]/', $password))
-    $errors[] = 'an uppercase letter';
-if (!preg_match('/[a-z]/', $password))
-    $errors[] = 'a lowercase letter';
-if (!preg_match('/\d/', $password))
-    $errors[] = 'a number';
-if (!preg_match('/[^A-Za-z0-9]/', $password))
-    $errors[] = 'a special character (e.g. @,#,!)';
-if (preg_match('/\s/', $password))
-    $errors[] = 'no spaces allowed';
+    if (strlen($password) < 8)
+        $errors[] = 'at least 8 characters';
+    if (!preg_match('/[A-Z]/', $password))
+        $errors[] = 'an uppercase letter';
+    if (!preg_match('/[a-z]/', $password))
+        $errors[] = 'a lowercase letter';
+    if (!preg_match('/\d/', $password))
+        $errors[] = 'a number';
+    if (!preg_match('/[^A-Za-z0-9]/', $password))
+        $errors[] = 'a special character (e.g. @,#,!)';
+    if (preg_match('/\s/', $password))
+        $errors[] = 'no spaces allowed';
 
-if ($errors) {
-    jsonResponse("error", "Password must include: " . implode(', ', $errors));
+    if ($errors) {
+        jsonResponse("error", "Password must include: " . implode(', ', $errors));
+    }
+    $data['password'] = $password;
 }
 
 

@@ -782,7 +782,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                 <p><span class="font-semibold">Color:</span> ${pet.color || "N/A"}</p>
                             </div>
                             <p class="mt-2 text-gray-600 text-sm">
-                                <span class="font-semibold">Notes:</span> ${pet.notes || "None"}
+                                <span class="font-semibold">Notes:</span><span style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;"> ${pet.notes || "None"}</span>
                             </p>
                             <div class="flex justify-end gap-2 mt-4">
                                 <button class="edit-pet-btn cursor-pointer flex items-center gap-1 text-green-700 text-sm font-semibold px-3 py-1.5 bg-green-100 rounded-lg hover:bg-green-600 hover:text-white transition" data-id="${pet.id}">

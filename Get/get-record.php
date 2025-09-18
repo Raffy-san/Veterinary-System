@@ -21,10 +21,10 @@ try {
             m.veterinarian,
             m.weight, 
             m.temperature, 
-            m.diagnosis, 
-            m.treatment, 
-            m.medications, 
-            m.notes, 
+            COALESCE(m.diagnosis, '') AS diagnosis, 
+            COALESCE(m.treatment, '') AS treatment, 
+            COALESCE(m.medications, '') AS medications, 
+            COALESCE(m.notes, '') AS notes, 
             CASE 
                 WHEN m.follow_up_date IS NOT NULL 
                 THEN DATE_FORMAT(m.follow_up_date, '%Y-%m-%d') 

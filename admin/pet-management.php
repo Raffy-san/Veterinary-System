@@ -40,7 +40,7 @@ if (!$admin) {
                     <h3 class="relative inline-block mt-4 font-semibold">Filter By Species:</h3>
                     <div class="relative inline-block mt-4">
                         <select id="speciesFilter"
-                            class="appearance-none w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
+                            class="appearance-none cursor-pointer w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
                                     bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
                                     hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
                             <option value="">Show All</option>
@@ -125,7 +125,7 @@ if (!$admin) {
                                     data-owner='" . htmlspecialchars($row['owner_name'] ?? '') . "'
                                     data-email='" . htmlspecialchars($row['owner_email'] ?? '') . "'
                                     data-phone='" . htmlspecialchars($row['owner_phone'] ?? '') . "'
-                                    class='open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300'>
+                                    class='open-modal fa-solid fa-eye cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300'>
                                 </button>
                               </td>";
                         echo "</tr>";
@@ -140,14 +140,13 @@ if (!$admin) {
         </section>
         <div id="viewModal" class="modal hidden fixed inset-0 items-center justify-center"
             style="background-color: rgba(0,0,0,0.4);">
-
             <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-semibold text-m">Pet Details - <span id="petName"></span></h3>
                         <h4 class="text-gray-500 text-sm">Complete pet information</h4>
                     </div>
-                    <button class="close text-xl" aria-label="Close">&times;</button>
+                    <button class="close text-xl cursor-pointer" aria-label="Close">&times;</button>
                 </div>
                 <div class="flex flex-row justify-between space-x-2">
                     <div id="petDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
@@ -157,7 +156,8 @@ if (!$admin) {
                         <!-- Additional details will be populated here -->
                     </div>
                 </div>
-                <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full"
+                    style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;">
                     <!-- Additional details will be populated here -->
                 </div>
             </div>
@@ -211,7 +211,6 @@ if (!$admin) {
                 // Update species count display to total visible pets
                 speciesCountDiv.textContent = `Total Pets: ${visibleCount}`;
             }
-
 
             searchInput.addEventListener('input', applyFilters);
             filterSelect.addEventListener('change', applyFilters);

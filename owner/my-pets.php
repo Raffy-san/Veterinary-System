@@ -33,6 +33,43 @@ $petCount = fetchOneData(
     <title>My Pets</title>
 </head>
 <style>
+    /* Always hide FA icons that have the hidden utility */
+    .fas.hidden,
+    .far.hidden,
+    .fal.hidden,
+    .fab.hidden,
+    .fa.hidden {
+        display: none !important;
+    }
+
+    /* Restore responsive Tailwind display for FA icons (sm = min-width:640px) */
+    @media (min-width: 640px) {
+
+        .fas.sm\:inline,
+        .far.sm\:inline,
+        .fal.sm\:inline,
+        .fab.sm\:inline,
+        .fa.sm\:inline {
+            display: inline !important;
+        }
+
+        .fas.sm\:inline-block,
+        .far.sm\:inline-block,
+        .fal.sm\:inline-block,
+        .fab.sm\:inline-block,
+        .fa.sm\:inline-block {
+            display: inline-block !important;
+        }
+
+        .fas.sm\:block,
+        .far.sm\:block,
+        .fal.sm\:block,
+        .fab.sm\:block,
+        .fa.sm\:block {
+            display: block !important;
+        }
+    }
+
     /* Mobile specific adjustments */
     @media (max-width: 640px) {
         .pet-info-grid {
@@ -110,7 +147,7 @@ $petCount = fetchOneData(
                             </span>
                         </div>
 
-                        <div class="pet-info-grid grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-6">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-6">
                             <div class="flex items-start md:items-center">
                                 <i
                                     class="fas fa-venus-mars text-blue-500 mr-2 md:mr-3 text-sm md:text-base mt-1 md:mt-0 flex-shrink-0"></i>

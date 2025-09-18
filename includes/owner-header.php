@@ -29,33 +29,34 @@
                 class="flex flex-row justify-between sm:justify-start gap-1 sm:gap-4 text-gray-700 text-xs sm:text-sm font-semibold">
                 <li class="flex-1 text-center">
                     <a href="../owner/owner-dashboard.php"
-                        class="flex items-center justify-center gap-1 sm:gap-2 shadow-sm py-4 sm:py-2 px-2 sm:px-4 rounded-full border border-gray-300 duration-200 hover:border-green-500 min-h-[44px] text-xs sm:text-sm <?= basename($_SERVER['PHP_SELF']) == 'owner-dashboard.php' ? 'bg-green-500 text-white border-green-500' : 'bg-white' ?>">
+                        class="flex items-center justify-center gap-1 sm:gap-2 shadow-sm py-1 sm:py-2 px-2 sm:px-4 rounded-full border border-gray-300 duration-200 hover:border-green-500 min-h-[44px] text-xs sm:text-sm <?= basename($_SERVER['PHP_SELF']) == 'owner-dashboard.php' ? 'bg-green-500 text-white border-green-500' : 'bg-white' ?>">
                         <!-- HIDE on mobile -->
-                        <i class="fas fa-chart-line hidden sm:inline-block"></i>
+                        <i class="fas fa-chart-line hidden sm:inline"></i>
                         <span>Overview</span>
                     </a>
                 </li>
 
-                <li class="flex-1 text-center">
+                <li class=" flex-1 text-center">
                     <a href="../owner/my-pets.php"
-                        class="flex items-center justify-center gap-1 sm:gap-2 shadow-sm py-4 sm:py-2 px-2 sm:px-4 rounded-full border border-gray-300 duration-200 hover:border-green-500 min-h-[44px] text-xs sm:text-sm <?= basename($_SERVER['PHP_SELF']) == 'my-pets.php' ? 'bg-green-500 text-white border-green-500' : 'bg-white' ?>">
+                        class="flex items-center justify-center gap-1 sm:gap-2 shadow-sm py-1 sm:py-2 px-2 sm:px-4 rounded-full border border-gray-300 duration-200 hover:border-green-500 min-h-[44px] text-xs sm:text-sm <?= basename($_SERVER['PHP_SELF']) == 'my-pets.php' ? 'bg-green-500 text-white border-green-500' : 'bg-white' ?>">
                         <!-- SHOW on mobile, hide on sm+ -->
-                        <i class="fas fa-paw inline-block sm:hidden"></i>
+                        <i class="fas fa-paw hidden sm:inline"></i>
                         <span>My Pets</span>
                     </a>
                 </li>
 
-                <li class="flex-1 text-center">
+                <li class=" flex-1 text-center">
                     <a href="../owner/medical-records.php"
-                        class="flex items-center justify-center gap-1 sm:gap-2 shadow-sm py-4 sm:py-2 px-2 sm:px-4 rounded-full border border-gray-300 duration-200 hover:border-green-500 min-h-[44px] text-xs sm:text-sm <?= basename($_SERVER['PHP_SELF']) == 'medical-records.php' ? 'bg-green-500 text-white border-green-500' : 'bg-white' ?>">
+                        class="flex items-center justify-center gap-1 sm:gap-2 shadow-sm py-1 sm:py-2 px-2 sm:px-4 rounded-full border border-gray-300 duration-200 hover:border-green-500 min-h-[44px] text-xs sm:text-sm <?= basename($_SERVER['PHP_SELF']) == 'medical-records.php' ? 'bg-green-500 text-white border-green-500' : 'bg-white' ?>">
                         <!-- HIDE on mobile -->
-                        <i class="fas fa-file-medical hidden sm:inline-block"></i>
-                        <span>Medical Records</span>
+                        <i class="fas fa-file-medical hidden sm:inline"></i>
+                        <span class="sm:hidden">Records</span>
+                        <span class="hidden sm:inline">Medical Records</span>
                     </a>
                 </li>
             </ul>
-
         </nav>
+
     </div>
 
 </header>
