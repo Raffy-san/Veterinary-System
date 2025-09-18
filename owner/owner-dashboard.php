@@ -74,6 +74,43 @@ $Uppercase = ucfirst($client['status']);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
 
+    /* Always hide FA icons that have the hidden utility */
+    .fas.hidden,
+    .far.hidden,
+    .fal.hidden,
+    .fab.hidden,
+    .fa.hidden {
+        display: none !important;
+    }
+
+    /* Restore responsive Tailwind display for FA icons (sm = min-width:640px) */
+    @media (min-width: 640px) {
+
+        .fas.sm\:inline,
+        .far.sm\:inline,
+        .fal.sm\:inline,
+        .fab.sm\:inline,
+        .fa.sm\:inline {
+            display: inline !important;
+        }
+
+        .fas.sm\:inline-block,
+        .far.sm\:inline-block,
+        .fal.sm\:inline-block,
+        .fab.sm\:inline-block,
+        .fa.sm\:inline-block {
+            display: inline-block !important;
+        }
+
+        .fas.sm\:block,
+        .far.sm\:block,
+        .fal.sm\:block,
+        .fab.sm\:block,
+        .fa.sm\:block {
+            display: block !important;
+        }
+    }
+
     /* Mobile responsive adjustments */
     @media (max-width: 640px) {
         .stats-grid {

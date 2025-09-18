@@ -28,7 +28,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
     <title>Medical Records</title>
 </head>
 
-<body class="w-full bg-green-100 min-h-screen overflow-y-auto">
+<body class="bg-green-100 w-full min-h-screen overflow-y-auto">
     <?php
     include_once '../includes/admin-header.php';
     ?>
@@ -160,7 +160,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                 </form>
             </div>
         </div>
-        <section class="w-full bg-white rounded-lg shadow-md p-8">
+        <section class="w-full bg-white rounded-lg shadow-md p-10">
             <div class="mb-4 flex items-center justify-between">
                 <div>
                     <h3 class="font-semibold text-lg">Medical Records</h3>
@@ -199,14 +199,14 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         class="bg-gray-100 rounded px-3 py-2 mb-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-green-500">
                 </form>
             </div>
-            <table id="recordsTable" class="w-full table-collapse">
+            <table id="recordsTable" class="table-fixed w-full table-collapse">
                 <thead>
                     <tr class="text-sm text-left border-b border-gray-300">
                         <th class="font-semibold py-2">Date</th>
                         <th class="font-semibold py-2">Patient</th>
                         <th class="font-semibold py-2">Type</th>
                         <th class="font-semibold py-2">Veterinarian</th>
-                        <th class="font-semibold py-2">Diagnosis</th>
+                        <th class="font-semibold py-2 w-[150px]">Diagnosis</th>
                         <th class="font-semibold py-2">Follow-up-Date</th>
                         <th class="font-semibold py-2 text-right">Actions</th>
                     </tr>
@@ -253,7 +253,9 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                 </div>
                             </td>';
                         echo '<td class="py-2">' . htmlspecialchars($record['veterinarian']) . '</td>';
-                        echo '<td class="py-2">' . htmlspecialchars($record['diagnosis']) . '</td>';
+                        echo '<td class="py-2 truncate whitespace-nowrap overflow-hidden" style="width:150px; max-width:150px;">'
+                            . htmlspecialchars($record['diagnosis']) .
+                            '</td>';
                         echo '<td>' . (
                             !empty($record['follow_up_date']) && $record['follow_up_date'] !== '0000-00-00'
                             ? htmlspecialchars($record['follow_up_date'])
@@ -271,6 +273,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                     data-type-icon="' . htmlspecialchars($typeinfo['icon']) . '"
                                     data-patient="' . htmlspecialchars($record['patient_name'] ?? '') . '" 
                                     data-owner="' . htmlspecialchars($record['owner_name'] ?? '') . '" 
+                                    data-veterinarian="' . htmlspecialchars($record['veterinarian'] ?? '') . '"
                                     data-weight="' . htmlspecialchars($record['weight'] ?? '') . '"
                                     data-temperature="' . htmlspecialchars($record['temperature'] ?? '') . '"
                                     data-diagnosis="' . htmlspecialchars($record['diagnosis'] ?? '') . '" 
@@ -278,7 +281,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                     data-medications="' . htmlspecialchars($record['medications'] ?? '') . '" 
                                     data-follow="' . htmlspecialchars($dataFollow) . '" 
                                     data-notes="' . htmlspecialchars($record['notes'] ?? '') . '" 
-                                    class="open-modal fa-solid fa-eye cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                    class="open-modal fa-solid fa-eye cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300"></button>
                                 <button class="open-edit-modal fa-solid fa-pencil cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
                                 <button class="open-delete-modal fa-solid fa-trash cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-red-400" data-id="' . $record['medical_record_id'] . '"></button>
                             </td>';
@@ -293,16 +296,16 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             </table>
             <div id="pagination" class="flex justify-center space-x-2 mt-4"></div>
         </section>
-        <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-10 items-center justify-center"
+
+        <div id="viewModal" class="modal hidden fixed inset-0 items-center justify-center"
             style="background-color: rgba(0,0,0,0.4);">
-            <div
-                class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] min-w-[400px] max-w-[450px] overflow-y-auto">
+            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-semibold text-m">Medical Record - <span id="petName"></span></h3>
                         <h4 class="text-gray-500 text-sm"><span id="recordDate"></span></h4>
                     </div>
-                    <button class="close text-xl" aria-label="Close">&times;</button>
+                    <button class="close text-xl cursor-pointer" aria-label="Close">&times;</button>
                 </div>
                 <div class="flex flex-row justify-between space-x-2">
                     <div id="medicalDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
@@ -312,16 +315,20 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <!-- Additional details will be populated here -->
                     </div>
                 </div>
-                <div id="diagnosisDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                <div id="diagnosisDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full"
+                    style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;">
                     <!-- Additional details will be populated here -->
                 </div>
-                <div id="treatmentDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                <div id="treatmentDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full"
+                    style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;">
                     <!-- Additional details will be populated here -->
                 </div>
-                <div id="medicationsDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                <div id="medicationsDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full"
+                    style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;">
                     <!-- Additional details will be populated here -->
                 </div>
-                <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full">
+                <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full"
+                    style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;">
                     <!-- Additional details will be populated here -->
                 </div>
             </div>
@@ -344,7 +351,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <input type="hidden" name="record_id" id="updateRecordId">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
-                        <input type="text" name="pet_name" id="updatePetName" class="w-44 border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                        <input type="text" name="pet_name" id="updatePetName"
+                            class="w-44 border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             readonly>
                     </div>
                     <div class="mb-4 w-auto">
@@ -420,7 +428,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <button type="btn"
                             class="close cursor-pointer mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">
                             Cancel</button>
-                        <button type="submit" name="update_record"
+                        <button type="submit" name="update_record" id="updateRecordButton"
                             class="px-4 cursor-pointer py-2 bg-green-500 text-white rounded hover:bg-green-700 text-xs">Update
                             Record</button>
                     </div>
@@ -475,70 +483,37 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             };
 
             // Modal Open/Close
-            document.addEventListener('click', async (e) => {
-                const btn = e.target.closest('.open-modal');
-                if (!btn) return;
-
-                const modalId = btn.dataset.modal;
-                const modal = document.getElementById(modalId);
-
-                // Clear/reset sections before inserting data
-                medicalDetails.innerHTML = "<h3 class='font-semibold mb-4'><i class='fa-solid fa-stethoscope mr-2 text-green-600'></i>Visit information</h3>";
-                followUpDetail.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-calendar mr-2 text-green-600'></i>Follow-up date</h4>";
-                diagnosisDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-notes-medical mr-2 text-green-600'></i>Diagnosis</h4>";
-                treatmentDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-syringe mr-2 text-green-600'></i>Treatment</h4>";
-                medicationsDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-pills mr-2 text-green-600'></i>Medications</h4>";
-                notesDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-comment mr-2 text-green-600'></i>Notes</h4>";
-
-                try {
-                    const id = btn.dataset.id;
-                    const res = await fetch(`../Get/get-record.php?id=${id}&t=${Date.now()}`, { cache: "no-store" });
-                    const record = await res.json();
-                    const followUpDate = (record.follow_up_date && record.follow_up_date !== "0000-00-00")
-                        ? record.follow_up_date
-                        : "No follow-up date";
-
-                    if (record.error) throw new Error(record.error);
-
-                    // Fill modal with latest DB values
-                    petName.textContent = record.pet_name || '';
-                    recordDate.textContent = record.visit_date || '';
-
-                    addField(medicalDetails, "Date:", record.visit_date || '');
-
-                    const visitTypeHTML = `
-                            <div class="${btn.dataset.typeBg} ${btn.dataset.typeColor} rounded-lg px-2 py-1 inline-flex items-center gap-1">
-                                <i class="${btn.dataset.typeIcon}"></i>
-                                <span class="text-xs">${btn.dataset.type || "N/A"}</span>
-                            </div>
-                        `;
-                    medicalDetails.insertAdjacentHTML('beforeend', `
-                        <div>
-                            <span class="font-semibold">Visit Type:</span>
-                            ${visitTypeHTML}
-                        </div>
-                        `);
-
-                    addField(medicalDetails, "Veterinarian:", record.veterinarian || '');
-                    addField(medicalDetails, "Patient:", record.pet_name || '');
-                    addField(medicalDetails, "Weight:", record.weight || '');
-                    addField(medicalDetails, "Temperature:", record.temperature || '');
-
-                    addField(followUpDetail, "", followUpDate);
-                    addField(diagnosisDetails, "", record.diagnosis || '');
-                    addField(treatmentDetails, "", record.treatment || '');
-                    addField(medicationsDetails, "", record.medications || '');
-                    addField(notesDetails, "", record.notes || 'No Additional Notes');
-
-                    // Open modal
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
+            document.querySelectorAll(".open-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const modal = document.getElementById(btn.dataset.modal);
+                    modal.classList.remove("hidden");
+                    modal.classList.add("flex");
                     updateBodyScroll();
 
-                } catch (err) {
-                    console.error("Error fetching record:", err.message);
-                    showMessage("Error", "Unable to load latest data.");
-                }
+                    // Clear/reset sections before inserting data
+                    medicalDetails.innerHTML = "<h3 class='font-semibold mb-4'><i class='fa-solid fa-stethoscope mr-2 text-green-600'></i>Visit information</h3>";
+                    followUpDetail.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-calendar mr-2 text-green-600'></i>Follow-up date</h4>";
+                    diagnosisDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-notes-medical mr-2 text-green-600'></i>Diagnosis</h4>";
+                    treatmentDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-syringe mr-2 text-green-600'></i>Treatment</h4>";
+                    medicationsDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-pills mr-2 text-green-600'></i>Medications</h4>";
+                    notesDetails.innerHTML = "<h4 class='font-semibold mb-4'><i class='fa-solid fa-comment mr-2 text-green-600'></i>Notes</h4>";
+
+                    petName.textContent = btn.dataset.patient || '';
+                    recordDate.textContent = btn.dataset.date || '';
+
+                    addField(medicalDetails, "Date:", btn.dataset.date || '');
+                    // Visit type HTML as before...
+                    addField(medicalDetails, "Veterinarian:", btn.dataset.veterinarian || '');
+                    addField(medicalDetails, "Patient:", btn.dataset.patient || '');
+                    addField(medicalDetails, "Weight:", btn.dataset.weight || '');
+                    addField(medicalDetails, "Temperature:", btn.dataset.temperature || '');
+
+                    addField(followUpDetail, "", btn.dataset.follow || 'No Follow-up date');
+                    addField(diagnosisDetails, "", btn.dataset.diagnosis || '');
+                    addField(treatmentDetails, "", btn.dataset.treatment || '');
+                    addField(medicationsDetails, "", btn.dataset.medications || '');
+                    addField(notesDetails, "", btn.dataset.notes || 'No Additional Notes');
+                });
             });
 
             // Function to open "Add New Record" modal
@@ -761,38 +736,38 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             }
 
             // =================== Update Record ===================
-            const updateForm = document.querySelector("#updateMedicalRecordForm");
-            if (updateForm) {
-                updateForm.addEventListener("submit", e => {
-                    e.preventDefault();
-                    const formData = new FormData(updateForm);
-                    formData.set("csrf_token", csrfToken);
+            document.getElementById("updateMedicalRecordForm").addEventListener("submit", function (e) {
+                e.preventDefault();
 
-                    fetch("../php/Update/update-records.php", { method: "POST", body: formData })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.csrf_token) csrfToken = data.csrf_token; // update global CSRF
+                const formData = new FormData(this);
+                formData.append("csrf_token", csrfToken); // ✅ include CSRF token
 
-                            showMessage(data.status === "success" ? "Success" : "Error", data.message, () => {
-                                if (data.status === "success") {
-                                    // Update row dynamically
-                                    const row = document.querySelector(`tr[data-id="${formData.get("record_id")}"]`);
-                                    if (row) {
-                                        row.querySelector("td:nth-child(1)").textContent = formData.get("visit_date");
-                                        row.querySelector("td:nth-child(3) span").textContent = formData.get("visit_type");
-                                        row.querySelector("td:nth-child(4)").textContent = formData.get("veterinarian")
-                                        row.querySelector("td:nth-child(5)").textContent = formData.get("diagnosis");
-                                        row.querySelector("td:nth-child(6)").textContent = formData.get("follow_up_date") || "No follow-up date";
-                                    }
-                                    updateForm.closest(".modal").classList.add("hidden");
-                                    updateBodyScroll();
+                const updateButton = document.getElementById('updateRecordButton');
+                updateButton.disabled = true;
+                updateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
 
-                                }
-                            });
-                        })
-                        .catch(err => showMessage("Error", "Update failed. See console for details."));
-                });
-            }
+                fetch('../php/Update/update-records.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.csrf_token) csrfToken = data.csrf_token; // ✅ update token if refreshed
+                        if (data.status === "success") {
+                            showMessage("Success", data.message, () => location.reload());
+                        } else {
+                            showMessage("Error", data.message);
+                        }
+                    })
+                    .catch(() => showMessage("Error", "Update failed."))
+                    .finally(() => {
+                        updateButton.disabled = false;
+                        updateButton.innerHTML = "Update";
+                    });
+            });
 
             // =================== Delete Record ===================
             document.querySelectorAll(".open-delete-modal").forEach(btn => {
@@ -836,7 +811,6 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         e.target.disabled = false;
                     });
             });
-
         });
 
     </script>
