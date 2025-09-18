@@ -319,6 +319,13 @@ function updateAdmin($pdo, $data)
             return json_encode(["status" => "error", "message" => "Admin not found"]);
         }
 
+        // Check for duplicate email
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+        $stmt->execute([$data['email'], $data['admin_id']]);
+        if ($stmt->fetch()) {
+            return json_encode(["status" => "error", "message" => "Email already exists"]);
+        }
+
         // If no changes, return success
         if ($currentEmail === $data['email'] && empty($data['password'])) {
             return json_encode(["status" => "success", "message" => "No changes were made"]);

@@ -28,35 +28,35 @@ $petCount = fetchOneData(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/output.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <title>My Pets</title>
-    <style>
-        /* Mobile specific adjustments */
-        @media (max-width: 640px) {
-            .pet-info-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .pet-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .species-badge {
-                align-self: flex-start;
-            }
-        }
-
-        @media (min-width: 641px) and (max-width: 768px) {
-            .pet-info-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
 </head>
+<style>
+    /* Mobile specific adjustments */
+    @media (max-width: 640px) {
+        .pet-info-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .pet-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .species-badge {
+            align-self: flex-start;
+        }
+    }
+
+    @media (min-width: 641px) and (max-width: 768px) {
+        .pet-info-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
 
 <body class="bg-green-100">
     <?php

@@ -19,7 +19,7 @@ if (SessionManager::isLoggedIn()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="assets/img/green-paw.png">
     <title>Login - Medical Record System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/output.css">
     <script src="assets/js/script.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -67,7 +67,7 @@ if (SessionManager::isLoggedIn()) {
 
                 <!-- Description -->
                 <div id="access-description"
-                    class="mt-2 text-gray-600 text-xs sm:text-sm border rounded-md px-2 py-3 flex gap-2 flex-col">
+                    class="mt-2 text-gray-600 text-xs sm:text-sm border border-gray-300 rounded-md px-2 py-3 flex gap-2 flex-col">
                     <div class="flex items-center gap-2">
                         <i id="desc-icon" class="fa-solid fa-paw text-green-500 rotate-45"></i>
                         <span id="desc-text" class="font-semibold">Pet Owner</span>
@@ -80,7 +80,7 @@ if (SessionManager::isLoggedIn()) {
             <div class="mb-3">
                 <label class="font-bold block text-gray-700 mb-2 text-sm sm:text-base" for="email">Email</label>
                 <input
-                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
                     type="email" id="email" name="email" placeholder="Enter Your email" required>
             </div>
 
@@ -88,10 +88,10 @@ if (SessionManager::isLoggedIn()) {
             <div class="relative">
                 <label class="font-bold block text-gray-700 mb-2 text-sm sm:text-base" for="password">Password</label>
                 <input
-                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
                     type="password" id="password" name="password" placeholder="Enter Your Password" required>
                 <i id="togglePassword"
-                    class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-2 text-gray-600 text-sm sm:text-base">
+                    class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-2 py-1 text-gray-600 text-sm sm:text-base">
                 </i>
             </div>
             <div>
@@ -182,6 +182,7 @@ if (SessionManager::isLoggedIn()) {
                         document.getElementById('messageTitle').textContent = "Login Failed";
                         document.getElementById('messageText').textContent = data.message || 'Login failed';
                         document.getElementById('messageModal').classList.remove('hidden');
+                        document.getElementById('messageModal').classList.add('flex');
                         updateBodyScroll();
                     }
                 })
@@ -189,6 +190,7 @@ if (SessionManager::isLoggedIn()) {
                     document.getElementById('messageTitle').textContent = "Error";
                     document.getElementById('messageText').textContent = 'An error occurred. Please try again.';
                     document.getElementById('messageModal').classList.remove('hidden');
+                    document.getElementById('messageModal').classList.add('flex');
                     updateBodyScroll();
                     console.error(err);
                 });
@@ -197,6 +199,7 @@ if (SessionManager::isLoggedIn()) {
 
         document.getElementById('closeMessageBtn').addEventListener('click', function () {
             document.getElementById('messageModal').classList.add('hidden');
+        
             updateBodyScroll();
         });
 

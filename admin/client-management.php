@@ -22,7 +22,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/output.css">
     <script src="../assets/js/script.js"></script>
     <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -41,7 +41,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <h4 class="text-gray-600">Manage client information and accounts</h4>
                 </div>
                 <button data-modal="addClientModal"
-                    class="open-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700">
+                    class="open-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700 cursor-pointer">
                     <i class="fa-solid fa-plus mr-2"></i>Add Client
                 </button>
             </div>
@@ -56,7 +56,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
             <table class="w-full border-collapse">
                 <thead>
-                    <tr class="text-sm text-left border-b">
+                    <tr class="text-sm text-left border-b border-gray-300">
                         <th class="font-semibold py-2">Name</th>
                         <th class="font-semibold py-2">Contact</th>
                         <th class="font-semibold py-2">Join Date</th>
@@ -83,7 +83,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             ");
                     foreach ($clients as $client) {
 
-                        echo '<tr class="border-b hover:bg-green-50 text-sm text-left">';
+                        echo '<tr class="border-b border-gray-300 hover:bg-green-50 text-sm text-left">';
                         echo '<td class="py-2">' . htmlspecialchars($client['name']) . '</td>';
                         echo '<td class="py-2 flex flex-col">' . '<span><i class="fa-solid fa-envelope text-green-600"></i>&nbsp;' . htmlspecialchars($client['email']) . '</span>' . '<span class="text-gray-500 text-xs"><i class="fa-solid fa-phone">&nbsp;</i>' . htmlspecialchars($client['phone']) . '</span></td>';
                         echo '<td class="py-2">' . date('Y-m-d', strtotime($client['created_at'])) . '</td>';
@@ -99,20 +99,20 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                     data-created="' . date('Y-m-d', strtotime($client['created_at'])) . '"
                                     data-address="' . htmlspecialchars($client['address'] ?? '') . '"
                                     data-petcount="' . $client['pet_count'] . '"
-                                    class="open-modal fa-solid fa-eye text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
+                                    class="open-modal fa-solid fa-eye cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
                                 </button>
-                                <button class="open-update-modal fa-solid fa-pencil-alt text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300" data-id="' . $client['owner_id'] . '"></button>
+                                <button class="open-update-modal fa-solid fa-pencil-alt cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300" data-id="' . $client['owner_id'] . '"></button>
                                 <button 
                                 data-owner="' . $client['owner_id'] . '" 
-                                class="open-pet-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
+                                class="open-pet-modal text-gray-700 cursor-pointer mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
                                 <i class="fa-solid fa-plus mr-1"></i>Add Pet
                                 </button>
                                  <button
                                     data-modal="viewPetModal"
                                     data-owner="' . $client['owner_id'] . '"
-                                 class="open-modal text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">View Pet</button>
+                                 class="open-modal text-gray-700 cursor-pointer mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">View Pet</button>
                                 <button 
-                                    class="open-delete-modal fa-solid fa-trash text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
+                                    class="open-delete-modal fa-solid fa-trash cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
                                     data-id="' . $client['user_id'] . '" 
                                     data-name="' . htmlspecialchars($client['name']) . '">
                                 </button>
@@ -128,14 +128,15 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
         <!-- Add Client Modal -->
         <div id="addClientModal"
-            class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+            class="modal fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 hidden"
+            style="background-color: rgba(0,0,0,0.4);">
             <div class="bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="text-m font-semibold">Create Client Account</h3>
                         <h4 class="text-sm text-gray-600">Add new client to the system</h4>
                     </div>
-                    <button class="close text-xl" aria-label="Close">&times;</button>
+                    <button class="close text-xl cursor-pointer" aria-label="Close">&times;</button>
                 </div>
                 <form id="addClientForm" class="flex flex-wrap items-center justify-between" method="POST"
                     action="client-management.php">
@@ -143,44 +144,44 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Name</label>
                         <input type="text" name="name" required
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Name">
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Email</label>
                         <input type="email" name="email"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Email">
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Password</label>
                         <input type="password" name="password" required
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Password">
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Phone</label>
                         <input type="tel" name="phone" required pattern="^09\d{9}$"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="09XXXXXXXXX">
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Emergency Contact</label>
                         <input type="tel" name="emergency" pattern="^09\d{9}$"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="09XXXXXXXXX">
                     </div>
                     <div class="mb-4 w-full">
                         <label class="block text-gray-700 mb-1 text-sm">Address</label>
                         <input type="text" name="address" required
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter Client Full Address">
                     </div>
                     <div class="flex justify-end w-full">
                         <button type="button"
-                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
+                            class="close cursor-pointer mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
                         <button type="submit" name="submit" id="addClient"
-                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Create
+                            class="cursor-pointer px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Create
                             Account</button>
                     </div>
                 </form>
@@ -188,14 +189,15 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
         </div>
 
         <!-- View Modal -->
-        <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
+        <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center"
+            style="background-color: rgba(0,0,0,0.4);">
+            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[70vh] max-w-[450px] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-semibold text-m">Client Details - <span id="clientName"></span></h3>
                         <h4 class="text-gray-500 text-sm">Complete client information</h4>
                     </div>
-                    <button class="close text-xl" aria-label="Close">&times;</button>
+                    <button class="close text-xl cursor-pointer" aria-label="Close">&times;</button>
                 </div>
                 <div class="flex flex-row justify-between space-x-2">
                     <div id="clientDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 max-w-[220px]">
@@ -209,14 +211,15 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
         </div>
 
         <div id="updateClientModal"
-            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            class="modal hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center"
+            style="background-color: rgba(0,0,0,0.4);">
             <div class="bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-semibold text-m">Update Client Information</h3>
                         <h4 class="text-gray-500 text-sm">Edit the details of the selected client</h4>
                     </div>
-                    <button class="close text-xl" aria-label="Close">&times;</button>
+                    <button class="close text-xl cursor-pointer" aria-label="Close">&times;</button>
                 </div>
                 <form class="flex flex-wrap items-center justify-between" id="updateClientForm" method="POST"
                     action="client-management.php">
@@ -227,58 +230,58 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Name</label>
                         <input type="text" name="name" id="updateClientName" required
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Name">
                     </div>
 
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Email</label>
                         <input type="email" name="email" id="updateClientEmail"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Email">
                     </div>
 
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Password</label>
                         <input type="password" name="password" id="updateClientPassword"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Leave blank to keep current password">
                     </div>
 
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Phone</label>
                         <input type="tel" name="phone" id="updateClientPhone" required pattern="^09\d{9}$"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="09XXXXXXXXX">
                     </div>
 
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Emergency Contact</label>
                         <input type="tel" name="emergency" id="updateClientEmergency" pattern="^09\d{9}$"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="09XXXXXXXXX">
                     </div>
 
                     <div class="mb-4 w-full">
                         <label class="block text-gray-700 mb-1 text-sm">Address</label>
                         <input type="text" name="address" id="updateClientAddress" required
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter Client Full Address">
                     </div>
 
                     <div class="flex justify-end w-full">
                         <button type="button"
-                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
+                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm cursor-pointer">Cancel</button>
                         <button type="submit" name="update_client" id="updateButton"
-                            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Update</button>
+                            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm cursor-pointer">Update</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Delete Confirmation Modal -->
-        <div id="deleteModal"
-            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div id="deleteModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center"
+            style="background-color: rgba(0,0,0,0.4);">
             <div class="bg-white rounded-lg p-6 max-w-md w-full">
                 <div class="flex flex-row items-center mb-4">
                     <i class="fa-solid fa-circle-exclamation mr-2" style="color: #c00707;"></i>
@@ -288,7 +291,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     Are you sure you want to delete this client?
                 </p>
                 <div class="flex justify-end space-x-2">
-                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
+                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs cursor-pointer">Cancel</button>
                     <a id="confirmDeleteBtn" href="#"
                         class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
                         Delete
@@ -297,15 +300,15 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             </div>
         </div>
 
-        <div id="addPetModal"
-            class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div id="addPetModal" class="modal fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 hidden"
+            style="background-color: rgba(0,0,0,0.4);">
             <div class="bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="text-m font-semibold">Add new Pet</h3>
                         <h4 class="text-sm text-gray-600">Link this pet to the selected client</h4>
                     </div>
-                    <button class="close text-xl">&times;</button>
+                    <button class="close text-xl cursor-pointer">&times;</button>
                 </div>
                 <form id="addPetForm" class="flex flex-wrap items-center justify-between" method="POST"
                     action="client-management.php">
@@ -313,14 +316,14 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Pet Name</label>
                         <input type="text" name="name"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Pet Name" required>
                     </div>
 
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Species</label>
                         <select
-                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-44 border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="species" required>
                             <option value="" disabled selected>Select Species</option>
                             <option value="Dog">Dog</option>
@@ -335,21 +338,21 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Breed</label>
                             <input type="text" name="breed"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                                 placeholder="Breed">
                         </div>
 
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
                             <input type="number" name="age"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                                 placeholder="Years" min="0">
                         </div>
 
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Gender</label>
                             <select
-                                class="w-auto border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                class="w-auto border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                                 name="gender" required>
                                 <option value="" disabled selected>Select Gender</option>
                                 <option value="male">Male</option>
@@ -362,7 +365,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
                         <input type="text" name="weight"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="e.g. 10kg">
                     </div>
 
@@ -370,7 +373,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
                         <input type="text" name="color"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Pet Color">
                     </div>
 
@@ -379,15 +382,15 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-full">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Notes</label>
                         <textarea name="notes"
-                            class="w-full border rounded px-2 py-1 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Any special notes about the pet"></textarea>
                     </div>
 
                     <div class="flex justify-end w-full">
                         <button type="button"
-                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
+                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm cursor-pointer">Cancel</button>
                         <button type="submit" name="add_pet" id="addPet"
-                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Add
+                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm cursor-pointer">Add
                             Pet</button>
                     </div>
                 </form>
@@ -396,14 +399,15 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
 
         <div id="updatePetModal"
-            class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden z-[9999]">
+            class="modal fixed inset-0 bg-black bg-opacity-40 items-center justify-center hidden z-[9999]"
+            style="background-color: rgba(0,0,0,0.4);">
             <div class="bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="text-m font-semibold">Update Pet Information</h3>
                         <h4 class="text-sm text-gray-600">Edit the details of the selected Pet</h4>
                     </div>
-                    <button class="close text-xl">&times;</button>
+                    <button class="close text-xl cursor-pointer">&times;</button>
                 </div>
                 <form id="updatePetForm" class="flex flex-wrap items-center justify-between" method="POST"
                     action="client-management.php">
@@ -412,14 +416,14 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Pet Name</label>
                         <input type="text" name="name" id="updatePetName"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Pet Name" required>
                     </div>
 
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Species</label>
                         <select
-                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-44 border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="species" id="updatePetSpecies" required>
                             <option value="" disabled selected>Select Species</option>
                             <option value="Dog">Dog</option>
@@ -434,21 +438,21 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Breed</label>
                             <input type="text" name="breed" id="updatePetBreed"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                                 placeholder="Breed">
                         </div>
 
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
                             <input type="number" name="age" id="updatePetAge"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                                 placeholder="Years" min="0">
                         </div>
 
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Gender</label>
                             <select
-                                class="w-auto border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                class="w-auto border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                                 name="gender" id="updatePetGender" required>
                                 <option value="" disabled selected>Select Gender</option>
                                 <option value="Male">Male</option>
@@ -460,29 +464,29 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
                         <input type="text" name="weight" id="updatePetWeight"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="e.g. 10kg">
                     </div>
 
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
                         <input type="text" name="color" id="updatePetColor"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Pet Color">
                     </div>
 
                     <div class="mb-4 w-full">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Notes</label>
                         <textarea name="notes" id="updatePetNotes"
-                            class="w-full border rounded px-2 py-1 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Any special notes about the pet"></textarea>
                     </div>
 
                     <div class="flex justify-end w-full">
                         <button type="button"
-                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancel</button>
+                            class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm cursor-pointer">Cancel</button>
                         <button type="submit" name="update_pet" id="submitButton"
-                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm">Update
+                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm cursor-pointer">Update
                             Pet</button>
                     </div>
                 </form>
@@ -490,7 +494,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
         </div>
 
         <div id="deletePetModal"
-            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+            class="modal hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-[9999]"
+            style="background-color: rgba(0,0,0,0.4);">
             <div class="bg-white rounded-lg p-6 max-w-md w-full">
                 <div class="flex flex-row items-center mb-4">
                     <i class="fa-solid fa-circle-exclamation mr-2" style="color: #c00707;"></i>
@@ -500,7 +505,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     Are you sure you want to delete this Pet?
                 </p>
                 <div class="flex justify-end space-x-2">
-                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
+                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs cursor-pointer">Cancel</button>
                     <a id="confirmDeleteBtnPet" href="#"
                         class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
                         Delete
@@ -510,7 +515,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
         </div>
 
         <div id="viewPetModal"
-            class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+            class="modal fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 hidden"
+            style="background-color: rgba(0,0,0,0.4);">
             <div
                 class="custom-scrollbar bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[70vh] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
@@ -518,7 +524,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <h3 class="text-m font-semibold">Pet Details</h3>
                         <h4 class="text-sm text-gray-600">All pets linked to this client</h4>
                     </div>
-                    <button class="close text-xl">&times;</button>
+                    <button class="close text-xl cursor-pointer">&times;</button>
                 </div>
                 <div id="petDetailsContent" class="space-y-4"></div>
             </div>
@@ -551,6 +557,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
             const openModal = (modal) => {
                 modal.classList.remove("hidden");
+                modal.classList.add("flex");
                 updateBodyScroll();
             };
 
@@ -571,6 +578,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                 titleElement.classList.toggle("text-red-600", type !== "success");
 
                 openModal(modal);
+                modal.classList.add('flex');
 
                 document.getElementById("closeMessageBtn").onclick = () => {
                     closeModal(modal);
@@ -605,10 +613,10 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             showMessage("Error", data.message, "error");
                         }
                     })
-                    .catch(() => showMessage("Error", "Update failed."))
+                    .catch(() => showMessage("Error", "Create failed."))
                     .finally(() => {
                         addClient.disabled = false;
-                        addClient.innerHTML = "Update";
+                        addClient.innerHTML = "Create Account";
                     });
             });
 
@@ -719,10 +727,10 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             showMessage("Error", data.message, "error");
                         }
                     })
-                    .catch(() => showMessage("Error", "Update failed."))
+                    .catch(() => showMessage("Error", "Add failed."))
                     .finally(() => {
                         addPet.disabled = false;
-                        addPet.innerHTML = "Update";
+                        addPet.innerHTML = "Add Pet";
                     });
             });
 
@@ -777,10 +785,10 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                 <span class="font-semibold">Notes:</span> ${pet.notes || "None"}
                             </p>
                             <div class="flex justify-end gap-2 mt-4">
-                                <button class="edit-pet-btn flex items-center gap-1 text-green-700 text-sm font-semibold px-3 py-1.5 bg-green-100 rounded-lg hover:bg-green-600 hover:text-white transition" data-id="${pet.id}">
+                                <button class="edit-pet-btn cursor-pointer flex items-center gap-1 text-green-700 text-sm font-semibold px-3 py-1.5 bg-green-100 rounded-lg hover:bg-green-600 hover:text-white transition" data-id="${pet.id}">
                                     <i class="fa-solid fa-pen-alt"></i> Edit
                                 </button>
-                                <button class="delete-pet-btn flex items-center gap-1 text-red-600 text-sm font-semibold px-3 py-1.5 bg-red-100 rounded-lg hover:bg-red-500 hover:text-white transition" data-id="${pet.id}" data-name="${pet.name}">
+                                <button class="delete-pet-btn cursor-pointer flex items-center gap-1 text-red-600 text-sm font-semibold px-3 py-1.5 bg-red-100 rounded-lg hover:bg-red-500 hover:text-white transition" data-id="${pet.id}" data-name="${pet.name}">
                                     <i class="fa-solid fa-trash"></i> Delete
                                 </button>
                             </div>

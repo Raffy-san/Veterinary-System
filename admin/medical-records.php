@@ -21,8 +21,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="../assets/js/script.js"></script>
+    <link rel="stylesheet" href="../assets/css/output.css">
     <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Medical Records</title>
@@ -34,7 +34,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
     ?>
     <main class="p-10 max-w-[1400px] mx-auto">
         <div id="addNewRecord"
-            class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+            class="modal fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 hidden"
+            style="background-color: rgba(0,0,0,0.4);">
             <div
                 class="custom-scrollbar bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[80vh] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
@@ -42,7 +43,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <h3 class="text-m font-semibold">Create Medical Record</h3>
                         <h4 class="text-sm text-gray-600">Document a medical visit, treatment, or procedure.</h4>
                     </div>
-                    <button class="close text-xl">&times;</button>
+                    <button class="close text-xl cursor-pointer">&times;</button>
                 </div>
                 <form id="addRecordForm" class="flex flex-wrap items-center justify-between" method="POST"
                     action="medical-records.php">
@@ -50,7 +51,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
                         <select
-                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-44 bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="patient" id="patient" required>
                             <option value="" Selected disabled>Select Patient</option>
                             <?php
@@ -76,14 +77,14 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Date</label>
                         <input type="date" name="visit_date"
-                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-44 bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             required>
                     </div>
 
                     <div class="mb-4 w-auto">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Visit Type</label>
                         <select name="visit_type"
-                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            class="w-44 bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
                             <option value="" selected disabled>Select Type</option>
                             <option value="Routine Checkup">Routine Checkup</option>
                             <option value="Vaccination">Vaccination</option>
@@ -95,44 +96,44 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Veterinarian</label>
                         <input type="text"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="veterinarian" placeholder="e.g, Dr. Will Smith" required>
                     </div>
                     <div class="mb-4 w-auto">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
                         <input type="text"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="weight" placeholder="e.g, 20lbs" required>
                     </div>
                     <div class="mb-4 w-auto">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
                         <input type="text"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="temperature" placeholder="e.g, 36°C" required>
                     </div>
 
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Diagnosis</label>
                         <input type="text"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="diagnosis" placeholder="Primary diagnosis or reason for visit" required>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Treatment</label>
                         <textarea name="treatment" id=""
-                            class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
+                            class="w-full bg-white border border-gray-300 px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
                             placeholder="Describe the treatment of procedures performed"></textarea>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Medications</label>
                         <textarea name="medications" id=""
-                            class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
+                            class="w-full bg-white border border-gray-300 px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
                             placeholder="List the medications prescribed with dosage and frequency"></textarea>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Additional Notes</label>
                         <textarea name="notes" id=""
-                            class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
+                            class="w-full bg-white border border-gray-300 px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
                             placeholder="Add additional observations, instructions, or notes"></textarea>
                     </div>
 
@@ -145,14 +146,15 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <label for="follow_up_date" class="block text-gray-700 mb-1 text-sm font-semibold">Follow-Up
                             Date (if applicable)</label>
                         <input type="date" id="follow_up_date" name="follow_up_date"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
                     </div>
 
                     <div class="flex justify-end w-full">
-                        <button type="btn" class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">
+                        <button type="btn"
+                            class="close cursor-pointer mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">
                             Cancel</button>
                         <button type="submit" name="submit"
-                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-xs">Add
+                            class="px-4 py-2 cursor-pointer bg-green-500 text-white rounded hover:bg-green-700 text-xs">Add
                             Record</button>
                     </div>
                 </form>
@@ -169,7 +171,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <h3 class="relative inline-block mt-4 font-semibold">Filter By Visit Type:</h3>
                         <div class="relative inline-block mt-4">
                             <select id="typeFilter"
-                                class="appearance-none w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
+                                class="appearance-none cursor-pointer w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
                                 bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
                                 hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
                                 <option value="">Show All</option>
@@ -186,7 +188,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         </div>
                     </div>
                     <button data-modal="addNewRecord"
-                        class="open-add-modal mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700"><i
+                        class="open-add-modal cursor-pointer mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700"><i
                             class="fa-solid fa-plus mr-2"></i>New Record</button>
                 </div>
             </div>
@@ -199,7 +201,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             </div>
             <table id="recordsTable" class="w-full table-collapse">
                 <thead>
-                    <tr class="text-sm text-left border-b">
+                    <tr class="text-sm text-left border-b border-gray-300">
                         <th class="font-semibold py-2">Date</th>
                         <th class="font-semibold py-2">Patient</th>
                         <th class="font-semibold py-2">Type</th>
@@ -238,7 +240,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         echo '<tr 
                             data-id="' . htmlspecialchars($record['medical_record_id']) . '" 
                             data-type="' . htmlspecialchars($record['visit_type']) . '" 
-                            class="border-b hover:bg-green-50 text-sm">';
+                            class="border-b border-gray-300 hover:bg-green-50 text-sm">';
                         echo '<td class="py-2">' . htmlspecialchars($record['visit_date']) . '</td>';
                         echo "<td class='py-2'>
                                 <span class='font-medium'>" . htmlspecialchars($record['patient_name']) . "</span><br>
@@ -276,9 +278,9 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                     data-medications="' . htmlspecialchars($record['medications'] ?? '') . '" 
                                     data-follow="' . htmlspecialchars($dataFollow) . '" 
                                     data-notes="' . htmlspecialchars($record['notes'] ?? '') . '" 
-                                    class="open-modal fa-solid fa-eye text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
-                                <button class="open-edit-modal fa-solid fa-pencil text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
-                                <button class="open-delete-modal fa-solid fa-trash text-gray-700 bg-green-100 p-2 rounded hover:bg-red-400" data-id="' . $record['medical_record_id'] . '"></button>
+                                    class="open-modal fa-solid fa-eye cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button class="open-edit-modal fa-solid fa-pencil cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                                <button class="open-delete-modal fa-solid fa-trash cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-red-400" data-id="' . $record['medical_record_id'] . '"></button>
                             </td>';
                         echo '</tr>';
                     }
@@ -291,7 +293,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             </table>
             <div id="pagination" class="flex justify-center space-x-2 mt-4"></div>
         </section>
-        <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-10 items-center justify-center"
+            style="background-color: rgba(0,0,0,0.4);">
             <div
                 class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] min-w-[400px] max-w-[450px] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
@@ -324,7 +327,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             </div>
         </div>
         <div id="updateMedicalRecordModal"
-            class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+            class="modal fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 hidden"
+            style="background-color: rgba(0,0,0,0.4);">
             <div
                 class="custom-scrollbar bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[80vh] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
@@ -332,7 +336,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <h3 class="text-m font-semibold">Update Medical Record</h3>
                         <h4 class="text-sm text-gray-600">Document a medical visit, treatment, or procedure.</h4>
                     </div>
-                    <button class="close text-xl">&times;</button>
+                    <button class="close text-xl cursor-pointer">&times;</button>
                 </div>
                 <form id="updateMedicalRecordForm" class="flex flex-wrap items-center justify-between" method="POST"
                     action="medical-records.php">
@@ -340,20 +344,19 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <input type="hidden" name="record_id" id="updateRecordId">
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
-                        <input type="text" name="pet_name" id="updatePetName"
-                            class="w-44 bg-white border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-100"
+                        <input type="text" name="pet_name" id="updatePetName" class="w-44 border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             readonly>
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Date</label>
                         <input type="date" name="visit_date" id="updateVisitDate"
-                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-44 border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             required>
                     </div>
                     <div class="mb-4 w-auto">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Visit Type</label>
                         <select name="visit_type" id="updateVisitType"
-                            class="w-44 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            class="w-44 border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
                             <option value="" selected disabled>Select Type</option>
                             <option value="Routine Checkup">Routine Checkup</option>
                             <option value="Vaccination">Vaccination</option>
@@ -365,44 +368,44 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="mb-4 w-auto">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Veterinarian</label>
                         <input type="text" id="updateVeterinarian"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="veterinarian" placeholder="e.g, Dr. Will Smith" required>
                     </div>
                     <div class="mb-4 w-auto">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
                         <input type="text" id="updateWeight"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="weight" placeholder="e.g, 20lbs" required>
                     </div>
                     <div class="mb-4 w-auto">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
                         <input type="text" id="updateTemperature"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="temperature" placeholder="e.g, 36°C" required>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Diagnosis</label>
                         <input type="text" id="updateDiagnosis"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="diagnosis" placeholder="Primary diagnosis or reason for visit" required>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Treatment</label>
                         <textarea name="treatment" id="updateTreatment"
-                            class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
+                            class="w-full border bg-white border-gray-300 px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
                             placeholder="Describe the treatment of procedures performed"></textarea>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Medications</label>
                         <textarea name="medications" id="updateMedications"
-                            class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
+                            class="w-full border bg-white border-gray-300 px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
                             placeholder="List the medications prescribed with dosage and frequency"></textarea>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Additional
                             Notes</label>
                         <textarea name="notes" id="updateNotes"
-                            class="w-full border px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
+                            class="w-full border bg-white border-gray-300 px-2 py-1 resize-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 none"
                             placeholder="Add additional observations, instructions, or notes"></textarea>
                     </div>
 
@@ -410,21 +413,22 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <label for="follow_up_date" class="block text-gray-700 mb-1 text-sm font-semibold">Follow-Up
                             Date</label>
                         <input type="date" id="updateFollowUpDate" name="follow_up_date"
-                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            class="w-full border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
                     </div>
 
                     <div class="flex justify-end w-full">
-                        <button type="btn" class="close mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">
+                        <button type="btn"
+                            class="close cursor-pointer mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">
                             Cancel</button>
                         <button type="submit" name="update_record"
-                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-xs">Update
+                            class="px-4 cursor-pointer py-2 bg-green-500 text-white rounded hover:bg-green-700 text-xs">Update
                             Record</button>
                     </div>
                 </form>
             </div>
         </div>
-        <div id="deleteModal"
-            class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div id="deleteModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center"
+            style="background-color: rgba(0,0,0,0.4);">
             <div class="bg-white rounded-lg p-6 max-w-md w-full">
                 <div class="flex flex-record items-center mb-4">
                     <i class="fa-solid fa-circle-exclamation mr-2" style="color: #c00707;"></i>
@@ -528,6 +532,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
                     // Open modal
                     modal.classList.remove('hidden');
+                    modal.classList.add('flex');
                     updateBodyScroll();
 
                 } catch (err) {
@@ -551,6 +556,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
                 // Open modal
                 modal.classList.remove("hidden");
+                modal.classList.add("flex");
                 updateBodyScroll();
             }
 
@@ -695,6 +701,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         document.getElementById("updateFollowUpDate").value = data.follow_up_date || "";
 
                         modal.classList.remove("hidden");
+                        modal.classList.add("flex");
                         updateBodyScroll();
                     })
                     .catch(err => {
@@ -718,6 +725,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                 msgTitle.textContent = title;
                 msgText.textContent = text;
                 msgModal.classList.remove("hidden");
+                msgModal.classList.add("flex");
                 updateBodyScroll();
 
                 // Remove previous listeners
@@ -792,6 +800,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     const recordId = btn.dataset.id;
                     const modal = document.getElementById("deleteModal");
                     modal.classList.remove("hidden");
+                    modal.classList.add("flex");
                     updateBodyScroll();
 
                     document.getElementById("confirmDeleteBtn").dataset.id = recordId;
