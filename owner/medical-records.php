@@ -25,20 +25,20 @@ $medicalRecordCount = fetchOneData(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Medical Records</title>
-    <style>
-        .record-card {
-            transition: all 0.3s ease;
-        }
-
-        .record-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-    </style>
 </head>
+<style>
+    .record-card {
+        transition: all 0.3s ease;
+    }
+
+    .record-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+</style>
 
 <body class="w-full bg-green-100">
     <?php include_once '../includes/owner-header.php'; ?>
@@ -97,7 +97,7 @@ $medicalRecordCount = fetchOneData(
                         $species = $record['species'] ?? 'default';
                         $speciesInfo = $speciesData[$species] ?? $speciesData['default'];
                         ?>
-                        <div class="record-card bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md">
+                        <div class="record-card bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md mb-6">
                             <!-- Pet Header -->
                             <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-3 sm:p-4 text-white">
                                 <div class="flex items-center">
@@ -170,7 +170,8 @@ $medicalRecordCount = fetchOneData(
                                     <!-- Right Column -->
                                     <div class="detail-section w-full md:w-1/2 space-y-3 sm:space-y-4">
                                         <div class="flex items-start p-2 sm:p-3 bg-purple-50 rounded-lg">
-                                            <i class="fas fa-medkit text-purple-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
+                                            <i
+                                                class="fas fa-medkit text-purple-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
                                             <div class="flex-1">
                                                 <p class="text-xs sm:text-sm text-purple-600 font-semibold">Treatment</p>
                                                 <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base">
@@ -180,7 +181,8 @@ $medicalRecordCount = fetchOneData(
                                         </div>
 
                                         <div class="flex items-start p-2 sm:p-3 bg-indigo-50 rounded-lg">
-                                            <i class="fas fa-pills text-indigo-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
+                                            <i
+                                                class="fas fa-pills text-indigo-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
                                             <div class="flex-1">
                                                 <p class="text-xs sm:text-sm text-indigo-600 font-semibold">Medications</p>
                                                 <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base">
@@ -191,7 +193,8 @@ $medicalRecordCount = fetchOneData(
 
                                         <?php if (!empty($record['follow_up_date'])): ?>
                                             <div class="flex items-center p-2 sm:p-3 bg-orange-50 rounded-lg">
-                                                <i class="fas fa-calendar-check text-orange-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
+                                                <i
+                                                    class="fas fa-calendar-check text-orange-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
                                                 <div>
                                                     <p class="text-xs sm:text-sm text-orange-600 font-semibold">Follow-up Date</p>
                                                     <p class="text-gray-900 font-medium text-sm sm:text-base">
@@ -203,7 +206,8 @@ $medicalRecordCount = fetchOneData(
 
                                         <?php if (!empty($record['notes'])): ?>
                                             <div class="flex items-start p-2 sm:p-3 bg-gray-50 rounded-lg">
-                                                <i class="fas fa-sticky-note text-gray-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
+                                                <i
+                                                    class="fas fa-sticky-note text-gray-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
                                                 <div class="flex-1">
                                                     <p class="text-xs sm:text-sm text-gray-600 font-semibold">Additional Notes</p>
                                                     <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base">

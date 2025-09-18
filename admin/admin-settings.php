@@ -26,7 +26,7 @@ $csrf_token = $_SESSION['csrf_token'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
     <script src="../assets/js/script.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Admin Settings</title>
     <style>
@@ -98,18 +98,17 @@ $csrf_token = $_SESSION['csrf_token'];
 
                 <!-- Current Password Field (for verification) -->
                 <div class="space-y-2">
-                    <label for="current_password"
-                        class="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <label for="current_password" class="block text-sm font-medium text-gray-700 items-center gap-2">
                         <i class="fas fa-lock text-green-500 w-4"></i>
                         Current Password (for verification)
                     </label>
                     <div class="relative">
                         <input type="password" id="current_password" placeholder="Enter your current password"
-                            name="current_password" required
+                            autocomplete="off" name="current_password"
                             class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
                         <button type="button" onclick="togglePassword('current_password', 'current_toggleIcon')"
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-500 transition-colors">
-                            <i class="fas fa-eye" id="current_toggleIcon"></i>
+                            <i class="fas fa-eye mt-2 cursor-pointer" id="current_toggleIcon"></i>
                         </button>
                     </div>
                     <div id="current_password_error" class="error-message"></div>
@@ -117,7 +116,7 @@ $csrf_token = $_SESSION['csrf_token'];
 
                 <!-- Email Field -->
                 <div class="space-y-2">
-                    <label for="email" class="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <label for="email" class="block text-sm font-medium text-gray-700 items-center gap-2">
                         <i class="fas fa-envelope text-green-500 w-4"></i>
                         Change Email
                     </label>
@@ -129,16 +128,17 @@ $csrf_token = $_SESSION['csrf_token'];
 
                 <!-- New Password Field -->
                 <div class="space-y-2">
-                    <label for="password" class="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <label for="password" class="block text-sm font-medium text-gray-700 items-center gap-2">
                         <i class="fas fa-lock text-green-500 w-4"></i>
                         New Password (leave blank to keep current)
                     </label>
                     <div class="relative">
                         <input type="password" id="password" placeholder="New Password" name="password"
+                            autocomplete="off"
                             class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
                         <button type="button" onclick="togglePassword('password', 'toggleIcon')"
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-500 transition-colors">
-                            <i class="fas fa-eye" id="toggleIcon"></i>
+                            <i class="fas fa-eye mt-2 cursor-pointer" id="toggleIcon"></i>
                         </button>
                     </div>
                     <div id="password_strength" class="password-strength-meter"></div>
@@ -149,18 +149,17 @@ $csrf_token = $_SESSION['csrf_token'];
 
                 <!-- Confirm Password Field -->
                 <div class="space-y-2" id="confirm_password_container" style="display: none;">
-                    <label for="confirm_password"
-                        class="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-700 items-center gap-2">
                         <i class="fas fa-lock text-green-500 w-4"></i>
                         Confirm New Password
                     </label>
                     <div class="relative">
                         <input type="password" id="confirm_password" placeholder="Confirm New Password"
-                            name="confirm_password"
+                            autocomplete="off" name="confirm_password"
                             class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
                         <button type="button" onclick="togglePassword('confirm_password', 'confirm_toggleIcon')"
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-500 transition-colors">
-                            <i class="fas fa-eye" id="confirm_toggleIcon"></i>
+                            <i class="fas fa-eye mt-2 cursor-pointer" id="confirm_toggleIcon"></i>
                         </button>
                     </div>
                     <div id="confirm_password_error" class="error-message"></div>
@@ -169,12 +168,12 @@ $csrf_token = $_SESSION['csrf_token'];
                 <!-- Action Buttons -->
                 <div class="flex gap-4 pt-6">
                     <button type="submit" name="update" id="submitButton"
-                        class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+                        class="flex-1 cursor-pointer bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
                         <i class="fas fa-save"></i>
                         Save Changes
                     </button>
                     <button type="button" onclick="resetToOriginalValues()"
-                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2">
+                        class="px-6 cursor-pointer py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2">
                         <i class="fas fa-undo"></i>
                         Reset
                     </button>
@@ -332,6 +331,7 @@ $csrf_token = $_SESSION['csrf_token'];
             }
 
             modal.classList.remove("hidden");
+            modal.classList.add("flex");
             updateBodyScroll();
 
             document.getElementById("closeMessageBtn").onclick = () => {
@@ -423,10 +423,6 @@ $csrf_token = $_SESSION['csrf_token'];
                 });
         });
 
-        function updateBodyScroll() {
-            // Implementation depends on your existing code
-            // This would typically add/remove overflow-hidden from body
-        }
     </script>
 </body>
 

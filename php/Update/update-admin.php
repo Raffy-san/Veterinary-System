@@ -28,7 +28,7 @@ if (
 
 $data = [
     'admin_id' => filter_input(INPUT_POST, 'admin_id', FILTER_VALIDATE_INT),
-    'email' => trim($_POST['email'] ?? ''),
+    'email' => strtolower(trim($_POST['email'] ?? '')),
     'password' => trim($_POST['password'] ?? ''),
     'current_password' => trim($_POST['current_password'] ?? '')
 ];

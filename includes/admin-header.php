@@ -20,19 +20,19 @@
         <nav class="w-full">
             <ul class="flex space-x-4 text-gray-700 text-xs font-semibold">
                 <a href="../admin/admin-dashboard.php"
-                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'admin-dashboard.php' ? 'active' : 'bg-white' ?>">
+                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border-none duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'admin-dashboard.php' ? 'active' : 'bg-white' ?>">
                     <li>Overview</li>
                 </a>
                 <a href="../admin/client-management.php"
-                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'client-management.php' ? 'active' : 'bg-white' ?>">
+                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border-none duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'client-management.php' ? 'active' : 'bg-white' ?>">
                     <li>Client Management</li>
                 </a>
                 <a href="../admin/pet-management.php"
-                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'pet-management.php' ? 'active' : 'bg-white' ?>">
+                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border-none duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'pet-management.php' ? 'active' : 'bg-white' ?>">
                     <li>Patients</li>
                 </a>
                 <a href="../admin/medical-records.php"
-                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'medical-records.php' ? 'active' : 'bg-white' ?>">
+                    class="flex-1 text-center shadow-md font-semibold py-2 rounded-full border-none duration-200 hover:border-green-500 <?= basename($_SERVER['PHP_SELF']) == 'medical-records.php' ? 'active' : 'bg-white' ?>">
                     <li>Medical Records</li>
                 </a>
             </ul>

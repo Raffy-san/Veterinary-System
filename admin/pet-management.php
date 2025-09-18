@@ -20,7 +20,7 @@ if (!$admin) {
     <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
     <link rel="stylesheet" href="../assets/css/global.css">
     <script src="../assets/js/script.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Patients Management</title>
 </head>
@@ -75,7 +75,7 @@ if (!$admin) {
             <!-- Table -->
             <table class="w-full border-collapse">
                 <thead>
-                    <tr class="text-sm text-left border-b">
+                    <tr class="text-sm text-left border-b border-gray-300">
                         <th class="font-semibold py-2">Name</th>
                         <th class="font-semibold py-2">Species/Breed</th>
                         <th class="font-semibold py-2">Age</th>
@@ -97,7 +97,7 @@ if (!$admin) {
 
                     foreach ($pets as $row) {
                         $speciesLower = strtolower(trim($row['species']));
-                        echo "<tr class='border-b hover:bg-green-50 text-sm' data-species='{$speciesLower}'>";
+                        echo "<tr class='border-b border-gray-300 hover:bg-green-50 text-sm' data-species='{$speciesLower}'>";
                         echo "<td class='py-2'>{$row['pet_name']}</td>";
                         echo "<td class='py-2 flex flex-col'>
                                 <span>{$row['species']}</span>
@@ -138,7 +138,9 @@ if (!$admin) {
             </table>
             <div id="pagination" class="flex justify-center space-x-2 mt-4"></div>
         </section>
-        <div id="viewModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div id="viewModal" class="modal hidden fixed inset-0 items-center justify-center"
+            style="background-color: rgba(0,0,0,0.4);">
+
             <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -224,6 +226,7 @@ if (!$admin) {
                 btn.addEventListener("click", () => {
                     const modal = document.getElementById(btn.dataset.modal);
                     modal.classList.remove("hidden"); // ✅ Show modal
+                    modal.classList.add("flex");
                     updateBodyScroll();
 
                     petDetails.innerHTML = "<h3 class='font-semibold mb-4'>Pet information</h3>";
