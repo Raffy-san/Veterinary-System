@@ -316,19 +316,19 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     </div>
                 </div>
                 <div id="diagnosisDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full"
-                    style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;">
+                    style="word-break: break-word; white-space: pre-line;">
                     <!-- Additional details will be populated here -->
                 </div>
                 <div id="treatmentDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full"
-                    style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;">
+                    style="word-break: break-word; white-space: pre-line;">
                     <!-- Additional details will be populated here -->
                 </div>
                 <div id="medicationsDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full"
-                    style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;">
+                    style="word-break: break-word; white-space: pre-line;">
                     <!-- Additional details will be populated here -->
                 </div>
                 <div id="notesDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full"
-                    style="word-break: break-all; white-space: pre-wrap; overflow-wrap: anywhere;">
+                    style="word-break: break-word; white-space: pre-line;">
                     <!-- Additional details will be populated here -->
                 </div>
             </div>

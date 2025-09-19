@@ -179,8 +179,11 @@ $medicalRecordCount = fetchOneData(
                                                 </p>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div class="flex flex-row sm:flex-col gap-3 sm:gap-4">
+                                    <!-- Right Column -->
+                                    <div class="w-full md:w-1/2 space-y-3 sm:space-y-4">
+                                        <div class="flex flex-row justify-between sm:flex-row gap-3 sm:gap-4">
                                             <div class="flex items-center p-2 sm:p-3 bg-blue-50 rounded-lg flex-1">
                                                 <i class="fas fa-weight text-blue-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
                                                 <div>
@@ -202,58 +205,65 @@ $medicalRecordCount = fetchOneData(
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="flex items-center p-2 sm:p-3 bg-orange-50 rounded-lg">
+                                            <i
+                                                class="fas fa-calendar-check text-orange-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
+                                            <div>
+                                                <p class="text-xs sm:text-sm text-orange-600 font-semibold">Follow-up Date</p>
+                                                <p class="text-gray-900 font-medium text-sm sm:text-base">
+                                                    <?php if (!empty($record['follow_up_date'])): ?>
+                                                        <?= date('M j, Y', strtotime($record['follow_up_date'])) ?>
+                                                    <?php else: ?>
+                                                        No follow-up date
+                                                    <?php endif; ?>
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
+                                </div>
 
-                                    <!-- Right Column -->
-                                    <div class="detail-section w-full md:w-1/2 space-y-3 sm:space-y-4">
+                                <div class="detail-section w-full space-y-3 sm:space-y-4 mt-4 sm:mt-6">
+                                    <?php if (!empty($record['treatment'])): ?>
                                         <div class="flex items-start p-2 sm:p-3 bg-purple-50 rounded-lg">
                                             <i
                                                 class="fas fa-medkit text-purple-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
                                             <div class="flex-1">
                                                 <p class="text-xs sm:text-sm text-purple-600 font-semibold">Treatment</p>
-                                                <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base">
+                                                <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base mr-2"
+                                                    style="word-break: break-word; white-space: pre-lines;">
                                                     <?= htmlspecialchars($record['treatment']) ?>
                                                 </p>
                                             </div>
                                         </div>
+                                    <?php endif; ?>
 
+                                    <?php if (!empty($record['medications'])): ?>
                                         <div class="flex items-start p-2 sm:p-3 bg-indigo-50 rounded-lg">
                                             <i
                                                 class="fas fa-pills text-indigo-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
                                             <div class="flex-1">
                                                 <p class="text-xs sm:text-sm text-indigo-600 font-semibold">Medications</p>
-                                                <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base">
+                                                <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base mr-2"
+                                                    style="word-break: break-word; white-space: pre-lines;">
                                                     <?= htmlspecialchars($record['medications']) ?>
                                                 </p>
                                             </div>
                                         </div>
+                                    <?php endif; ?>
 
-                                        <?php if (!empty($record['follow_up_date'])): ?>
-                                            <div class="flex items-center p-2 sm:p-3 bg-orange-50 rounded-lg">
-                                                <i
-                                                    class="fas fa-calendar-check text-orange-600 mr-2 sm:mr-3 text-sm sm:text-base"></i>
-                                                <div>
-                                                    <p class="text-xs sm:text-sm text-orange-600 font-semibold">Follow-up Date</p>
-                                                    <p class="text-gray-900 font-medium text-sm sm:text-base">
-                                                        <?= date('M j, Y', strtotime($record['follow_up_date'])) ?>
-                                                    </p>
-                                                </div>
+                                    <?php if (!empty($record['notes'])): ?>
+                                        <div class="flex items-start p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                            <i
+                                                class="fas fa-sticky-note text-gray-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
+                                            <div class="flex-1">
+                                                <p class="text-xs sm:text-sm text-gray-600 font-semibold">Additional Notes</p>
+                                                <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base mr-2"
+                                                    style="word-break: break-word; white-space: pre-lines;">
+                                                    <?= nl2br(htmlspecialchars($record['notes'])) ?>
+                                                </p>
                                             </div>
-                                        <?php endif; ?>
-
-                                        <?php if (!empty($record['notes'])): ?>
-                                            <div class="flex items-start p-2 sm:p-3 bg-gray-50 rounded-lg">
-                                                <i
-                                                    class="fas fa-sticky-note text-gray-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
-                                                <div class="flex-1">
-                                                    <p class="text-xs sm:text-sm text-gray-600 font-semibold">Additional Notes</p>
-                                                    <p class="text-gray-900 font-medium leading-relaxed text-sm sm:text-base">
-                                                        <?= nl2br(htmlspecialchars($record['notes'])) ?>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>

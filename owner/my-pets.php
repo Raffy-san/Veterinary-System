@@ -95,11 +95,11 @@ $petCount = fetchOneData(
     }
 </style>
 
-<body class="bg-green-100">
+<body class="bg-green-100 w-full">
     <?php
     include_once '../includes/owner-header.php';
     ?>
-    <main class="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-16 py-8">
+    <main class="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-16 py-4">
         <div class="space-y-4 md:space-y-6">
             <?php
             $pets = fetchAllData(
@@ -190,8 +190,9 @@ $petCount = fetchOneData(
                                     <i class="fas fa-sticky-note text-indigo-500 mr-2 text-sm md:text-base"></i>
                                     <p class="text-xs md:text-sm text-gray-500 font-medium">Notes</p>
                                 </div>
-                                <p class="text-sm md:text-base text-gray-700 leading-relaxed">
-                                    <?= nl2br(htmlspecialchars($pet['notes'])); ?>
+                                <p class="text-sm md:text-base text-gray-700 leading-relaxed"
+                                    style="word-break: break-word; white-space: pre-lines;">
+                                    <?= nl2br(htmlspecialchars(ltrim($pet['notes']))); ?>
                                 </p>
                             </div>
                         <?php endif; ?>
