@@ -1,7 +1,7 @@
 <?php
-require_once '../functions/session.php';
-include_once '../config/config.php';
-require_once '../helpers/fetch.php';
+include_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../functions/session.php';
+require_once __DIR__ . '/../helpers/fetch.php';
 SessionManager::requireLogin();
 // Require role OWNER
 SessionManager::requireRole('owner');

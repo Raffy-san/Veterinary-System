@@ -1,8 +1,8 @@
 <?php
-include_once '../config/config.php';
-require_once '../functions/session.php';
-require_once '../helpers/fetch.php';
-require_once '../functions/crud.php';
+include_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../functions/session.php';
+require_once __DIR__ . '/../helpers/fetch.php';
+require_once __DIR__ . '/../functions/crud.php';
 SessionManager::requireLogin();
 SessionManager::requireRole('admin');
 

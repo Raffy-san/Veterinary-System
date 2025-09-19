@@ -1,6 +1,6 @@
 <?php
-require_once 'functions/session.php';
-include_once 'config/config.php';
+include_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/functions/session.php';
 
 if (SessionManager::isLoggedIn()) {
     if (isset($_SESSION['access_type']) && $_SESSION['access_type'] === 'admin') {
