@@ -138,6 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 document.getElementById('messageTitle').textContent = 'Password Reset';
                 document.getElementById('messageText').textContent = '<?= $message ?>';
                 modal.classList.remove("hidden");
+                modal.classList.add("flex");
             <?php endif; ?>
         });
     </script>

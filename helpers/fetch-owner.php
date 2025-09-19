@@ -1,6 +1,6 @@
 <?php
-include_once '../config/config.php'; // make sure $pdo is defined here
-include_once '../functions/session.php';
+include_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../functions/session.php';
 
 if (isset($_GET['query'])) {
     $search = "%" . $_GET['query'] . "%";

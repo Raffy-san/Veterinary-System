@@ -65,6 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             document.getElementById('messageTitle').textContent = 'Password Reset';
             document.getElementById('messageText').textContent = '$message';
             document.getElementById('messageModal').classList.remove('hidden');
+            document.getElementById('messageModal').classList.add('flex');
         });
       </script>";
 }
@@ -109,6 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             closeBtn.addEventListener("click", () => {
                 modal.classList.add("hidden");
+
             });
         });
     </script>

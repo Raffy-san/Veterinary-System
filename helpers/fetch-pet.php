@@ -1,6 +1,6 @@
 <?php
-include_once '../config/config.php';
-include_once '../functions/session.php';
+include_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../functions/session.php';
 
 if (isset($_GET['owner_id'])) {
     $ownerId = intval($_GET['owner_id']);
