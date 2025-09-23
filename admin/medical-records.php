@@ -502,7 +502,23 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     recordDate.textContent = btn.dataset.date || '';
 
                     addField(medicalDetails, "Date:", btn.dataset.date || '');
-                    // Visit type HTML as before...
+
+                    const visitTypeHTML = `
+                            <div class="${btn.dataset.typeBg} ${btn.dataset.typeColor} rounded-lg px-2 py-1 inline-flex items-center gap-1">
+                                <i class="${btn.dataset.typeIcon}"></i>
+                                <span class="text-xs">${btn.dataset.type || "N/A"}</span>
+                            </div>
+                        `;
+
+                    medicalDetails.insertAdjacentHTML(
+                        "beforeend",
+                        `
+                        <div>
+                            <span class="font-semibold">Visit Type:</span> ${visitTypeHTML}
+                        </div>
+                        `
+                    );
+
                     addField(medicalDetails, "Veterinarian:", btn.dataset.veterinarian || '');
                     addField(medicalDetails, "Patient:", btn.dataset.patient || '');
                     addField(medicalDetails, "Weight:", btn.dataset.weight || '');
