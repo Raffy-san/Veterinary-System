@@ -24,7 +24,7 @@ if (SessionManager::isLoggedIn()) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
-<body class="flex items-center justify-center min-h-screen px-4 bg-cover bg-center bg-[url('/assets/img/bg.jpg')]">
+<body class="flex items-center justify-center min-h-screen px-4 bg-blue-100">
     <section class="w-full max-w-md bg-white rounded-lg shadow-xl p-6 sm:p-8">
         <!-- Icon -->
         <div class="w-full flex justify-center mb-2">
