@@ -869,6 +869,12 @@
   .bg-fixed {
     background-attachment: fixed;
   }
+  .bg-scroll {
+    background-attachment: scroll;
+  }
+  .bg-center {
+    background-position: center;
+  }
   .bg-no-repeat {
     background-repeat: no-repeat;
   }
@@ -1468,6 +1474,11 @@
         margin-block-start: calc(calc(var(--spacing) * 4) * var(--tw-space-y-reverse));
         margin-block-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-y-reverse)));
       }
+    }
+  }
+  .sm\:bg-fixed {
+    @media (width >= 40rem) {
+      background-attachment: fixed;
     }
   }
   .sm\:p-3 {
