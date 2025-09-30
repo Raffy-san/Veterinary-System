@@ -1,15 +1,11 @@
 {
-  "dependencies": {
-    "@tailwindcss/cli": "^4.1.13",
-    "tailwindcss": "^4.1.13"
-  },
   "name": "veterinary-system",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx @tailwindcss/cli -i ./assets/css/tailwind.css -o ./assets/css/output.css --watch"
+    "dev": "npx @tailwindcss/cli -i ./assets/css/input.css -o ./assets/css/output.css --watch"
   },
   "repository": {
     "type": "git",
@@ -20,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/Raffy-san/Veterinary-System/issues"
   },
-  "homepage": "https://github.com/Raffy-san/Veterinary-System#readme"
+  "homepage": "https://github.com/Raffy-san/Veterinary-System#readme",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
 }
