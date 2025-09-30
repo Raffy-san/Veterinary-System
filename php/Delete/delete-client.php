@@ -32,7 +32,7 @@ if (
 // Validate pet ID
 $ownerID = filter_input(INPUT_POST, 'client_id', FILTER_VALIDATE_INT);
 if (!$ownerID) {
-    jsonResponse("error", "Invalid or missing record ID");
+    jsonResponse("error", "Invalid or missing client ID");
 }
 
 try {
@@ -41,15 +41,15 @@ try {
     if ($deleted) {
         // regenerate CSRF token for next request
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        jsonResponse("success", "Medical record deleted successfully", [
+        jsonResponse("success", "Client account deleted successfully", [
             "csrf_token" => $_SESSION['csrf_token']
         ]);
     } else {
-        jsonResponse("error", "Pet not found or could not be deleted");
+        jsonResponse("error", "Client not found or could not be deleted");
     }
 } catch (Exception $e) {
-    error_log("Delete pet failed: " . $e->getMessage());
-    jsonResponse("error", "An error occurred while deleting the record");
+    error_log("Delete client failed: " . $e->getMessage());
+    jsonResponse("error", "An error occurred while deleting the Client Account");
 }
 
 ob_end_flush();
