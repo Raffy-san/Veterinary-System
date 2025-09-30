@@ -61,6 +61,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <th class="font-semibold py-2">Contact</th>
                         <th class="font-semibold py-2">Join Date</th>
                         <th class="font-semibold py-2">Pets</th>
+                        <th class="font-semibold py-2">Status</th>
                         <th class="font-semibold py-2 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -74,6 +75,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                 o.emergency,
                                 o.phone,
                                 o.created_at,
+                                o.status,
                                 o.address, 
                                 GROUP_CONCAT(p.name SEPARATOR ', ') AS pets,
                                 COUNT(p.id) AS pet_count 
@@ -81,43 +83,79 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             LEFT JOIN pets p ON o.id = p.owner_id
                             GROUP BY o.id ORDER BY o.created_at DESC
                             ");
+                    $status = [
+                        'Active' => ['bg' => 'bg-green-100', 'color' => 'text-green-800'],
+                        'Inactive' => ['bg' => 'bg-red-500', 'color' => 'text-white']
+                    ];
                     foreach ($clients as $client) {
+                        $Type = $client['status'];
+                        $typeinfo = $status[$Type] ?? ['color' => 'text-gray-700', 'bg' => 'bg-gray-200'];
 
                         echo '<tr class="border-b border-gray-300 hover:bg-green-50 text-sm text-left">';
                         echo '<td class="py-2">' . htmlspecialchars($client['name']) . '</td>';
                         echo '<td class="py-2 flex flex-col">' . '<span><i class="fa-solid fa-envelope text-green-600"></i>&nbsp;' . htmlspecialchars($client['email']) . '</span>' . '<span class="text-gray-500 text-xs"><i class="fa-solid fa-phone">&nbsp;</i>' . htmlspecialchars($client['phone']) . '</span></td>';
                         echo '<td class="py-2">' . date('Y-m-d', strtotime($client['created_at'])) . '</td>';
                         echo '<td class="py-2"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['pet_count'] . '</span></td>';
+                        echo '<td class="py-2"><span class="' . $typeinfo['bg'] . ' ' . $typeinfo['color'] . ' text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['status'] . '</td>';
                         echo '<td class="py-2 text-right">
-                                <button 
-                                    data-modal="viewModal" 
-                                    data-id="' . $client['owner_id'] . '"
-                                    data-name="' . htmlspecialchars($client['name'] ?? '') . '"
-                                    data-email="' . htmlspecialchars($client['email'] ?? '') . '"
-                                    data-phone="' . htmlspecialchars($client['phone'] ?? '') . '"
-                                    data-emergency="' . htmlspecialchars($client['emergency'] ?? '') . '"
-                                    data-created="' . date('Y-m-d', strtotime($client['created_at'])) . '"
-                                    data-address="' . htmlspecialchars($client['address'] ?? '') . '"
-                                    data-petcount="' . $client['pet_count'] . '"
-                                    class="open-modal fa-solid fa-eye cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
-                                </button>
-                                <button class="open-update-modal fa-solid fa-pencil-alt cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300" data-id="' . $client['owner_id'] . '"></button>
-                                <button 
-                                data-owner="' . $client['owner_id'] . '" 
-                                class="open-pet-modal text-gray-700 cursor-pointer mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
-                                <i class="fa-solid fa-plus mr-1"></i>Add Pet
-                                </button>
-                                 <button
-                                    data-modal="viewPetModal"
-                                    data-owner="' . $client['owner_id'] . '"
-                                 class="open-modal text-gray-700 cursor-pointer mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">View Pet</button>
-                                <button 
-                                    class="open-delete-modal fa-solid fa-trash cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
-                                    data-id="' . $client['user_id'] . '" 
-                                    data-name="' . htmlspecialchars($client['name']) . '">
-                                </button>
+                            <button 
+                                data-modal="viewModal" 
+                                data-id="' . $client['owner_id'] . '"
+                                data-name="' . htmlspecialchars($client['name'] ?? '') . '"
+                                data-email="' . htmlspecialchars($client['email'] ?? '') . '"
+                                data-phone="' . htmlspecialchars($client['phone'] ?? '') . '"
+                                data-emergency="' . htmlspecialchars($client['emergency'] ?? '') . '"
+                                data-created="' . date('Y-m-d', strtotime($client['created_at'])) . '"
+                                data-address="' . htmlspecialchars($client['address'] ?? '') . '"
+                                data-petcount="' . $client['pet_count'] . '"
+                                class="open-modal fa-solid fa-eye cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300">
+                            </button>
 
-                            </td>';
+                            <button class="open-update-modal fa-solid fa-pencil-alt cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 rounded border border-green-200 hover:bg-green-300" 
+                                data-id="' . $client['owner_id'] . '">
+                            </button>';
+
+                        // ✅ Conditionally render Activate/Deactivate button
+                        if ($client['status'] === 'Inactive') {
+                            echo '
+    <button 
+        class="toggle-status-btn cursor-pointer text-gray-700 mr-2 bg-red-100 text-xs font-semibold p-1.5 rounded border border-red-200 hover:bg-red-300"
+        data-id="' . $client['user_id'] . '"
+        data-action="activate">
+        Activate
+    </button>';
+                        } else {
+                            echo '
+    <button 
+        class="toggle-status-btn cursor-pointer text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300"
+        data-id="' . $client['user_id'] . '"
+        data-action="deactivate">
+        Deactivate
+    </button>';
+                        }
+
+
+
+                        echo '
+                        <button 
+                            data-owner="' . $client['owner_id'] . '" 
+                            class="open-pet-modal text-gray-700 cursor-pointer mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
+                            <i class="fa-solid fa-plus mr-1"></i>Add Pet
+                        </button>
+
+                        <button
+                            data-modal="viewPetModal"
+                            data-owner="' . $client['owner_id'] . '"
+                            class="open-modal text-gray-700 cursor-pointer mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300">
+                            View Pet
+                        </button>
+
+                        <button 
+                            class="open-delete-modal fa-solid fa-trash cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-red-400"
+                            data-id="' . $client['user_id'] . '" 
+                            data-name="' . htmlspecialchars($client['name']) . '">
+                        </button>
+                    </td>';
                         echo '</tr>';
                     }
                     ?>
@@ -987,6 +1025,40 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     });
             });
 
+            document.querySelectorAll(".toggle-status-btn").forEach(btn => {
+                btn.addEventListener("click", e => {
+                    e.preventDefault();
+                    const clientID = btn.dataset.id;
+                    const action = btn.dataset.action;
+
+                    btn.textContent = action === "activate" ? "Activating..." : "Deactivating...";
+                    btn.disabled = true;
+
+                    fetch("../php/Toggle/toggle-client.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({
+                            user_id: clientID,
+                            action: action,
+                            csrf_token: csrfToken
+                        })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.csrf_token) csrfToken = data.csrf_token;
+                            showMessage(
+                                data.status === "success" ? "Success" : "Error",
+                                data.message,
+                                data.status,
+                                () => location.reload()
+                            );
+                        })
+                        .catch(() => showMessage("Error", "Update failed."))
+                        .finally(() => {
+                            btn.disabled = false;
+                        });
+                });
+            });
 
             // ===================== GENERIC MODAL CLOSE =====================
             document.querySelectorAll(".modal .close").forEach(btn => {
