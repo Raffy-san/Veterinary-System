@@ -1,36 +1,71 @@
 <?php
-require_once 'config/config.php';
-require_once 'functions/session.php';
+ini_set('display_errors', 0);
+error_reporting(0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/php-error.log');
 
-header('Content-Type: application/json');
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/functions/session.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+header('Content-Type: application/json; charset=utf-8');
+
+// Always ensure we return JSON
+$response = [
+    'success' => false,
+    'message' => 'Something went wrong.'
+];
+
+try {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        $response['message'] = 'Invalid request method';
+        echo json_encode($response);
+        exit;
+    }
+
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    $stmt = $pdo->prepare("SELECT id, email, password, access_type FROM users WHERE email = ?");
+    if ($email === '' || $password === '') {
+        $response['message'] = 'Email and password are required';
+        echo json_encode($response);
+        exit;
+    }
+
+    $stmt = $pdo->prepare("SELECT id, email, password, access_type, status FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($password, $user['password'])) {
-        // Secure session
+    if (!$user) {
+        $response['message'] = 'Invalid email or password';
+        echo json_encode($response);
+        exit;
+    }
+
+    if ($user['status'] !== 'Active') {
+        $response['message'] = 'Your account is inactive. Please contact support.';
+        echo json_encode($response);
+        exit;
+    }
+
+    if (password_verify($password, $user['password'])) {
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['access_type'] = $user['access_type']; // use 'role' consistently
+        $_SESSION['access_type'] = $user['access_type'];
 
         echo json_encode([
             'success' => true,
-            'access_type' => $user['access_type'] // send role for JS redirect
+            'access_type' => $user['access_type']
         ]);
+        exit;
     } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Invalid email or password'
-        ]);
+        $response['message'] = 'Invalid email or password';
+        echo json_encode($response);
+        exit;
     }
-} else {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Invalid request method'
-    ]);
+
+} catch (Exception $e) {
+    error_log("Login error: " . $e->getMessage());
+    $response['message'] = 'Server error, please try again later.';
+    echo json_encode($response);
+    exit;
 }
