@@ -1,6 +1,6 @@
 <?php
-require_once "../config/config.php";
-require_once '../functions/session.php';
+require_once __DIR__ . "/../config/config.php";
+require_once __DIR__ . '/../functions/session.php';
 date_default_timezone_set('Asia/Manila');
 
 // CSRF token generation

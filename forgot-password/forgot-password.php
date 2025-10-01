@@ -1,5 +1,5 @@
 <?php
-require_once "../config/config.php";
+require_once __DIR__ . "/../config/config.php";
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -10,7 +10,7 @@ require __DIR__ . '/../vendor/autoload.php';
 if ($_SERVER['HTTP_HOST'] === 'localhost') {
     $baseURL = "http://localhost/Veterinary-System";
 } else {
-    $baseURL = "https://yourdomain.com";
+    $baseURL = "https://yourdomain.com/Veterinary-System";
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -30,6 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // Build reset link dynamically
         $resetLink = $baseURL . "/forgot-password/reset.php?token=$token";
+
+        echo $resetLink;
 
         $mail = new PHPMailer(true);
         try {
@@ -95,9 +97,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <button type="submit"
                         class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700 transition-colors font-semibold text-sm sm:text-base">Send
                         Reset Link</button>
-                    <button onclick="window.history.back()"
-                        class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-700 transition-colors font-semibold text-sm sm:text-base">Back
-                        To Login</button>
+                    <a href="../login.php"
+                        class="w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-700 transition-colors font-semibold text-sm sm:text-base">Back
+                        To Login</a>
                 </div>
             </form>
         </div>
@@ -113,6 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             });
         });
+
     </script>
 
 </body>
