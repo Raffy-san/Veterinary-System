@@ -31,8 +31,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Build reset link dynamically
         $resetLink = $baseURL . "/forgot-password/reset.php?token=$token";
 
-        echo $resetLink;
-
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP();
