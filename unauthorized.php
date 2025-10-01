@@ -1,5 +1,5 @@
 <?php
-require_once 'functions/session.php';
+require_once __DIR__ . '/functions/session.php';
 SessionManager::requireLogin();
 ?>
 <!DOCTYPE html>
