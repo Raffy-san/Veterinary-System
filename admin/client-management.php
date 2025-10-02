@@ -191,11 +191,14 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Email">
                     </div>
-                    <div class="mb-4 w-auto">
+                    <div class="mb-4 w-auto relative">
                         <label class="block text-gray-700 mb-1 text-sm">Password</label>
-                        <input type="password" name="password" required
+                        <input type="password" name="password" id="addClientPassword" required
                             class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Password">
+                        <i id="toggleAddPassword"
+                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-6 py-2 text-gray-600 text-sm">
+                        </i>
                     </div>
                     <div class="mb-4 w-auto">
                         <label class="block text-gray-700 mb-1 text-sm">Phone</label>
@@ -279,11 +282,14 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             placeholder="Client Email">
                     </div>
 
-                    <div class="mb-4 w-auto">
+                    <div class="mb-4 w-auto relative">
                         <label class="block text-gray-700 mb-1 text-sm">Password</label>
                         <input type="password" name="password" id="updateClientPassword"
                             class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Leave blank to keep current password">
+                            placeholder="Enter new password">
+                        <i id="toggleUpdatePassword"
+                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-6 py-2 text-gray-600 text-sm">
+                        </i>
                     </div>
 
                     <div class="mb-4 w-auto">
@@ -1068,6 +1074,20 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                 modal.addEventListener("click", e => { if (e.target === modal) closeModal(modal); });
             });
         });
+
+
+        function togglePasswordVisibility(inputId, toggleId) {
+            document.getElementById(toggleId).addEventListener('click', function () {
+                const passwordInput = document.getElementById(inputId);
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Apply for both forms
+        togglePasswordVisibility('addClientPassword', 'toggleAddPassword');
+        togglePasswordVisibility('updateClientPassword', 'toggleUpdatePassword');
     </script>
 
 </body>
