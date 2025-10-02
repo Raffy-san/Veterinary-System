@@ -115,6 +115,9 @@ function updateClient($pdo, $data)
                 $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare("UPDATE users SET email = ?, password = ? WHERE id = ?");
                 $stmt->execute([$data['email'], $hashedPassword, $user_id]);
+
+                $logStmt = $pdo->prepare("INSERT INTO password_resets (user_id, reset_by_admin_id) VALUES (?, ?)");
+                $logStmt->execute([$user_id, $_SESSION['user_id']]);
             } else {
                 $stmt = $pdo->prepare("UPDATE users SET email = ? WHERE id = ?");
                 $stmt->execute([$data['email'], $user_id]);
