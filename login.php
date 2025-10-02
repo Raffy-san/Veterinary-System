@@ -24,7 +24,8 @@ if (SessionManager::isLoggedIn()) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
-<body class="flex items-center justify-center min-h-screen px-4 bg-[url('../img/bg.png')] bg-scroll sm:bg-fixed bg-no-repeat bg-center bg-cover">
+<body
+    class="flex items-center justify-center min-h-screen px-4 bg-[url('../img/bg.png')] bg-scroll sm:bg-fixed bg-no-repeat bg-center bg-cover">
     <section class="w-full max-w-md bg-white rounded-lg shadow-xl p-6 sm:p-8">
         <!-- Icon -->
         <div class="w-full flex justify-center mb-2">
@@ -94,15 +95,9 @@ if (SessionManager::isLoggedIn()) {
                     class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-2 py-1 text-gray-600 text-sm sm:text-base">
                 </i>
             </div>
-            <div>
-                <a href="forgot-password/forgot-password.php"
-                    class="text-sm font-semibold sm:text-base text-green-600 hover:underline mb-4 inline-block">Forgot
-                    Password?</a>
-            </div>
-
             <!-- Button -->
             <button
-                class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700 transition-colors font-semibold text-sm sm:text-base"
+                class="w-full mt-4 cursor-pointer bg-green-500 text-white py-2 rounded hover:bg-green-700 transition-colors font-semibold text-sm sm:text-base"
                 type="submit">
                 Sign in
             </button>
