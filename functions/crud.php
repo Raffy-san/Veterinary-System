@@ -162,10 +162,10 @@ function addPet($pdo, $data)
 {
     try {
         $stmt = $pdo->prepare("
-            INSERT INTO pets (name, species, breed, age, gender, weight, color, owner_id, notes) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO pets (name, species, breed, age, gender, weight, color, owner_id, notes, birth_date) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['owner_id'], $data['notes']]);
+        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['owner_id'], $data['notes'], $data['birth_date']]);
         return json_encode(["status" => "success", "message" => "Pet added successfully"]);
 
     } catch (PDOException $e) {
@@ -177,9 +177,9 @@ function updatePet($pdo, $data)
 {
     try {
         $stmt = $pdo->prepare("
-            UPDATE pets SET name = ?, species = ?, breed = ?, age = ?, gender = ?, weight = ?, color = ?, notes = ? WHERE id = ?
+            UPDATE pets SET name = ?, species = ?, breed = ?, age = ?, gender = ?, weight = ?, color = ?, birth_date = ?, notes = ? WHERE id = ?
         ");
-        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['notes'], $data['pet_id']]);
+        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['birth_date'], $data['notes'], $data['pet_id']]);
         return json_encode(["status" => "success", "message" => "Pet updated successfully"]);
 
     } catch (PDOException $e) {

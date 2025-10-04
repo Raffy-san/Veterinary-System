@@ -10,6 +10,12 @@ $admin = SessionManager::getUser($pdo);
 if (!$admin) {
     SessionManager::logout('../login.php');
 }
+
+if (empty($_SESSION['csrf_token'])) {
+    $csrf_token = SessionManager::regenerateCsrfToken();
+} else {
+    $csrf_token = $_SESSION['csrf_token'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -82,6 +88,7 @@ if (!$admin) {
                         <th class="font-semibold py-2">Gender</th>
                         <th class="font-semibold py-2">Owner</th>
                         <th class="font-semibold py-2">Contact</th>
+                        <th class="font-semibold py-2">Status</th>
                         <th class="text-right font-semibold py-2">Actions</th>
                     </tr>
                 </thead>
@@ -89,14 +96,21 @@ if (!$admin) {
                     <?php
                     $pets = fetchAllData(
                         $pdo,
-                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.gender, p.color, p.weight, p.notes,
+                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.gender, p.color, p.weight, p.birth_date , p.notes, p.status, p.death_reason, p.death_date,
                                 o.name AS owner_name, o.phone AS owner_phone, o.email AS owner_email
                          FROM pets p
                          JOIN owners o ON p.owner_id = o.id"
                     );
 
+                    $status = [
+                        'Alive' => ['bg' => 'bg-green-500', 'color' => 'text-white'],
+                        'Dead' => ['bg' => 'bg-red-500', 'color' => 'text-white']
+                    ];
+
                     foreach ($pets as $row) {
                         $speciesLower = strtolower(trim($row['species']));
+                        $Type = $row['status'];
+                        $typeinfo = $status[$Type];
                         echo "<tr class='border-b border-gray-300 hover:bg-green-50 text-sm' data-species='{$speciesLower}'>";
                         echo "<td class='py-2'>{$row['pet_name']}</td>";
                         echo "<td class='py-2 flex flex-col'>
@@ -110,11 +124,12 @@ if (!$admin) {
                                 <span><i class='fa-solid fa-envelope text-green-600'></i> {$row['owner_email']}</span>
                                 <span class='text-gray-500 text-xs'><i class='fa-solid fa-phone'></i> {$row['owner_phone']}</span>
                               </td>";
+                        echo '<td class="py-2"><span class="' . $typeinfo['bg'] . ' ' . $typeinfo['color'] . ' text-xs font-semibold px-2.5 py-0.5 rounded">' . $row['status'] . '</td>';
                         echo "<td class='text-right py-2'>
                                 <button 
                                     data-modal='viewModal'
                                     data-id='" . $row['pet_id'] . "'
-                                   data-name='" . htmlspecialchars($row['pet_name'] ?? '') . "'
+                                    data-name='" . htmlspecialchars($row['pet_name'] ?? '') . "'
                                     data-species='" . htmlspecialchars($row['species'] ?? '') . "'
                                     data-breed='" . htmlspecialchars($row['breed'] ?? '') . "'
                                     data-age='" . htmlspecialchars($row['age'] ?? '') . "'
@@ -122,12 +137,27 @@ if (!$admin) {
                                     data-color='" . htmlspecialchars($row['color'] ?? '') . "'
                                     data-weight='" . htmlspecialchars($row['weight'] ?? '') . "'
                                     data-notes='" . htmlspecialchars($row['notes'] ?? '') . "'
+                                    data-birthdate ='" . htmlspecialchars($row['birth_date']) . "'
+                                    data-status='" . htmlspecialchars($row['status'] ?? '') . "'
+                                    data-deathreason='" . htmlspecialchars($row['death_reason']) . "'
+                                    data-deathdate='" . htmlspecialchars($row['death_date']) . "'
                                     data-owner='" . htmlspecialchars($row['owner_name'] ?? '') . "'
                                     data-email='" . htmlspecialchars($row['owner_email'] ?? '') . "'
                                     data-phone='" . htmlspecialchars($row['owner_phone'] ?? '') . "'
                                     class='open-modal fa-solid fa-eye cursor-pointer text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300'>
                                 </button>
-                              </td>";
+                                
+                                <button class='open-status-modal cursor-pointer font-semibold text-xs text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300'  data-id='" . $row['pet_id'] . "'  data-name='" . htmlspecialchars($row['pet_name'] ?? '') . "'>Toggle Status</button>";
+                        if (isset($row['status']) && strtolower($row['status']) === 'dead') {
+                            echo "
+                                <a 
+                                    href='../print/death-certificate.php?pet_id=" . $row['pet_id'] . "' 
+                                    target='_blank'
+                                    class='cursor-pointer font-semibold text-xs text-gray-700 bg-red-100 p-1.5 border rounded border-red-200 hover:bg-red-300'>
+                                    Print Death Certificate
+                                </a>";
+                        }
+                        echo "</td>";
                         echo "</tr>";
                     }
                     ?>
@@ -138,12 +168,15 @@ if (!$admin) {
             </table>
             <div id="pagination" class="flex justify-center space-x-2 mt-4"></div>
         </section>
+
         <div id="viewModal" class="modal hidden fixed inset-0 items-center justify-center"
             style="background-color: rgba(0,0,0,0.4);">
             <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[60vh] max-w-[450px] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h3 class="font-semibold text-m">Pet Details - <span id="petName"></span></h3>
+                        <h3 class="font-semibold text-m">Pet Details - <span id="petName"></span>
+                            <span id="statusBadge" class="text-xs font-semibold px-2 py-1 rounded"></span>
+                        </h3>
                         <h4 class="text-gray-500 text-sm">Complete pet information</h4>
                     </div>
                     <button class="close text-xl cursor-pointer" aria-label="Close">&times;</button>
@@ -160,8 +193,57 @@ if (!$admin) {
                     style="word-break: break-word; white-space: pre-line;">
                     <!-- Additional details will be populated here -->
                 </div>
+                <div id="deathDetails" class="text-sm bg-white p-4 border-green-400 rounded-lg mt-4 w-full hidden"
+                    style="word-break: break-word; white-space: pre-line;">
+                    <!-- Death details will be populated here -->
+                </div>
             </div>
         </div>
+
+        <div id="ToggleModal" class="modal hidden fixed inset-0 items-center justify-center"
+            style="background-color: rgba(0,0,0,0.4);">
+            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[70vh] overflow-y-auto"
+                style="min-width: 20rem;">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-semibold text-m">Update Pet Status - <span id="togglePetName"></span></h3>
+                        <h4 class="text-gray-500 text-sm">Change status to Alive or Dead</h4>
+                    </div>
+                    <button class="close text-xl cursor-pointer" aria-label="Close">&times;</button>
+                </div>
+
+                <form id="togglePetStatus" method="POST" class="space-y-4">
+                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                    <input type="hidden" name="pet_id" id="togglePetId">
+
+                    <div>
+                        <label class="block font-semibold">Status</label>
+                        <select id="statusSelect" name="status" class="w-full p-2 border rounded bg-white" required>
+                            <option value="Alive">Alive</option>
+                            <option value="Dead">Dead</option>
+                        </select>
+                    </div>
+
+                    <div id="deathFields" style="display:none;">
+                        <div>
+                            <label class="block font-semibold">Reason of Death</label>
+                            <textarea name="death_reason" class="w-full p-2 border rounded bg-white"></textarea>
+                        </div>
+                        <div>
+                            <label class="block font-semibold">Date of Death</label>
+                            <input type="date" name="death_date" class="w-full p-2 border rounded bg-white">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="updateStatusButton"
+                        class="bg-green-500 text-white cursor-pointer px-4 py-2 rounded hover:bg-green-600">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <?php include __DIR__ . '/../includes/message-modal.php' ?>
     </main>
 
     <!-- JS -->
@@ -171,6 +253,7 @@ if (!$admin) {
             const petDetails = document.getElementById("petDetails");
             const ownerDetails = document.getElementById("ownerDetails");
             const notesDetails = document.getElementById("notesDetails");
+            const deathDetails = document.getElementById("deathDetails");
             const petNameSpan = document.getElementById("petName");
             const searchInput = document.getElementById('search');
             const filterSelect = document.getElementById('speciesFilter');
@@ -181,6 +264,38 @@ if (!$admin) {
             const rowsPerPage = 6;
             let currentPage = 1;
             const totalPages = Math.ceil(rows.length / rowsPerPage);
+            const statusSelect = document.getElementById("statusSelect");
+            const deathFields = document.getElementById("deathFields");
+            let csrfToken = "<?= $csrf_token ?>";
+            const statusBadge = document.getElementById("statusBadge");
+
+            const openModal = (modal) => {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                updateBodyScroll();
+            };
+
+            const closeModal = (modal) => {
+                modal.classList.add("hidden");
+                updateBodyScroll();
+            };
+
+            // Attach close button functionality
+            document.querySelectorAll(".modal .close").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const modal = btn.closest(".modal");
+                    closeModal(modal);
+                });
+            });
+
+            // Optional: close when clicking outside modal content
+            document.querySelectorAll(".modal").forEach(modal => {
+                modal.addEventListener("click", (e) => {
+                    if (e.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+            });
 
             function applyFilters() {
                 const searchTerm = searchInput.value.toLowerCase();
@@ -224,14 +339,30 @@ if (!$admin) {
             document.querySelectorAll(".open-modal").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const modal = document.getElementById(btn.dataset.modal);
+                    const status = btn.dataset.status ? btn.dataset.status.toLowerCase() : "";
                     modal.classList.remove("hidden"); // ✅ Show modal
                     modal.classList.add("flex");
                     updateBodyScroll();
 
+                    deathDetails.classList.add("hidden");
+
                     petDetails.innerHTML = "<h3 class='font-semibold mb-4'>Pet information</h3>";
                     ownerDetails.innerHTML = "<h4 class='font-semibold mb-4'>Owner information</h4>";
                     notesDetails.innerHTML = "<h4 class='font-semibold mb-4'>Notes</h4>";
+
+                    if (status === "dead") {
+                        deathDetails.classList.remove("hidden");
+                        deathDetails.innerHTML = "<h4 class='font-semibold mb-4'>Death Details</h4>";
+                    }
                     petNameSpan.textContent = btn.dataset.name;
+
+                    statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+                    if (status === "alive") {
+                        statusBadge.className = "text-xs font-semibold px-2 py-1 rounded bg-green-500 text-white";
+                    } else {
+                        statusBadge.className = "text-xs font-semibold px-2 py-1 rounded bg-red-500 text-white";
+                    }
 
                     addField(petDetails, "Pet Name:", btn.dataset.name);
                     addField(petDetails, "Species:", btn.dataset.species);
@@ -239,32 +370,35 @@ if (!$admin) {
                     addField(petDetails, "Age:", btn.dataset.age || "None");
                     addField(petDetails, "Color:", btn.dataset.color || "None");
                     addField(petDetails, "Weight:", btn.dataset.weight || "None");
+                    addField(petDetails, "Birth Date:", btn.dataset.birthdate);
 
                     addField(ownerDetails, "Name:", btn.dataset.owner);
                     addField(ownerDetails, "Email:", btn.dataset.email);
                     addField(ownerDetails, "Phone:", btn.dataset.phone);
 
                     addField(notesDetails, "", btn.dataset.notes || "None");
-                });
-            });
 
-            // Close modal
-            document.querySelectorAll(".modal .close").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    btn.closest(".modal").classList.add("hidden");
-                    updateBodyScroll();
-                });
-            });
-
-            // Close modal by clicking outside
-            document.querySelectorAll(".modal").forEach(modal => {
-                modal.addEventListener("click", e => {
-                    if (e.target === modal) {
-                        modal.classList.add("hidden");
-                        updateBodyScroll();
+                    if (status === "dead") {
+                        addField(deathDetails, "Date of Death:", btn.dataset.deathdate);
+                        addField(deathDetails, "Reason of Death:", btn.dataset.deathreason);
                     }
                 });
             });
+
+            document.querySelectorAll(".open-status-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    openModal(document.getElementById("ToggleModal"));
+                });
+            });
+
+            // ===================== GENERIC MODAL CLOSE =====================
+            document.querySelectorAll(".modal .close").forEach(btn => {
+                btn.addEventListener("click", () => closeModal(btn.closest(".modal")));
+            });
+            document.querySelectorAll(".modal").forEach(modal => {
+                modal.addEventListener("click", e => { if (e.target === modal) closeModal(modal); });
+            });
+
             // Pagination
             const showPage = page => {
                 currentPage = page;
@@ -302,8 +436,83 @@ if (!$admin) {
             showPage(1);
 
             applyFilters();
-        });
 
+            statusSelect.addEventListener("change", () => {
+                deathFields.style.display = statusSelect.value === "Dead" ? "block" : "none";
+            });
+
+            // When clicking "Toggle Status" button, set pet_id and pet_name
+            document.querySelectorAll(".open-status-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const modal = document.getElementById("ToggleModal");
+                    openModal(modal);
+
+                    const petId = btn.dataset.id; // ✅ numeric ID
+                    const petName = btn.dataset.name; // ✅ pet name
+
+                    document.getElementById("togglePetId").value = petId;
+                    document.getElementById("togglePetName").textContent = petName;
+                });
+            });
+
+
+            document.getElementById("togglePetStatus").addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                formData.append("csrf_token", csrfToken); // ✅ include CSRF token
+
+                const updateStatusButton = document.getElementById('updateStatusButton');
+                updateStatusButton.disabled = true;
+                updateStatusButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+                fetch('../php/Toggle/toggle-pet.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.csrf_token) csrfToken = data.csrf_token; // ✅ update token if refreshed
+                        if (data.status === "success") {
+                            showMessage("Success", data.message, () => location.reload());
+                        } else {
+                            showMessage("Error", data.message);
+                        }
+                    })
+                    .catch(() => showMessage("Error", "Update failed."))
+                    .finally(() => {
+                        updateStatusButton.disabled = false;
+                        updateStatusButton.innerHTML = "Save Changes";
+                    });
+            });
+
+            // =================== Helper: Show message modal ===================
+            function showMessage(title, text, callback) {
+                const msgModal = document.getElementById("messageModal");
+                const msgTitle = document.getElementById("messageTitle");
+                const msgText = document.getElementById("messageText");
+                const okBtn = document.getElementById("closeMessageBtn");
+
+                msgTitle.textContent = title;
+                msgText.textContent = text;
+                msgModal.classList.remove("hidden");
+                msgModal.classList.add("flex");
+                updateBodyScroll();
+
+                // Remove previous listeners
+                okBtn.replaceWith(okBtn.cloneNode(true));
+                const newOkBtn = document.getElementById("closeMessageBtn");
+
+                newOkBtn.addEventListener("click", () => {
+                    msgModal.classList.add("hidden");
+                    updateBodyScroll();
+                    if (typeof callback === "function") callback();
+                });
+            }
+        });
     </script>
 </body>
 

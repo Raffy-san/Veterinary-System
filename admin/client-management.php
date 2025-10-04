@@ -133,9 +133,6 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
         Deactivate
     </button>';
                         }
-
-
-
                         echo '
                         <button 
                             data-owner="' . $client['owner_id'] . '" 
@@ -197,7 +194,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Password">
                         <i id="toggleAddPassword"
-                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-6 py-2 text-gray-600 text-sm">
+                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-4 py-2 text-gray-600 text-sm">
                         </i>
                     </div>
                     <div class="mb-4 w-auto">
@@ -288,7 +285,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter new password">
                         <i id="toggleUpdatePassword"
-                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-6 py-2 text-gray-600 text-sm">
+                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-4 py-2 text-gray-600 text-sm">
                         </i>
                     </div>
 
@@ -406,20 +403,26 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         </div>
                     </div>
 
+                    <div class="flex flex-row space-x-2">
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
+                            <input type="text" name="weight"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="e.g. 10kg">
+                        </div>
 
-                    <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
-                        <input type="text" name="weight"
-                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="e.g. 10kg">
-                    </div>
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
+                            <input type="text" name="color"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="Pet Color">
+                        </div>
 
-
-                    <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
-                        <input type="text" name="color"
-                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Pet Color">
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Birth Date</label>
+                            <input type="date" name="birth_date"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
                     </div>
 
                     <input type="hidden" name="owner_id" id="modal_owner_id">
@@ -506,18 +509,26 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         </div>
                     </div>
 
-                    <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
-                        <input type="text" name="weight" id="updatePetWeight"
-                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="e.g. 10kg">
-                    </div>
+                    <div class="flex flex-row space-x-2">
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
+                            <input type="text" name="weight" id="updatePetWeight"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="e.g. 10kg">
+                        </div>
 
-                    <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
-                        <input type="text" name="color" id="updatePetColor"
-                            class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Pet Color">
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
+                            <input type="text" name="color" id="updatePetColor"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="Pet Color">
+                        </div>
+
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Color</label>
+                            <input type="date" name="birth_date" id="updatePetBirthDate"
+                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
                     </div>
 
                     <div class="mb-4 w-full">
@@ -826,6 +837,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                 <p><span class="font-semibold">Gender:</span> ${pet.gender || "N/A"}</p>
                                 <p><span class="font-semibold">Weight:</span> ${pet.weight || "N/A"}</p>
                                 <p><span class="font-semibold">Color:</span> ${pet.color || "N/A"}</p>
+                                <p><span class="font-semibold">Birth Date:</span> ${pet.birth_date || "N/A"}</p>
                             </div>
                             <p class="mt-2 text-gray-600 text-sm">
                                 <span class="font-semibold">Notes:</span><span style="word-break: break-word; white-space: pre-line;"> ${pet.notes || "None"}</span>
@@ -854,6 +866,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                             document.getElementById("updatePetGender").value = data.gender;
                                             document.getElementById("updatePetWeight").value = data.weight || "";
                                             document.getElementById("updatePetColor").value = data.color || "";
+                                            document.getElementById("updatePetBirthDate").value = data.birth_date || "";
                                             document.getElementById("updatePetNotes").value = data.notes || "";
                                         });
                                     openModal(document.getElementById("updatePetModal"));
