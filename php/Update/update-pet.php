@@ -35,6 +35,7 @@ $data = [
     'gender' => trim($_POST['gender'] ?? ''),
     'weight' => trim($_POST['weight'] ?? ''),
     'color' => trim($_POST['color'] ?? ''),
+    'birth_date' => $_POST['birth_date'] ?? '',
     'notes' => trim($_POST['notes'] ?? '')
 ];
 

@@ -263,6 +263,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         ) . '</td>';
 
                         echo '<td class="py-2 text-right space-x-1">
+                                <a href="../print/medical-records.php?record_id=' . $record['medical_record_id'] . '" class="cursor-pointer text-xs font-semibold text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" target="_blank">Print</a>
                                 <button  
                                     data-modal = "viewModal"
                                     data-id="' . $record['medical_record_id'] . '"

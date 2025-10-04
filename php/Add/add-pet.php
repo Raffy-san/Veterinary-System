@@ -37,7 +37,8 @@ $data = [
     'age' => ($_POST['age'] !== '' ? filter_var($_POST['age'], FILTER_VALIDATE_INT) : null),
     'weight' => trim($_POST['weight'] ?? ''),
     'color' => trim($_POST['color'] ?? ''),
-    'notes' => trim($_POST['notes'] ?? '')
+    'notes' => trim($_POST['notes'] ?? ''),
+    'birth_date' => ($_POST['birth_date'] ?? '')
 ];
 
 if ($data['owner_id'] === false || $data['owner_id'] === null) {
