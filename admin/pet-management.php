@@ -96,10 +96,11 @@ if (empty($_SESSION['csrf_token'])) {
                     <?php
                     $pets = fetchAllData(
                         $pdo,
-                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.age_unit, p.gender, p.color, p.weight, p.weight_unit, p.birth_date , p.notes, p.status, p.death_reason, p.death_date,
+                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.age_unit, p.gender, p.color, p.weight, p.weight_unit, p.birth_date , p.notes, p.status, dr.cause_of_death, dr.date_of_death, dr.time_of_death, dr.recorded_by, dr.location_of_death, dr.remarks,
                                 o.name AS owner_name, o.phone AS owner_phone, o.email AS owner_email
                          FROM pets p
-                         JOIN owners o ON p.owner_id = o.id"
+                         LEFT JOIN owners o ON p.owner_id = o.id
+                         LEFT JOIN death_records dr ON p.id = dr.pet_id"
                     );
 
                     $status = [
@@ -141,8 +142,8 @@ if (empty($_SESSION['csrf_token'])) {
                                     data-notes='" . htmlspecialchars($row['notes'] ?? '') . "'
                                     data-birthdate ='" . htmlspecialchars($row['birth_date']) . "'
                                     data-status='" . htmlspecialchars($row['status'] ?? '') . "'
-                                    data-deathreason='" . htmlspecialchars($row['death_reason']) . "'
-                                    data-deathdate='" . htmlspecialchars($row['death_date']) . "'
+                                    data-deathreason='" . htmlspecialchars($row['cause_of_death']) . "'
+                                    data-deathdate='" . htmlspecialchars($row['date_of_death']) . "'
                                     data-owner='" . htmlspecialchars($row['owner_name'] ?? '') . "'
                                     data-email='" . htmlspecialchars($row['owner_email'] ?? '') . "'
                                     data-phone='" . htmlspecialchars($row['owner_phone'] ?? '') . "'
@@ -201,44 +202,88 @@ if (empty($_SESSION['csrf_token'])) {
                 </div>
             </div>
         </div>
-
+        <!-- Toggle Pet Status Modal -->
         <div id="ToggleModal" class="modal hidden fixed inset-0 items-center justify-center"
             style="background-color: rgba(0,0,0,0.4);">
-            <div class="custom-scrollbar bg-green-100 rounded-lg p-4 max-h-[70vh] overflow-y-auto"
-                style="min-width: 20rem;">
+            <div
+                class="custom-scrollbar bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[80vh] overflow-y-auto">
+
+                <!-- Header -->
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h3 class="font-semibold text-m">Update Pet Status - <span id="togglePetName"></span></h3>
-                        <h4 class="text-gray-500 text-sm">Change status to Alive or Dead</h4>
+                        <h3 class="font-semibold text-lg">Update Pet Status - <span id="togglePetName"
+                                class="text-green-700"></span></h3>
+                        <p class="text-gray-600 text-sm">Change status to <strong>Alive</strong> or
+                            <strong>Dead</strong>
+                        </p>
                     </div>
-                    <button class="close text-xl cursor-pointer" aria-label="Close">&times;</button>
+                    <button class="close text-2xl text-gray-700 hover:text-red-600 font-bold cursor-pointer"
+                        aria-label="Close">&times;</button>
                 </div>
 
+                <!-- Form -->
                 <form id="togglePetStatus" method="POST" class="space-y-4">
                     <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <input type="hidden" name="pet_id" id="togglePetId">
 
+                    <!-- Status Selector -->
                     <div>
-                        <label class="block font-semibold">Status</label>
-                        <select id="statusSelect" name="status" class="w-full p-2 border rounded bg-white" required>
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Status</label>
+                        <select id="statusSelect" name="status"
+                            class="w-full border border-gray-300 bg-white px-2 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            required>
                             <option value="Alive">Alive</option>
                             <option value="Dead">Dead</option>
                         </select>
                     </div>
 
-                    <div id="deathFields" style="display:none;">
-                        <div>
-                            <label class="block font-semibold">Reason of Death</label>
-                            <textarea name="death_reason" class="w-full p-2 border rounded bg-white"></textarea>
+                    <!-- Death Details (Hidden by Default) -->
+                    <div id="deathFields" class="space-y-4 hidden border-t border-gray-300 pt-4">
+                        <h4 class="font-semibold text-gray-700 text-base">Death Details</h4>
+
+                        <!-- Date and Time Row -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-1 text-sm font-semibold">Date of Death</label>
+                                <input type="date" name="death_date"
+                                    class="w-full border border-gray-300 bg-white px-2 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 mb-1 text-sm font-semibold">Time of Death</label>
+                                <input type="time" name="death_time"
+                                    class="w-full border border-gray-300 bg-white px-2 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
                         </div>
+
                         <div>
-                            <label class="block font-semibold">Date of Death</label>
-                            <input type="date" name="death_date" class="w-full p-2 border rounded bg-white">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Reason of Death</label>
+                            <textarea name="death_reason" rows="2"
+                                class="w-full border border-gray-300 bg-white px-2 py-1 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Recorded By</label>
+                            <input type="text" name="recorded_by" placeholder="Veterinarian name"
+                                class="w-full border border-gray-300 bg-white px-2 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Location of Death</label>
+                            <input type="text" name="location_of_death" placeholder="Clinic, home, etc."
+                                class="w-full border border-gray-300 bg-white px-2 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Remarks</label>
+                            <textarea name="remarks" rows="2"
+                                class="w-full border border-gray-300 bg-white px-2 py-1 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500 "></textarea>
                         </div>
                     </div>
 
+                    <!-- Submit Button -->
                     <button type="submit" id="updateStatusButton"
-                        class="bg-green-500 text-white cursor-pointer px-4 py-2 rounded hover:bg-green-600">
+                        class="w-full bg-green-500 text-white font-semibold px-4 py-2 rounded hover:bg-green-600 transition cursor-pointer">
                         Save Changes
                     </button>
                 </form>
