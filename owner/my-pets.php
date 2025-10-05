@@ -147,7 +147,7 @@ $petCount = fetchOneData(
                             </span>
                         </div>
 
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-6">
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-6 mb-4 md:mb-6">
                             <div class="flex items-start md:items-center">
                                 <i
                                     class="fas fa-venus-mars text-blue-500 mr-2 md:mr-3 text-sm md:text-base mt-1 md:mt-0 flex-shrink-0"></i>
@@ -161,7 +161,9 @@ $petCount = fetchOneData(
                                     class="fas fa-weight text-green-500 mr-2 md:mr-3 text-sm md:text-base mt-1 md:mt-0 flex-shrink-0"></i>
                                 <div class="min-w-0 flex-1">
                                     <p class="text-xs md:text-sm text-gray-500 mb-1">Weight</p>
-                                    <p class="text-sm md:text-base text-gray-900"><?= htmlspecialchars($pet['weight']); ?></p>
+                                    <p class="text-sm md:text-base text-gray-900"><?= htmlspecialchars($pet['weight']); ?>
+                                        <?= htmlspecialchars($pet['weight_unit']); ?>
+                                    </p>
                                 </div>
                             </div>
                             <div class="flex items-start md:items-center">
@@ -170,6 +172,16 @@ $petCount = fetchOneData(
                                 <div class="min-w-0 flex-1">
                                     <p class="text-xs md:text-sm text-gray-500 mb-1">Color</p>
                                     <p class="text-sm md:text-base text-gray-900"><?= htmlspecialchars($pet['color']); ?></p>
+                                </div>
+                            </div>
+                            <div class="flex items-start md:items-center">
+                                <i
+                                    class="fas fa-birthday-cake text-pink-500 mr-2 md:mr-3 text-sm md:text-base mt-1 md:mt-0 flex-shrink-0"></i>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-xs md:text-sm text-gray-500 mb-1">Date of Birth</p>
+                                    <p class="text-sm md:text-base text-gray-900">
+                                        <?= date('M d, Y', strtotime($pet['birth_date'])); ?>
+                                    </p>
                                 </div>
                             </div>
                             <div class="flex items-start md:items-center">

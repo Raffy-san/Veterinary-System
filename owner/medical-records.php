@@ -133,6 +133,14 @@ $medicalRecordCount = fetchOneData(
                     foreach ($medicalRecord as $record) {
                         $species = $record['species'] ?? 'default';
                         $speciesInfo = $speciesData[$species] ?? $speciesData['default'];
+
+                        $visitTimeFormatted = '';
+                        if (!empty($record['visit_time'])) {
+                            $t = DateTime::createFromFormat('H:i:s', $record['visit_time']);
+                            if ($t) {
+                                $visitTimeFormatted = $t->format('h:i A');
+                            }
+                        }
                         ?>
                         <div class="record-card bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md mb-6">
                             <!-- Pet Header -->
@@ -149,6 +157,7 @@ $medicalRecordCount = fetchOneData(
                                         <p class="text-blue-100 text-xs sm:text-sm flex items-center">
                                             <i class="fas fa-calendar mr-1 sm:mr-2"></i>
                                             <?= date('F j, Y', strtotime($record['visit_date'])) ?>
+                                            <?= $visitTimeFormatted ?>
                                         </p>
                                     </div>
                                 </div>
@@ -190,6 +199,7 @@ $medicalRecordCount = fetchOneData(
                                                     <p class="text-xs sm:text-sm text-blue-600 font-semibold">Weight</p>
                                                     <p class="text-gray-900 font-medium text-sm sm:text-base">
                                                         <?= htmlspecialchars($record['weight']) ?>
+                                                        <?= htmlspecialchars($record['weight_unit']) ?>
                                                     </p>
                                                 </div>
                                             </div>
@@ -201,6 +211,7 @@ $medicalRecordCount = fetchOneData(
                                                     <p class="text-xs sm:text-sm text-red-600 font-semibold">Temperature</p>
                                                     <p class="text-gray-900 font-medium text-sm sm:text-base">
                                                         <?= htmlspecialchars($record['temperature']) ?>
+                                                        <?= htmlspecialchars($record['temp_unit']) ?>
                                                     </p>
                                                 </div>
                                             </div>
