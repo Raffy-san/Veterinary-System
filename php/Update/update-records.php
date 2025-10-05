@@ -33,9 +33,12 @@ $data = [
     'record_id' => filter_input(INPUT_POST, 'record_id', FILTER_VALIDATE_INT),
     'visit_type' => trim($_POST['visit_type'] ?? ''),
     'visit_date' => $_POST['visit_date'] ?? '',
+    'visit_time' => $_POST['visit_time'] ?? '',
     'veterinarian' => trim(ucwords(strtolower($_POST['veterinarian'] ?? ''))),
-    'weight' => trim($_POST['weight'] ?? ''),
-    'temperature' => trim($_POST['temperature'] ?? ''),
+    'weight' => ($_POST['weight'] !== '' ? filter_var($_POST['weight'], FILTER_VALIDATE_FLOAT) : null),
+    'weight_unit' => trim($_POST['weight_unit'] ?? ''),
+    'temperature' => ($_POST['temperature'] !== '' ? filter_var($_POST['temperature'], FILTER_VALIDATE_FLOAT) : null),
+    'temp_unit' => trim($_POST['temp_unit'] ?? ''),
     'diagnosis' => trim($_POST['diagnosis'] ?? ''),
     'treatment' => trim($_POST['treatment'] ?? ''),
     'medications' => trim($_POST['medications'] ?? ''),
@@ -56,6 +59,7 @@ if (!empty($data['visit_date'])) {
         jsonResponse("error", "Invalid visit date format");
     }
 }
+
 if (!empty($data['follow_up_date'])) {
     $d = DateTime::createFromFormat('Y-m-d', $data['follow_up_date']);
     if (!$d || $d->format('Y-m-d') !== $data['follow_up_date']) {

@@ -48,10 +48,10 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                 <form id="addRecordForm" class="flex flex-wrap items-center justify-between" method="POST"
                     action="medical-records.php">
                     <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                    <div class="mb-4 w-auto">
+                    <div class="mb-4 w-full">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
                         <select
-                            class="w-44 bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="patient" id="patient" required>
                             <option value="" Selected disabled>Select Patient</option>
                             <?php
@@ -75,8 +75,16 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         </select>
                     </div>
                     <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Date</label>
-                        <input type="date" name="visit_date"
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Visit Date</label>
+                        <div class="flex items-center">
+                            <input type="date" name="visit_date"
+                                class="w-44 bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                required>
+                        </div>
+                    </div>
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Visit Time</label>
+                        <input type="time" name="visit_time"
                             class="w-44 bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             required>
                     </div>
@@ -99,17 +107,35 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="veterinarian" placeholder="e.g, Dr. Will Smith" required>
                     </div>
-                    <div class="mb-4 w-auto">
-                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
-                        <input type="text"
-                            class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            name="weight" placeholder="e.g, 20lbs" required>
-                    </div>
-                    <div class="mb-4 w-auto">
-                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
-                        <input type="text"
-                            class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            name="temperature" placeholder="e.g, 36°C" required>
+
+                    <div class="flex flex-row space-x-8">
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
+                            <div class="flex items-center">
+                                <input type="number" name="weight" id="Weight" min="0" step="any"
+                                    class="w-full border border-gray-300 border-r-0 rounded-l bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    placeholder="Value">
+                                <select name="weight_unit" id="WeightUnit"
+                                    class="w-auto border border-gray-300 bg-white rounded-r px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="Kg">Kg</option>
+                                    <option value="Lbs">Lbs</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 w-auto">
+                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
+                            <div class="flex items-center">
+                                <input type="number" min="0" step="any"
+                                    class="w-full bg-white border border-gray-300 rounded-l px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    name="temperature" placeholder="Value" required>
+                                <select name="temp_unit" id="tempUnit"
+                                    class="w-auto border border-gray-300 bg-white rounded-r px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="C">C</option>
+                                    <option value="F">F</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-4 w-full">
@@ -215,7 +241,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <?php
                     $records = fetchAllData(
                         $pdo,
-                        "SELECT m.id AS medical_record_id, m.visit_date, m.veterinarian, m.weight, m.temperature, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes, m.follow_up_date
+                        "SELECT m.id AS medical_record_id, m.visit_date, m.visit_time, m.veterinarian, m.weight, m.weight_unit, m.temperature, m.temp_unit, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes, m.follow_up_date
                         FROM medical_records m 
                         JOIN pets p ON m.pet_id = p.id
                         JOIN owners o ON p.owner_id = o.id
@@ -236,12 +262,22 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         $dataFollow = (!empty($record['follow_up_date']) && $record['follow_up_date'] !== '0000-00-00')
                             ? $record['follow_up_date']
                             : '';
+                        $visitTimeFormatted = '';
+                        if (!empty($record['visit_time'])) {
+                            $t = DateTime::createFromFormat('H:i:s', $record['visit_time']);
+                            if ($t) {
+                                $visitTimeFormatted = $t->format('h:i A');
+                            }
+                        }
 
                         echo '<tr 
                             data-id="' . htmlspecialchars($record['medical_record_id']) . '" 
                             data-type="' . htmlspecialchars($record['visit_type']) . '" 
                             class="border-b border-gray-300 hover:bg-green-50 text-sm">';
-                        echo '<td class="py-2">' . htmlspecialchars($record['visit_date']) . '</td>';
+                        echo "<td class='py-2'>
+                                <span class='font-medium'>" . htmlspecialchars($record['visit_date']) . "</span><br>
+                                <span class='text-gray-500 text-xs'>" . $visitTimeFormatted . "</span>
+                            </td>";
                         echo "<td class='py-2'>
                                 <span class='font-medium'>" . htmlspecialchars($record['patient_name']) . "</span><br>
                                 <span class='text-gray-500 text-xs'>" . htmlspecialchars($record['owner_name']) . "</span>
@@ -267,7 +303,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                 <button  
                                     data-modal = "viewModal"
                                     data-id="' . $record['medical_record_id'] . '"
-                                    data-date="' . htmlspecialchars($record['visit_date'] ?? '') . '"                  
+                                    data-date="' . htmlspecialchars($record['visit_date'] ?? '') . '"
+                                    data-time="' . htmlspecialchars($record['visit_time'] ?? '') . '"                  
                                     data-type="' . htmlspecialchars($record['visit_type'] ?? '') . '" 
                                     data-type-bg="' . htmlspecialchars($typeinfo['bg']) . '"
                                     data-type-color="' . htmlspecialchars($typeinfo['color']) . '"
@@ -276,7 +313,9 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                     data-owner="' . htmlspecialchars($record['owner_name'] ?? '') . '" 
                                     data-veterinarian="' . htmlspecialchars($record['veterinarian'] ?? '') . '"
                                     data-weight="' . htmlspecialchars($record['weight'] ?? '') . '"
+                                    data-weightunit="' . htmlspecialchars($record['weight_unit'] ?? '') . '"
                                     data-temperature="' . htmlspecialchars($record['temperature'] ?? '') . '"
+                                    data-tempunit="' . htmlspecialchars($record['temp_unit'] ?? '') . '"
                                     data-diagnosis="' . htmlspecialchars($record['diagnosis'] ?? '') . '" 
                                     data-treatment="' . htmlspecialchars($record['treatment'] ?? '') . '" 
                                     data-medications="' . htmlspecialchars($record['medications'] ?? '') . '" 
@@ -350,15 +389,21 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     action="medical-records.php">
                     <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <input type="hidden" name="record_id" id="updateRecordId">
-                    <div class="mb-4 w-auto">
+                    <div class="mb-4 w-full">
                         <label class="block text-gray-700 mb-1 text-sm font-semibold">Patient</label>
                         <input type="text" name="pet_name" id="updatePetName"
-                            class="w-44 border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             readonly>
                     </div>
                     <div class="mb-4 w-auto">
-                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Date</label>
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Visit Date</label>
                         <input type="date" name="visit_date" id="updateVisitDate"
+                            class="w-44 border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            required>
+                    </div>
+                    <div class="mb-4 w-auto">
+                        <label class="block text-gray-700 mb-1 text-sm font-semibold">Visit Time</label>
+                        <input type="time" name="visit_time" id="updateVisitTime"
                             class="w-44 border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             required>
                     </div>
@@ -380,17 +425,34 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             class="w-full border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             name="veterinarian" placeholder="e.g, Dr. Will Smith" required>
                     </div>
-                    <div class="mb-4 w-auto">
-                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
-                        <input type="text" id="updateWeight"
-                            class="w-full border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            name="weight" placeholder="e.g, 20lbs" required>
-                    </div>
-                    <div class="mb-4 w-auto">
-                        <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
-                        <input type="text" id="updateTemperature"
-                            class="w-full border bg-white border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                            name="temperature" placeholder="e.g, 36°C" required>
+                    <div class="flex flex-row space-x-8">
+                        <div class="mb-4 w-auto">
+                            <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
+                            <div class="flex items-center">
+                                <input type="number" name="weight" id="updateWeight" min="0" step="any"
+                                    class="w-full border border-gray-300 border-r-0 rounded-l bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    placeholder="Value">
+                                <select name="weight_unit" id="updateWeightUnit"
+                                    class="w-auto border border-gray-300 bg-white rounded-r px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="Kg">Kg</option>
+                                    <option value="Lbs">Lbs</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 w-auto">
+                            <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Temperature</label>
+                            <div class="flex items-center">
+                                <input type="number" min="0" id="updateTemperature" step="any"
+                                    class="w-full bg-white border border-gray-300 rounded-l px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    name="temperature" placeholder="Value" required>
+                                <select name="temp_unit" id="updateTempUnit"
+                                    class="w-auto border border-gray-300 bg-white rounded-r px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="C">C</option>
+                                    <option value="F">F</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-4 w-full">
                         <label for="" class="block text-gray-700 mb-1 text-sm font-semibold">Diagnosis</label>
@@ -502,7 +564,16 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     petName.textContent = btn.dataset.patient || '';
                     recordDate.textContent = btn.dataset.date || '';
 
-                    addField(medicalDetails, "Date:", btn.dataset.date || '');
+                    let formattedTime = "";
+                    if (btn.dataset.time) {
+                        const [hour, minute] = btn.dataset.time.split(":");
+                        const dateObj = new Date();
+                        dateObj.setHours(hour, minute);
+                        formattedTime = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
+                    addField(medicalDetails, "Visit Date:", btn.dataset.date || '');
+                    addField(medicalDetails, "Visit Time:", ` ${formattedTime}` || '');
 
                     const visitTypeHTML = `
                             <div class="${btn.dataset.typeBg} ${btn.dataset.typeColor} rounded-lg px-2 py-1 inline-flex items-center gap-1">
@@ -522,8 +593,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
                     addField(medicalDetails, "Veterinarian:", btn.dataset.veterinarian || '');
                     addField(medicalDetails, "Patient:", btn.dataset.patient || '');
-                    addField(medicalDetails, "Weight:", btn.dataset.weight || '');
-                    addField(medicalDetails, "Temperature:", btn.dataset.temperature || '');
+                    addField(medicalDetails, "Weight:", `${btn.dataset.weight} ${btn.dataset.weightunit}` || '');
+                    addField(medicalDetails, "Temperature:", `${btn.dataset.temperature} ${btn.dataset.tempunit}` || '');
 
                     addField(followUpDetail, "", btn.dataset.follow || 'No Follow-up date');
                     addField(diagnosisDetails, "", btn.dataset.diagnosis || '');
@@ -682,10 +753,13 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         document.getElementById("updateRecordId").value = data.id;
                         document.getElementById("updatePetName").value = data.pet_name;
                         document.getElementById("updateVisitDate").value = data.visit_date || "";
+                        document.getElementById("updateVisitTime").value = data.visit_time || "";
                         document.getElementById("updateVisitType").value = data.visit_type || "";
                         document.getElementById("updateVeterinarian").value = data.veterinarian || "";
                         document.getElementById("updateWeight").value = data.weight || "";
+                        document.getElementById("updateWeightUnit").value = data.weight_unit || "";
                         document.getElementById("updateTemperature").value = data.temperature || "";
+                        document.getElementById("updateTempUnit").value = data.temp_unit || "";
                         document.getElementById("updateDiagnosis").value = data.diagnosis || "";
                         document.getElementById("updateTreatment").value = data.treatment || "";
                         document.getElementById("updateMedications").value = data.medications || "";

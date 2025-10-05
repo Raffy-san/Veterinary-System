@@ -32,15 +32,24 @@ $data = [
     'species' => trim($_POST['species'] ?? ''),
     'breed' => trim($_POST['breed'] ?? ''),
     'age' => ($age = filter_var($_POST['age'] ?? null, FILTER_VALIDATE_INT)) !== false ? $age : null,
+    'age_unit' => trim($_POST['age_unit'] ?? ''),
     'gender' => trim($_POST['gender'] ?? ''),
-    'weight' => trim($_POST['weight'] ?? ''),
+    'weight' => ($_POST['weight'] !== '' ? filter_var($_POST['weight'], FILTER_VALIDATE_INT) : null),
+    'weight_unit' => trim($_POST['weight_unit'] ?? ''),
     'color' => trim($_POST['color'] ?? ''),
-    'birth_date' => $_POST['birth_date'] ?? '',
+    'birth_date' => trim($_POST['birth_date'] ?? ''),
     'notes' => trim($_POST['notes'] ?? '')
 ];
 
 if (!$data['pet_id']) {
     jsonResponse("error", "Invalid or missing pet ID");
+}
+
+if (!empty($data['birth_date'])) {
+    $d = DateTime::createFromFormat('Y-m-d', $data['birth_date']);
+    if (!$d || $d->format('Y-m-d') !== $data['birth_date']) {
+        jsonResponse("error", "Invalid birth date format");
+    }
 }
 
 // Run update

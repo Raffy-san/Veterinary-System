@@ -96,7 +96,7 @@ if (empty($_SESSION['csrf_token'])) {
                     <?php
                     $pets = fetchAllData(
                         $pdo,
-                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.gender, p.color, p.weight, p.birth_date , p.notes, p.status, p.death_reason, p.death_date,
+                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.age_unit, p.gender, p.color, p.weight, p.weight_unit, p.birth_date , p.notes, p.status, p.death_reason, p.death_date,
                                 o.name AS owner_name, o.phone AS owner_phone, o.email AS owner_email
                          FROM pets p
                          JOIN owners o ON p.owner_id = o.id"
@@ -117,7 +117,7 @@ if (empty($_SESSION['csrf_token'])) {
                                 <span>{$row['species']}</span>
                                 <span class='text-gray-500'>{$row['breed']}</span>
                               </td>";
-                        echo "<td class='py-2'>{$row['age']} <span>Years</span></td>";
+                        echo "<td class='py-2'>{$row['age']} <span>{$row['age_unit']}</span> old</td>";
                         echo "<td class='py-2'>{$row['gender']}</td>";
                         echo "<td class='py-2'>{$row['owner_name']}</td>";
                         echo "<td class='flex flex-col py-2'>
@@ -133,9 +133,11 @@ if (empty($_SESSION['csrf_token'])) {
                                     data-species='" . htmlspecialchars($row['species'] ?? '') . "'
                                     data-breed='" . htmlspecialchars($row['breed'] ?? '') . "'
                                     data-age='" . htmlspecialchars($row['age'] ?? '') . "'
+                                    data-ageunit='" . htmlspecialchars($row['age_unit'] ?? '') . "'
                                     data-gender='" . htmlspecialchars($row['gender'] ?? '') . "'
                                     data-color='" . htmlspecialchars($row['color'] ?? '') . "'
                                     data-weight='" . htmlspecialchars($row['weight'] ?? '') . "'
+                                    data-weightunit='" . htmlspecialchars($row['weight_unit'] ?? '') . "'
                                     data-notes='" . htmlspecialchars($row['notes'] ?? '') . "'
                                     data-birthdate ='" . htmlspecialchars($row['birth_date']) . "'
                                     data-status='" . htmlspecialchars($row['status'] ?? '') . "'
@@ -367,9 +369,9 @@ if (empty($_SESSION['csrf_token'])) {
                     addField(petDetails, "Pet Name:", btn.dataset.name);
                     addField(petDetails, "Species:", btn.dataset.species);
                     addField(petDetails, "Breed:", btn.dataset.breed);
-                    addField(petDetails, "Age:", btn.dataset.age || "None");
+                    addField(petDetails, "Age:", `${btn.dataset.age} ${btn.dataset.ageunit}` || "None");
                     addField(petDetails, "Color:", btn.dataset.color || "None");
-                    addField(petDetails, "Weight:", btn.dataset.weight || "None");
+                    addField(petDetails, "Weight:", `${btn.dataset.weight} ${btn.dataset.weightunit}` || "None");
                     addField(petDetails, "Birth Date:", btn.dataset.birthdate);
 
                     addField(ownerDetails, "Name:", btn.dataset.owner);
