@@ -162,10 +162,10 @@ function addPet($pdo, $data)
 {
     try {
         $stmt = $pdo->prepare("
-            INSERT INTO pets (name, species, breed, age, gender, weight, color, owner_id, notes, birth_date) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO pets (name, species, breed, age, age_unit, gender, weight, weight_unit, color, owner_id, notes, birth_date) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['owner_id'], $data['notes'], $data['birth_date']]);
+        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['age_unit'], $data['gender'], $data['weight'], $data['weight_unit'], $data['color'], $data['owner_id'], $data['notes'], $data['birth_date']]);
         return json_encode(["status" => "success", "message" => "Pet added successfully"]);
 
     } catch (PDOException $e) {
@@ -177,9 +177,9 @@ function updatePet($pdo, $data)
 {
     try {
         $stmt = $pdo->prepare("
-            UPDATE pets SET name = ?, species = ?, breed = ?, age = ?, gender = ?, weight = ?, color = ?, birth_date = ?, notes = ? WHERE id = ?
+            UPDATE pets SET name = ?, species = ?, breed = ?, age = ?, age_unit = ?, gender = ?, weight = ?, weight_unit = ?, color = ?, birth_date = ?, notes = ? WHERE id = ?
         ");
-        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['gender'], $data['weight'], $data['color'], $data['birth_date'], $data['notes'], $data['pet_id']]);
+        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['age_unit'] ,$data['gender'], $data['weight'], $data['weight_unit'], $data['color'], $data['birth_date'], $data['notes'], $data['pet_id']]);
         return json_encode(["status" => "success", "message" => "Pet updated successfully"]);
 
     } catch (PDOException $e) {
@@ -207,17 +207,20 @@ function addMedicalRecord($pdo, $data)
 
         $stmt = $pdo->prepare("
             INSERT INTO medical_records 
-                (pet_id, visit_date, visit_type, veterinarian, weight, temperature, diagnosis, treatment, medications, notes, follow_up_date) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (pet_id, visit_date, visit_time, visit_type, veterinarian, weight, weight_unit, temperature, temp_unit, diagnosis, treatment, medications, notes, follow_up_date) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
             $data['pet_id'],
             $data['visit_date'],
+            $data['visit_time'],
             $data['visit_type'],
             $data['veterinarian'],
             $data['weight'],
+            $data['weight_unit'],
             $data['temperature'],
+            $data['temp_unit'],
             $data['diagnosis'],
             $data['treatment'],
             $data['medications'],
@@ -253,10 +256,13 @@ function updateMedicalRecord($pdo, $data)
         $stmt = $pdo->prepare("
             UPDATE medical_records 
             SET visit_date = ?, 
+                visit_time = ?,
                 visit_type = ?, 
                 veterinarian =?,
                 weight = ?, 
-                temperature = ?, 
+                weight_unit = ?,
+                temperature = ?,
+                temp_unit = ?, 
                 diagnosis = ?, 
                 treatment = ?, 
                 medications = ?, 
@@ -267,10 +273,13 @@ function updateMedicalRecord($pdo, $data)
 
         $stmt->execute([
             $data['visit_date'],
+            $data['visit_time'],
             $data['visit_type'],
             $data['veterinarian'],
             $data['weight'],
+            $data['weight_unit'],
             $data['temperature'],
+            $data['temp_unit'],
             $data['diagnosis'],
             $data['treatment'],
             $data['medications'],

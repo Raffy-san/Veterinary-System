@@ -248,6 +248,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             </div>
         </div>
 
+        <!-- Update Client Modal -->
         <div id="updateClientModal"
             class="modal hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center"
             style="background-color: rgba(0,0,0,0.4);">
@@ -342,6 +343,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             </div>
         </div>
 
+        <!-- Add Pet Modal -->
         <div id="addPetModal" class="modal fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 hidden"
             style="background-color: rgba(0,0,0,0.4);">
             <div class="bg-green-100 rounded-lg shadow-lg w-full max-w-md p-6 relative">
@@ -386,9 +388,17 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
-                            <input type="number" name="age"
-                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                placeholder="Years" min="0">
+                            <div class="flex items-center">
+                                <input type="number" name="age"
+                                    class="w-full border border-gray-300 border-r-0 bg-white rounded-l px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    placeholder="Value" min="0">
+                                <select name="age_unit"
+                                    class="w-full border border-gray-300 bg-white rounded-r px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="Days">Days</option>
+                                    <option value="Months">Months</option>
+                                    <option value="Years">Years</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="mb-4 w-auto">
@@ -406,9 +416,16 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="flex flex-row space-x-2">
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
-                            <input type="text" name="weight"
-                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                placeholder="e.g. 10kg">
+                            <div class="flex items-center">
+                                <input type="number" name="weight" min="0" step="any"
+                                    class="w-full border border-gray-300 border-r-0 rounded-l bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    placeholder="Value">
+                                <select name="weight_unit"
+                                    class="w-full border border-gray-300 bg-white rounded-r px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="Kg">Kg</option>
+                                    <option value="Lbs">Lbs</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="mb-4 w-auto">
@@ -492,9 +509,17 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Age</label>
-                            <input type="number" name="age" id="updatePetAge"
-                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                placeholder="Years" min="0">
+                            <div class="flex items-center">
+                                <input type="number" name="age" id="updatePetAge"
+                                    class="w-full border border-gray-300 border-r-0 bg-white rounded-l px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    placeholder="Value" min="0">
+                                <select name="age_unit" id="updatePetAgeUnit"
+                                    class="w-full border border-gray-300 bg-white rounded-r px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="Days">Days</option>
+                                    <option value="Months">Months</option>
+                                    <option value="Years">Years</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="mb-4 w-auto">
@@ -512,9 +537,16 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <div class="flex flex-row space-x-2">
                         <div class="mb-4 w-auto">
                             <label class="block text-gray-700 mb-1 text-sm font-semibold">Weight</label>
-                            <input type="text" name="weight" id="updatePetWeight"
-                                class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                placeholder="e.g. 10kg">
+                            <div class="flex items-center">
+                                <input type="number" name="weight" id="updatePetWeight" min="0" step="any"
+                                    class="w-full border border-gray-300 border-r-0 rounded-l bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    placeholder="Value">
+                                <select name="weight_unit" id="updatePetWeightUnit"
+                                    class="w-full border border-gray-300 bg-white rounded-r px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="Kg">Kg</option>
+                                    <option value="Lbs">Lbs</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="mb-4 w-auto">
@@ -833,9 +865,9 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             </div>
                             <div class="grid grid-cols-2 gap-2 text-sm text-gray-700">
                                 <p><span class="font-semibold">Breed:</span> ${pet.breed || "N/A"}</p>
-                                <p><span class="font-semibold">Age:</span> ${pet.age || "N/A"} yrs</p>
+                                <p><span class="font-semibold">Age:</span> ${pet.age || "N/A"} ${pet.age_unit} old</p>
                                 <p><span class="font-semibold">Gender:</span> ${pet.gender || "N/A"}</p>
-                                <p><span class="font-semibold">Weight:</span> ${pet.weight || "N/A"}</p>
+                                <p><span class="font-semibold">Weight:</span> ${pet.weight || "N/A"} ${pet.weight_unit}</p>
                                 <p><span class="font-semibold">Color:</span> ${pet.color || "N/A"}</p>
                                 <p><span class="font-semibold">Birth Date:</span> ${pet.birth_date || "N/A"}</p>
                             </div>
@@ -863,8 +895,10 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                             document.getElementById("updatePetSpecies").value = data.species;
                                             document.getElementById("updatePetBreed").value = data.breed || "";
                                             document.getElementById("updatePetAge").value = data.age || "";
+                                            document.getElementById("updatePetAgeUnit").value = data.age_unit || "";
                                             document.getElementById("updatePetGender").value = data.gender;
                                             document.getElementById("updatePetWeight").value = data.weight || "";
+                                            document.getElementById("updatePetWeightUnit").value = data.weight_unit || "";
                                             document.getElementById("updatePetColor").value = data.color || "";
                                             document.getElementById("updatePetBirthDate").value = data.birth_date || "";
                                             document.getElementById("updatePetNotes").value = data.notes || "";
