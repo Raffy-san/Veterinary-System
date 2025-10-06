@@ -14,13 +14,13 @@ if ($death_id <= 0) {
 // Fetch data from database
 $stmt = $pdo->prepare("
     SELECT 
-        dr.certificate_number,
+        c.certificate_number,
         dr.date_of_death,
         dr.time_of_death,
         dr.cause_of_death,
         dr.location_of_death,
         dr.recorded_by,
-        dr.certificate_date,
+        c.certificate_date,
         p.name AS pet_name,
         p.species,
         p.breed,
@@ -31,6 +31,7 @@ $stmt = $pdo->prepare("
         o.name AS owner_name
     FROM death_records dr
     LEFT JOIN pets p ON dr.pet_id = p.id
+    LEFT JOIN certificates c ON p.id = c.pet_id
     LEFT JOIN owners o ON p.owner_id = o.id
     WHERE dr.id = ?
 ");
