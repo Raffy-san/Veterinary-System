@@ -96,7 +96,7 @@ if (empty($_SESSION['csrf_token'])) {
                     <?php
                     $pets = fetchAllData(
                         $pdo,
-                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.age_unit, p.gender, p.color, p.weight, p.weight_unit, p.birth_date , p.notes, p.status, dr.cause_of_death, dr.date_of_death, dr.time_of_death, dr.recorded_by, dr.location_of_death, dr.remarks,
+                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.age_unit, p.gender, p.color, p.weight, p.weight_unit, p.birth_date , p.notes, p.status, dr.id AS death_record_id, dr.cause_of_death, dr.date_of_death, dr.time_of_death, dr.recorded_by, dr.location_of_death, dr.remarks, dr.certificate_number, dr.certificate_date, dr.certificate_issued, dr.issued_by,
                                 o.name AS owner_name, o.phone AS owner_phone, o.email AS owner_email
                          FROM pets p
                          LEFT JOIN owners o ON p.owner_id = o.id
@@ -144,6 +144,10 @@ if (empty($_SESSION['csrf_token'])) {
                                     data-status='" . htmlspecialchars($row['status'] ?? '') . "'
                                     data-deathreason='" . htmlspecialchars($row['cause_of_death']) . "'
                                     data-deathdate='" . htmlspecialchars($row['date_of_death']) . "'
+                                    data-deathtime='" . htmlspecialchars($row['time_of_death']) . "'
+                                    data-deathlocation='" . htmlspecialchars($row['location_of_death']) . "'
+                                    data-recordedby='" . htmlspecialchars($row['recorded_by']) . "'
+                                    data-remarks='" . htmlspecialchars($row['remarks']) . "'
                                     data-owner='" . htmlspecialchars($row['owner_name'] ?? '') . "'
                                     data-email='" . htmlspecialchars($row['owner_email'] ?? '') . "'
                                     data-phone='" . htmlspecialchars($row['owner_phone'] ?? '') . "'
@@ -151,14 +155,18 @@ if (empty($_SESSION['csrf_token'])) {
                                 </button>
                                 
                                 <button class='open-status-modal cursor-pointer font-semibold text-xs text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300'  data-id='" . $row['pet_id'] . "'  data-name='" . htmlspecialchars($row['pet_name'] ?? '') . "'>Toggle Status</button>";
-                        if (isset($row['status']) && strtolower($row['status']) === 'dead') {
+                        if (isset($row['status']) && strtolower($row['status']) === 'dead' && !empty($row['death_record_id'])) {
                             echo "
-                                <a 
-                                    href='../print/death-certificate.php?pet_id=" . $row['pet_id'] . "' 
-                                    target='_blank'
-                                    class='cursor-pointer font-semibold text-xs text-gray-700 bg-red-100 p-1.5 border rounded border-red-200 hover:bg-red-300'>
-                                    Print Death Certificate
-                                </a>";
+        <button 
+            class='issue-certificate-btn cursor-pointer font-semibold text-xs text-gray-700 bg-red-100 p-1.5 border rounded border-red-200 hover:bg-red-300'
+            data-death-record-id='" . htmlspecialchars($row['death_record_id']) . "'
+            data-death-certificate-number='" . htmlspecialchars($row['certificate_number']) . "'
+            data-pet-name='" . htmlspecialchars($row['pet_name']) . "'
+        >
+            Issue Death Certificate
+        </button>";
+
+
                         }
                         echo "</td>";
                         echo "</tr>";
@@ -427,7 +435,11 @@ if (empty($_SESSION['csrf_token'])) {
 
                     if (status === "dead") {
                         addField(deathDetails, "Date of Death:", btn.dataset.deathdate);
+                        addField(deathDetails, "Time of Death:", btn.dataset.deathtime);
                         addField(deathDetails, "Reason of Death:", btn.dataset.deathreason);
+                        addField(deathDetails, "Location of Death:", btn.dataset.deathlocation);
+                        addField(deathDetails, "Recorded By:", btn.dataset.recordedby);
+                        addField(deathDetails, "Remarks:", btn.dataset.remarks);
                     }
                 });
             });
@@ -503,38 +515,51 @@ if (empty($_SESSION['csrf_token'])) {
             });
 
 
-            document.getElementById("togglePetStatus").addEventListener("submit", function (e) {
-                e.preventDefault();
+            document.querySelectorAll(".issue-certificate-btn").forEach(button => {
+                button.addEventListener("click", async () => {
+                    const deathRecordId = button.dataset.deathRecordId;
+                    const petName = button.dataset.petName;
 
-                const formData = new FormData(this);
-                formData.append("csrf_token", csrfToken); // ✅ include CSRF token
+                    if (!confirm(`Issue death certificate for ${petName}?`)) return;
 
-                const updateStatusButton = document.getElementById('updateStatusButton');
-                updateStatusButton.disabled = true;
-                updateStatusButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                    try {
+                        const response = await fetch("../php/Toggle/issue-certificate.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: new URLSearchParams({
+                                csrf_token: csrfToken,
+                                death_record_id: deathRecordId
+                            })
+                        });
 
-                fetch('../php/Toggle/toggle-pet.php', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.csrf_token) csrfToken = data.csrf_token; // ✅ update token if refreshed
+                        const data = await response.json();
+
+                        // Update CSRF token for next request
+                        if (data.csrf_token) csrfToken = data.csrf_token;
+
                         if (data.status === "success") {
-                            showMessage("Success", data.message, () => location.reload());
+                            showMessage(
+                                "Certificate Issued",
+                                `✅ Certificate issued for ${petName}\nCertificate No: ${data.certificate_number}`,
+                                () => {
+                                    // Open PDF in new tab
+                                    const win = window.open(`../print/death-certificate.php?id=${deathRecordId}`, "_blank");
+                                    if (!win) showMessage("Popup Blocked", "Please allow popups to view the certificate.");
+                                }
+                            );
                         } else {
-                            showMessage("Error", data.message);
+                            showMessage("Error", "❌ " + data.message);
                         }
-                    })
-                    .catch(() => showMessage("Error", "Update failed."))
-                    .finally(() => {
-                        updateStatusButton.disabled = false;
-                        updateStatusButton.innerHTML = "Save Changes";
-                    });
+
+                    } catch (error) {
+                        console.error("Error issuing certificate:", error);
+                        showMessage("Error", "An unexpected error occurred. Please try again.");
+                    }
+                });
             });
+
 
             // =================== Helper: Show message modal ===================
             function showMessage(title, text, callback) {
