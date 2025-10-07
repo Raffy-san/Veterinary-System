@@ -96,11 +96,12 @@ if (empty($_SESSION['csrf_token'])) {
                     <?php
                     $pets = fetchAllData(
                         $pdo,
-                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.age_unit, p.gender, p.color, p.weight, p.weight_unit, p.birth_date , p.notes, p.status, dr.id AS death_record_id, dr.cause_of_death, dr.date_of_death, dr.time_of_death, dr.recorded_by, dr.location_of_death, dr.remarks, dr.certificate_number, dr.certificate_date, dr.certificate_issued, dr.issued_by,
+                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.age_unit, p.gender, p.color, p.weight, p.weight_unit, p.birth_date , p.notes, p.status, dr.id AS death_record_id, dr.cause_of_death, dr.date_of_death, dr.time_of_death, dr.recorded_by, dr.location_of_death, dr.remarks, c.certificate_number, c.certificate_date, c.certificate_issued, c.issued_by,
                                 o.name AS owner_name, o.phone AS owner_phone, o.email AS owner_email
                          FROM pets p
                          LEFT JOIN owners o ON p.owner_id = o.id
-                         LEFT JOIN death_records dr ON p.id = dr.pet_id"
+                         LEFT JOIN death_records dr ON p.id = dr.pet_id
+                         LEFT JOIN certificates c ON p.id = c.pet_id"
                     );
 
                     $status = [
@@ -419,6 +420,14 @@ if (empty($_SESSION['csrf_token'])) {
                         statusBadge.className = "text-xs font-semibold px-2 py-1 rounded bg-red-500 text-white";
                     }
 
+                    let formattedTime = "";
+                    if (btn.dataset.deathtime) {
+                        const [hour, minute] = btn.dataset.deathtime.split(":");
+                        const dateObj = new Date();
+                        dateObj.setHours(hour, minute);
+                        formattedTime = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
                     addField(petDetails, "Pet Name:", btn.dataset.name);
                     addField(petDetails, "Species:", btn.dataset.species);
                     addField(petDetails, "Breed:", btn.dataset.breed);
@@ -435,7 +444,7 @@ if (empty($_SESSION['csrf_token'])) {
 
                     if (status === "dead") {
                         addField(deathDetails, "Date of Death:", btn.dataset.deathdate);
-                        addField(deathDetails, "Time of Death:", btn.dataset.deathtime);
+                        addField(deathDetails, "Time of Death:", `${formattedTime}`);
                         addField(deathDetails, "Reason of Death:", btn.dataset.deathreason);
                         addField(deathDetails, "Location of Death:", btn.dataset.deathlocation);
                         addField(deathDetails, "Recorded By:", btn.dataset.recordedby);
@@ -514,6 +523,23 @@ if (empty($_SESSION['csrf_token'])) {
                 });
             });
 
+            document.getElementById("togglePetStatus").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                formData.append("csrf_token", "<?= $csrf_token ?>");
+
+                const response = await fetch("../php/Toggle/toggle-pet.php", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.status === "success") {
+                    showMessage("Success", "Pet status updated successfully!", () => location.reload());
+                } else {
+                    showMessage("Error", data.message);
+                }
+            });
 
             document.querySelectorAll(".issue-certificate-btn").forEach(button => {
                 button.addEventListener("click", async () => {
@@ -559,7 +585,6 @@ if (empty($_SESSION['csrf_token'])) {
                     }
                 });
             });
-
 
             // =================== Helper: Show message modal ===================
             function showMessage(title, text, callback) {

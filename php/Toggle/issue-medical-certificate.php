@@ -33,10 +33,10 @@ if (
 }
 
 // Validate inputs
-$death_record_id = filter_input(INPUT_POST, 'death_record_id', FILTER_VALIDATE_INT);
+$medical_record_id = filter_input(INPUT_POST, 'medical_record_id', FILTER_VALIDATE_INT);
 $issued_by = $current_user['user_id'];
 
-if (!$death_record_id || !$issued_by) {
+if (!$medical_record_id || !$issued_by) {
     jsonResponse("error", "Invalid or missing input");
 }
 
@@ -44,21 +44,21 @@ try {
     $pdo->beginTransaction();
 
     // Generate certificate number format: DC-YYYY-0001
-    $certificate_number = 'DC-' . date('Y') . '-' . str_pad($death_record_id, 4, '0', STR_PAD_LEFT);
+    $certificate_number = 'MR-' . date('Y') . '-' . str_pad($medical_record_id, 4, '0', STR_PAD_LEFT);
 
     // Insert into certificates table
     $stmt = $pdo->prepare("
-    INSERT INTO certificates (pet_id, death_record_id, certificate_number, issued_by, certificate_issued)
-    SELECT dr.pet_id, dr.id, ?, ?, 1
-    FROM death_records dr
-    WHERE dr.id = ?
+    INSERT INTO certificates (pet_id, record_id, certificate_number, issued_by, certificate_issued)
+    SELECT m.pet_id, m.id, ?, ?, 1
+    FROM medical_records m
+    WHERE m.id = ?
     ON DUPLICATE KEY UPDATE
         certificate_number = VALUES(certificate_number),
         issued_by = VALUES(issued_by),
         certificate_issued = 1,
         certificate_date = NOW();
     ");
-    $stmt->execute([$certificate_number, $issued_by, $death_record_id]);
+    $stmt->execute([$certificate_number, $issued_by, $medical_record_id]);
 
 
     $pdo->commit();

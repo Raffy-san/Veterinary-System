@@ -5,13 +5,15 @@ require __DIR__ . '/../config/config.php'; // DB connection
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-$record_id = isset($_GET['record_id']) ? intval($_GET['record_id']) : 0;
+$record_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($record_id > 0) {
-  // Fetch the medical record + join with pet + owner
-  $stmt = $pdo->prepare("
+    // Fetch the medical record + join with pet + owner
+    $stmt = $pdo->prepare("
         SELECT 
             m.visit_date,
+            c.certificate_number,
+            c.certificate_date,
             m.visit_type,
             m.visit_time,
             m.diagnosis,
@@ -37,46 +39,50 @@ if ($record_id > 0) {
             o.phone
         FROM medical_records m
         INNER JOIN pets p ON m.pet_id = p.id
+        INNER JOIN certificates c ON m.id = c.record_id
         INNER JOIN owners o ON p.owner_id = o.id
         WHERE m.id = ?
     ");
-  $stmt->execute([$record_id]);
-  $record = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute([$record_id]);
+    $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  if (!$record) {
-    die('Medical record not found!');
-  }
-
-  $record['visit_date'] = date('F j, Y', strtotime($record['visit_date']));
-  $record['birth_date'] = date('F j, Y', strtotime($record['birth_date']));
-
-  if (!empty($record['follow_up_date']) && $record['follow_up_date'] !== '0000-00-00') {
-    $followUp = date('F j, Y', strtotime($record['follow_up_date']));
-  } else {
-    $followUp = 'No follow-up date';
-  }
-
-  $visitTimeFormatted = '';
-  if (!empty($record['visit_time'])) {
-    $t = DateTime::createFromFormat('H:i:s', $record['visit_time']);
-    if ($t) {
-      $visitTimeFormatted = $t->format('h:i A');
+    if (!$record) {
+        die('Medical record not found!');
     }
-  }
 
-  $record['diagnosis'] = !empty($record['diagnosis']) ? $record['diagnosis'] : 'No diagnosis provided';
-  $record['treatment'] = !empty($record['treatment']) ? $record['treatment'] : 'No treatment provided';
-  $record['medications'] = !empty($record['medications']) ? $record['medications'] : 'No medications provided';
-  $record['notes'] = !empty($record['notes']) ? $record['notes'] : 'No additional notes';
+    $record['visit_date'] = date('F j, Y', strtotime($record['visit_date']));
+    $record['birth_date'] = date('F j, Y', strtotime($record['birth_date']));
 
-  // Setup Dompdf
-  $options = new Options();
-  $options->set('isHtml5ParserEnabled', true);
-  $options->set('isRemoteEnabled', true);
-  $dompdf = new Dompdf($options);
+    if (!empty($record['follow_up_date']) && $record['follow_up_date'] !== '0000-00-00') {
+        $followUp = date('F j, Y', strtotime($record['follow_up_date']));
+    } else {
+        $followUp = 'No follow-up date';
+    }
 
-  // Build HTML
-  $html = "
+    $visitTimeFormatted = '';
+    if (!empty($record['visit_time'])) {
+        $t = DateTime::createFromFormat('H:i:s', $record['visit_time']);
+        if ($t) {
+            $visitTimeFormatted = $t->format('h:i A');
+        }
+    }
+
+    $issued_date = date('F d, Y', strtotime($record['certificate_date']));
+    // Output: October 06, 2025
+
+    $record['diagnosis'] = !empty($record['diagnosis']) ? $record['diagnosis'] : 'No diagnosis provided';
+    $record['treatment'] = !empty($record['treatment']) ? $record['treatment'] : 'No treatment provided';
+    $record['medications'] = !empty($record['medications']) ? $record['medications'] : 'No medications provided';
+    $record['notes'] = !empty($record['notes']) ? $record['notes'] : 'No additional notes';
+
+    // Setup Dompdf
+    $options = new Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isRemoteEnabled', true);
+    $dompdf = new Dompdf($options);
+
+    // Build HTML
+    $html = "
     <!DOCTYPE html>
 <html lang='en'>
 
@@ -88,8 +94,17 @@ if ($record_id > 0) {
 
 <body style='font-family: Arial, Helvetica, sans-serif; margin: 20px;'>
     <header>
-      
         <h2 style='text-align: center; color: green; margin-bottom: 10px;'>Medical Record</h2>
+       <table style='width: 100%; border: none;'>
+            <tr>
+                <td style='text-align: left;'>
+                <h4>{$record['certificate_number']}</h4>
+                </td>
+                <td style='text-align: right;'>
+                <h4>{$issued_date}</h4>
+                </td>
+            </tr>
+            </table>
     </header>
 
     <section style='margin-bottom: 10px;'>
@@ -217,11 +232,11 @@ if ($record_id > 0) {
 
 </html>";
 
-  // Load into Dompdf
-  $dompdf->loadHtml($html);
-  $dompdf->setPaper('A4', 'portrait');
-  $dompdf->render();
+    // Load into Dompdf
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
 
-  // Output
-  $dompdf->stream("{$record['pet_name']}_medical_record.pdf", ['Attachment' => false]);
+    // Output
+    $dompdf->stream("{$record['pet_name']}_medical_record.pdf", ['Attachment' => false]);
 }
