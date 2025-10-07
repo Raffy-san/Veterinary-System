@@ -534,6 +534,8 @@ if (empty($_SESSION['csrf_token'])) {
                 });
                 const data = await response.json();
 
+                if (data.csrf_token) csrfToken = data.csrf_token;
+
                 if (data.status === "success") {
                     showMessage("Success", "Pet status updated successfully!", () => location.reload());
                 } else {
