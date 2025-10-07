@@ -98,14 +98,21 @@ if ($record_id > 0) {
        <table style='width: 100%; border: none;'>
             <tr>
                 <td style='text-align: left;'>
-                <h4>{$record['certificate_number']}</h4>
+                <h4>Certificate No: {$record['certificate_number']}</h4>
                 </td>
                 <td style='text-align: right;'>
-                <h4>{$issued_date}</h4>
+                <h4>Date Issued: {$issued_date}</h4>
                 </td>
             </tr>
             </table>
     </header>
+
+    <p style='text-align: justify; margin: 10px 0; font-size: 14px;'>
+    This is to certify that the following pet has been examined and treated at
+    <strong>Southern Leyte Veterinary Clinic</strong>. The information below represents
+    an accurate record of the medical findings, diagnosis, and treatment
+    administered by the attending veterinarian on the stated date.
+    </p>
 
     <section style='margin-bottom: 10px;'>
         <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px;'>
@@ -225,8 +232,12 @@ if ($record_id > 0) {
     </section>
 
     <p style='margin-top: 30px; text-align: right;'>
-        <strong>Veterinarian:</strong> ___________________________
+        <strong>Authorized Veterinarian:</strong> ___________________________
     </p>
+
+    <footer style='position: fixed; bottom: 20px; right: 10px; text-align: center; font-size: 12px; width: 100%;'>
+    <p>Southern Leyte Veterinary Clinic • Official Medical Record Certificate • This document is valid without a signature if digitally issued.</p>
+    </footer>
 
 </body>
 

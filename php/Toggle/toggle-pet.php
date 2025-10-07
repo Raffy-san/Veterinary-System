@@ -80,11 +80,15 @@ try {
 
     $pdo->commit();
 
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    SessionManager::regenerateCsrfToken();
 
-    jsonResponse("success", "Pet status updated successfully", [
-        "csrf_token" => $_SESSION['csrf_token']
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Pet status updated successfully.',
+        'csrf_token' => $_SESSION['csrf_token']
     ]);
+    exit;
+
 } catch (Exception $e) {
     $pdo->rollBack();
     error_log("Toggle pet failed: " . $e->getMessage());
