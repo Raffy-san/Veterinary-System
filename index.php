@@ -196,6 +196,11 @@
             animation: slideInLeft 0.8s ease-out;
         }
 
+
+        .contact-text {
+            animation: slideInLeft 0.8s ease-out;
+        }
+
         .paw-background {
             animation: float 6s ease-in-out infinite;
             opacity: 0.15;
@@ -211,9 +216,76 @@
             transform: scale(1.05);
         }
 
+        /* Mobile menu styles */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 70%;
+            max-width: 300px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu nav {
+            display: flex;
+            flex-direction: column;
+            padding: 80px 30px 30px;
+            gap: 20px;
+        }
+
+        .mobile-menu .nav-link {
+            font-size: 1.1rem;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .mobile-menu-overlay.active {
+            display: block;
+        }
+
+        .menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #15803d;
+            cursor: pointer;
+            padding: 5px;
+            z-index: 1001;
+        }
+
         @media (max-width: 768px) {
             nav {
                 display: none;
+            }
+
+            .menu-btn {
+                display: block;
+            }
+
+            .mobile-menu {
+                display: block;
             }
 
             .grid-cols-2 {
@@ -233,6 +305,21 @@
 </head>
 
 <body class="flex items-center justify-center min-h-screen w-full overflow-y-auto text-gray-800 max-w-[1444px] mx-auto">
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <nav>
+            <a href="#header" class="nav-link hover:text-green-900 transition font-semibold">Home</a>
+            <a href="#about" class="nav-link hover:text-green-900 transition font-semibold">About</a>
+            <a href="#services" class="nav-link hover:text-green-900 transition font-semibold">Services</a>
+            <a href="#contact" class="nav-link hover:text-green-900 transition font-semibold">Contact</a>
+            <a href="login.php"
+                class="login-btn bg-green-700 text-white px-6 py-3 rounded-full font-medium hover:bg-green-800 transition text-center">Login</a>
+        </nav>
+    </div>
+
     <main>
         <header id="header"
             class="flex justify-between items-center text-green-700 px-6 py-8 bg-white/40 backdrop-blur-sm w-full">
@@ -240,7 +327,8 @@
             <div class="logo-section text-xl font-semibold tracking-wide flex justify-between items-center gap-4">
                 <img src="assets/img/green-paw.png" class="w-10 transition-transform hover:rotate-12 hover:scale-110"
                     alt="Clinic Logo">
-                <h2 class="logo-text text-green-800">SOUTHERN LEYTE VETERINARY CLINIC</h2>
+                <h2 class="logo-text text-green-800 hidden sm:inline">SOUTHERN LEYTE VETERINARY CLINIC</h2>
+                <h2 class="logo-text text-green-800 inline sm:hidden">SLVC</h2>
             </div>
 
             <!-- Desktop Nav -->
@@ -252,6 +340,10 @@
                 <a href="login.php"
                     class="login-btn bg-green-700 text-white px-6 py-2 rounded-full font-medium hover:bg-green-800 transition text-sm">Login</a>
             </nav>
+
+            <button class="menu-btn" id="menuBtn">
+                <i class="fa fa-bars"></i>
+            </button>
         </header>
 
         <section class="grid grid-cols-2 h-screen w-full overflow-hidden">
@@ -408,7 +500,7 @@
                         </h2>
                     </div>
 
-                    <div>
+                    <div class="contact-text">
                         <h3 class="text-lg font-semibold mb-2">CONTACT INFORMATION</h3>
                         <address class="not-italic leading-relaxed">
                             Brgy. Asuncion, Maasin City, Southern Leyte<br>
@@ -428,6 +520,28 @@
             </div>
         </footer>
     </main>
+
+    <script>
+        // Mobile menu functionality
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        const mobileMenuLinks = document.querySelectorAll('.mobile-menu .nav-link, .mobile-menu .login-btn');
+
+        function toggleMenu() {
+            mobileMenu.classList.toggle('active');
+            mobileMenuOverlay.classList.toggle('active');
+            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        mobileMenuOverlay.addEventListener('click', toggleMenu);
+
+        // Close menu when clicking on a link
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+    </script>
 </body>
 
 </html>
