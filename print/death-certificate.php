@@ -8,7 +8,7 @@ use Dompdf\Options;
 $death_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($death_id <= 0) {
-  die("Invalid certificate request.");
+    die("Invalid certificate request.");
 }
 
 // Fetch death record details
@@ -42,26 +42,30 @@ $stmt->execute([$death_id]);
 $death = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$death) {
-  die("Death record not found.");
+    die("Death record not found.");
 }
 
 // Format time of death
 $timeOfDeath = '';
 if (!empty($death['time_of_death'])) {
-  $t = DateTime::createFromFormat('H:i:s', $death['time_of_death']);
-  if ($t) {
-    $timeOfDeath = $t->format('h:i A');
-  }
+    $t = DateTime::createFromFormat('H:i:s', $death['time_of_death']);
+    if ($t) {
+        $timeOfDeath = $t->format('h:i A');
+    }
 }
 
 // Format issued date
 $issued_date = date('F d, Y', strtotime($death['certificate_date']));
 $date_of_death = date('F d, Y', strtotime($death['date_of_death']));
 
+
+$logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/green-paw.png');
+
 // Setup Dompdf
 $options = new Options();
 $options->set('isHtml5ParserEnabled', true);
 $options->set('isRemoteEnabled', true);
+$options->set('chroot', realpath(__DIR__ . '/..'));
 $dompdf = new Dompdf($options);
 
 // Build HTML
@@ -75,16 +79,19 @@ $html = "
     <title>Pet Death Certificate</title>
 </head>
 
-<body style='font-family: Arial, Helvetica, sans-serif; margin: 20px;'>
-    <header>
-        <h2 style='text-align: center; color: green; margin-bottom: 10px;'>Pet Death Certificate</h2>
+<body style='font-family: Arial, Helvetica, sans-serif; margin: 18px;'>
+       <header style='text-align: center; margin-bottom: 8px;'>
+    <img src='{$logoPath}' alt='Clinic Logo' width='55' style='margin-bottom: 4px;'>
+    <h2 style='color: green; margin: 0; font-size: 18px;'>SOUTHERN LEYTE VETERINARY CLINIC</h2>
+    <p style='margin: 0; font-size: 14px;'>Maasin City, Southern Leyte</p>
+    <h3 style='margin-top: 8px; font-size: 15px;'>OFFICIAL PET DEATH CERTIFICATE</h3>
         <table style='width: 100%; border: none;'>
             <tr>
                 <td style='text-align: left;'>
-                    <h4>Certificate No: {$death['certificate_number']}</h4>
+                    <h4 style='font-size: 14px; margin: 5px 0;'>Certificate No: {$death['certificate_number']}</h4>
                 </td>
                 <td style='text-align: right;'>
-                    <h4>Date Issued: {$issued_date}</h4>
+                    <h4 style='font-size: 14px; margin: 5px 0;'>Date Issued: {$issued_date}</h4>
                 </td>
             </tr>
         </table>
@@ -98,7 +105,7 @@ $html = "
 
 
     <section style='margin-bottom: 10px;'>
-        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px;'>
+        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px; font-size: 14px;'>
             <strong>PET INFORMATION</strong>
         </div>
 
@@ -125,7 +132,7 @@ $html = "
     </section>
 
     <section style='margin-bottom: 10px;'>
-        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px;'>
+        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px; font-size: 14px;'>
             <strong>OWNER INFORMATION</strong>
         </div>
 
@@ -149,7 +156,7 @@ $html = "
     </section>
 
     <section style='margin-bottom: 10px;'>
-        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px;'>
+        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px; font-size: 14px;'>
             <strong>DEATH DETAILS</strong>
         </div>
 
@@ -172,14 +179,14 @@ $html = "
     </section>
 
     <section style='margin-bottom: 10px;'>
-        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px;'>
+        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px; font-size: 14px;'>
             <strong>CERTIFICATE DETAILS</strong>
         </div>
 
         <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 5px;'>
             <tr>
                 <th style='text-align: left; border: 1px solid black; padding: 4px; width: 25%;'>Issued By</th>
-                <td colspan='3' style='border: 1px solid black; padding: 4px;'>Dr. {$death['recorded_by']}</td>
+                <td colspan='3' style='border: 1px solid black; padding: 4px;'>{$death['recorded_by']}</td>
             </tr>
         </table>
     </section>
@@ -192,11 +199,12 @@ $html = "
     </p>
 
 
-    <p style='margin-top: 40px; text-align: right;'>
-        <strong>Authorized Veterinarian:</strong> ___________________________
+    <p style='margin-top: 40px; text-align: right; font-size: 14px;'>
+        <strong>Authorized Veterinarian:</strong> ___________________________<br>
+        <span style='font-size: 14px;'>{$death['recorded_by']}</span>
     </p>
 
-    <footer style='position: fixed; bottom: 20px; right: 10px; text-align: center; font-size: 12px; width: 100%;'>
+    <footer style='position: fixed; bottom: 10px; right: 10px; text-align: center; font-size: 12px; width: 100%;'>
       <p>Southern Leyte Veterinary Clinic • Official Pet Death Certificate • This document is valid without a signature if digitally issued.</p>
     </footer>
 
