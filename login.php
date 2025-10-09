@@ -40,7 +40,7 @@ if (SessionManager::isLoggedIn()) {
             Sign in to access your dashboard
         </h3>
         <div class="mb-4">
-            <a href="homepage.php"
+            <a href="index.php"
                 class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-800 transition text-sm sm:text-base">
                 <i class="fa-solid fa-arrow-left"></i>
                 Back to Homepage
