@@ -39,6 +39,13 @@ if (SessionManager::isLoggedIn()) {
         <h3 class="text-lg sm:text-xl font-light mb-4 text-center text-gray-700">
             Sign in to access your dashboard
         </h3>
+        <div class="mb-4">
+            <a href="homepage.php"
+                class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-800 transition text-sm sm:text-base">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Homepage
+            </a>
+        </div>
 
         <!-- Login Form -->
         <form id="loginForm">

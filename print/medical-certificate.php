@@ -75,15 +75,19 @@ if ($record_id > 0) {
     $record['medications'] = !empty($record['medications']) ? $record['medications'] : 'No medications provided';
     $record['notes'] = !empty($record['notes']) ? $record['notes'] : 'No additional notes';
 
+
+    $logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/green-paw.png');
+
     // Setup Dompdf
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
     $options->set('isRemoteEnabled', true);
+    $options->set('chroot', realpath(__DIR__ . '/..'));
     $dompdf = new Dompdf($options);
 
     // Build HTML
     $html = "
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang='en'>
 
 <head>
@@ -92,150 +96,161 @@ if ($record_id > 0) {
     <title>Medical Record</title>
 </head>
 
-<body style='font-family: Arial, Helvetica, sans-serif; margin: 20px;'>
-    <header>
-        <h2 style='text-align: center; color: green; margin-bottom: 10px;'>Medical Record</h2>
+<body style='font-family: Arial, Helvetica, sans-serif; margin: 18px;'>
+    <header style='text-align: center; margin-bottom: 8px;'>
+    <img src='{$logoPath}' alt='Clinic Logo' width='55' style='margin-bottom: 4px;'>
+    <h2 style='color: green; margin: 0; font-size: 18px;'>SOUTHERN LEYTE VETERINARY CLINIC</h2>
+    <p style='margin: 0; font-size: 14px;'>Maasin City, Southern Leyte</p>
+    <h3 style='margin-top: 8px; font-size: 15px;'>OFFICIAL MEDICAL RECORD CERTIFICATE</h3>
        <table style='width: 100%; border: none;'>
             <tr>
                 <td style='text-align: left;'>
-                <h4>Certificate No: {$record['certificate_number']}</h4>
+                <h4 style='font-size: 14px; margin: 5px 0;'>Certificate No: {$record['certificate_number']}</h4>
                 </td>
                 <td style='text-align: right;'>
-                <h4>Date Issued: {$issued_date}</h4>
+                <h4 style='font-size: 14px; margin: 5px 0;'>Date Issued: {$issued_date}</h4>
                 </td>
             </tr>
             </table>
     </header>
 
-    <p style='text-align: justify; margin: 10px 0; font-size: 14px;'>
+    <p style='text-align: justify; margin: 8px 0; font-size: 14px;'>
     This is to certify that the following pet has been examined and treated at
     <strong>Southern Leyte Veterinary Clinic</strong>. The information below represents
     an accurate record of the medical findings, diagnosis, and treatment
     administered by the attending veterinarian on the stated date.
     </p>
 
-    <section style='margin-bottom: 10px;'>
-        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px;'>
+    <section style='margin-bottom: 8px;'>
+        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 4px; font-size: 14px;'>
             <strong>PET INFORMATION</strong>
         </div>
 
-        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 5px;'>
+        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 4px;'>
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Pet Name</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['pet_name']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Date of Birth</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['birth_date']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Pet Name</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['pet_name']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Date of Birth</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['birth_date']}</td>
             </tr>
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Species</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['species']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Breed</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['breed']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px;'>Species</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['species']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px;'>Breed</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['breed']}</td>
             </tr>
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Color</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['color']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Weight</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['pet_weight']} {$record['pet_weight_unit']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px;'>Color</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['color']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px;'>Weight</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['pet_weight']} {$record['pet_weight_unit']}</td>
             </tr>
         </table>
     </section>
-    <section style='margin-bottom: 10px;'>
-        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px;'>
+    <section style='margin-bottom: 8px;'>
+        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 4px; font-size: 14px;'>
             <strong>OWNER INFORMATION</strong>
         </div>
 
-        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 5px;'>
+        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 4px;'>
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Owner Name</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['owner_name']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Email Address</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['email']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Owner Name</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['owner_name']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Email Address</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['email']}</td>
             </tr>
 
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Phone Number</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['phone']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Emergency Contact</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['emergency']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Phone Number</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['phone']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Emergency Contact</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['emergency']}</td>
             </tr>
         </table>
     </section>
-    <section style='margin-bottom: 10px;'>
-        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px;'>
+    <section style='margin-bottom: 8px;'>
+        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 4px; font-size: 14px;'>
             <strong>RECORDS INFORMATION</strong>
         </div>
 
-        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 5px;'>
+        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 4px;'>
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Visit Date</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['visit_date']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Visit Time</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$visitTimeFormatted}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Visit Date</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['visit_date']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Visit Time</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$visitTimeFormatted}</td>
             </tr>
 
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Visit Type</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['visit_type']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Veterinarian</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['veterinarian']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Visit Type</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['visit_type']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Veterinarian</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['veterinarian']}</td>
             </tr>
 
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Weight</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['record_weight']} {$record['record_weight_unit']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Temperature</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$record['temperature']} {$record['temp_unit']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Weight</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['record_weight']} {$record['record_weight_unit']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Temperature</th>
+                <td style='border: 1px solid black; padding: 3px;'>{$record['temperature']} {$record['temp_unit']}</td>
             </tr>
         </table>
     </section>
 
-    <section style='margin-bottom: 10px;'>
-        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px;'>
+    <section style='margin-bottom: 8px;'>
+        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 4px; font-size: 14px;'>
             <strong>MEDICAL DETAILS</strong>
         </div>
 
-        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 5px;'>
+        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 4px;'>
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 20%;'>Diagnosis</th>
-                <td colspan='3' style='border: 1px solid black; padding: 4px;'>
+                <th style='text-align: left; border: 1px solid black; padding: 3px; width: 20%;'>Diagnosis</th>
+                <td colspan='3' style='border: 1px solid black; padding: 3px;'>
                     {$record['diagnosis']}
                 </td>
             </tr>
 
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Treatment</th>
-                <td colspan='3' style='border: 1px solid black; padding: 4px;'>
+                <th style='text-align: left; border: 1px solid black; padding: 3px;'>Treatment</th>
+                <td colspan='3' style='border: 1px solid black; padding: 3px;'>
                     {$record['treatment']}
                 </td>
             </tr>
 
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Medications</th>
-                <td colspan='3' style='border: 1px solid black; padding: 4px;'>
+                <th style='text-align: left; border: 1px solid black; padding: 3px;'>Medications</th>
+                <td colspan='3' style='border: 1px solid black; padding: 3px;'>
                     {$record['medications']}
                 </td>
             </tr>
 
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Additional Notes</th>
-                <td colspan='3' style='border: 1px solid black; padding: 4px;'>
+                <th style='text-align: left; border: 1px solid black; padding: 3px;'>Additional Notes</th>
+                <td colspan='3' style='border: 1px solid black; padding: 3px;'>
                     {$record['notes']}
                 </td>
             </tr>
 
             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Follow-up Date</th>
-                <td colspan='3' style='border: 1px solid black; padding: 4px;'>{$followUp}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 3px;'>Follow-up Date</th>
+                <td colspan='3' style='border: 1px solid black; padding: 3px;'>{$followUp}</td>
             </tr>
         </table>
     </section>
 
-    <p style='margin-top: 30px; text-align: right;'>
-        <strong>Authorized Veterinarian:</strong> ___________________________
+    <p style='margin-top: 20px; text-align: justify; font-size: 14px;'>
+    I hereby certify that the above information is true and correct to the best of my knowledge
+    and belief. This record serves as an official documentation of the medical examination,
+    findings, and treatment provided to the pet stated herein.
     </p>
 
-    <footer style='position: fixed; bottom: 20px; right: 10px; text-align: center; font-size: 12px; width: 100%;'>
+
+    <p style='margin-top: 20px; text-align: right; font-size: 14px;'>
+        <strong>Authorized Veterinarian:</strong> ___________________________<br>
+         <span style='font-size: 14px;'>{$record['veterinarian']}</span>
+    </p>
+
+    <footer style='position: fixed; bottom: 10px; right: 10px; text-align: center; font-size: 11px; width: 100%;'>
     <p>Southern Leyte Veterinary Clinic • Official Medical Record Certificate • This document is valid without a signature if digitally issued.</p>
     </footer>
 

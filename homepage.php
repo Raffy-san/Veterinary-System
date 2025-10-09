@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/img/green-paw.png">
+    <link rel="stylesheet" href="assets/css/output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Southern Leyte Veterinary Clinic</title>
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 50%, #d1fae5 100%);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(-45deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(-45deg);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .logo-section {
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .nav-link {
+            position: relative;
+            display: inline-block;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background-color: #15803d;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .login-btn {
+            animation: fadeIn 0.8s ease-out 0.3s backwards;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(21, 128, 61, 0.2);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(21, 128, 61, 0.3);
+        }
+
+        .hero-text {
+            animation: slideInLeft 1s ease-out 0.3s backwards;
+        }
+
+        .hero-subtext {
+            animation: slideInLeft 1s ease-out 0.5s backwards;
+        }
+
+        .about-text {
+            animation: slideInLeft 1s ease-out 0.3s backwards;
+        }
+
+        .about-subtext {
+            animation: slideInLeft 1s ease-out 0.5s backwards;
+        }
+
+        .service-section-title {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .service-card {
+            animation: fadeInUp 1s ease-out backwards;
+        }
+
+        .service-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .service-card:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .service-card:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .developer-section-title {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .developer-card {
+            animation: fadeInUp 1s ease-out backwards;
+        }
+
+        .developer-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .developer-card:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .developer-card:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .developer-card:nth-child(4) {
+            animation-delay: 0.5s;
+        }
+
+        .contact-section {
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .paw-background {
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.15;
+        }
+
+        .dog-image {
+            animation: slideInRight 1s ease-out 0.3s backwards;
+            transition: transform 0.5s ease;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
+        }
+
+        .dog-image:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+            }
+
+            .grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-text {
+                font-size: 2rem;
+                padding: 2rem;
+            }
+
+            .logo-text {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen w-full overflow-y-auto text-gray-800 max-w-[1444px] mx-auto">
+    <main>
+        <header id="header"
+            class="flex justify-between items-center text-green-700 px-6 py-8 bg-white/40 backdrop-blur-sm w-full">
+            <!-- Logo -->
+            <div class="logo-section text-xl font-semibold tracking-wide flex justify-between items-center gap-4">
+                <img src="assets/img/green-paw.png" class="w-10 transition-transform hover:rotate-12 hover:scale-110"
+                    alt="Clinic Logo">
+                <h2 class="logo-text text-green-800">SOUTHERN LEYTE VETERINARY CLINIC</h2>
+            </div>
+
+            <!-- Desktop Nav -->
+            <nav class="flex space-x-8 justify-between items-center">
+                <a href="#header" class="nav-link hover:text-green-900 transition font-semibold">Home</a>
+                <a href="#about" class="nav-link hover:text-green-900 transition font-semibold">About</a>
+                <a href="#services" class="nav-link hover:text-green-900 transition font-semibold">Services</a>
+                <a href="#contact" class="nav-link hover:text-green-900 transition font-semibold">Contact</a>
+                <a href="login.php"
+                    class="login-btn bg-green-700 text-white px-6 py-2 rounded-full font-medium hover:bg-green-800 transition text-sm">Login</a>
+            </nav>
+        </header>
+
+        <section class="grid grid-cols-2 h-screen w-full overflow-hidden">
+            <!-- Left Side: Text -->
+            <div class="flex justify-center items-center px-8">
+                <div class="max-w-2xl">
+                    <h1
+                        class="hero-text text-4xl md:text-5xl font-bold text-green-600 text-center md:text-left tracking-wide leading-tight mb-6">
+                        YOUR TRUSTED PARTNER FOR COMPLETE <span class="text-green-900">PET HEALTH</span> AND WELLNESS.
+                    </h1>
+                    <h3
+                        class="hero-subtext text-lg md:text-xl text-gray-700 text-center md:text-left font-normal leading-relaxed">
+                        Providing compassionate care and expert veterinary services to keep your furry friends healthy
+                        and happy.
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Right Side: Background + Dog Image -->
+            <div class="relative flex justify-center items-center overflow-hidden">
+                <!-- Green paw as background -->
+                <div class="paw-background absolute inset-0 bg-no-repeat bg-center bg-contain"
+                    style="background-image: url('assets/img/green-paw.png'); transform: rotate(-45deg);">
+                </div>
+
+                <!-- Dog image on top -->
+                <img src="assets/img/dog.png" alt="Happy Dog"
+                    class="dog-image relative z-10 max-h-full max-w-full object-contain">
+            </div>
+        </section>
+
+        <section id="about"
+            class="flex justify-center flex-col py-16 px-6 md:px-10 min-h-screen bg-cover bg-center bg-no-repeat relative"
+            style="background-image: url('assets/img/about-section.webp');">
+
+            <!-- Optional: Add overlay for better text contrast -->
+            <div class="absolute inset-0 bg-black/30"></div>
+
+            <!-- Your content goes here (on top of background) -->
+            <div class="relative z-10 max-w-4xl mx-auto">
+                <h1 class="about-text text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-lg">Who We Are</h1>
+                <p class="about-subtext text-lg md:text-xl text-white leading-relaxed drop-shadow-md">
+                    At Southern Leyte Veterinary Clinic, we are dedicated to providing compassionate and
+                    comprehensive care for your beloved pets. Our team of experienced veterinarians and staff work
+                    tirelessly to ensure the health, happiness, and well-being of every animal that comes through our
+                    doors.
+                </p>
+            </div>
+        </section>
+
+        <section id="services" class="flex justify-center flex-col py-16 px-6 md:px-10">
+            <div class="mb-12 service-section-title">
+                <h1 class="text-start text-3xl md:text-5xl font-bold text-green-800 mb-3">SERVICES WE OFFER</h1>
+                <h3 class="text-start text-gray-600 text-base md:text-lg max-w-3xl">
+                    We provide comprehensive veterinary care services designed to keep your pets healthy, happy, and
+                    thriving at every stage of their lives.
+                </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto w-full gap-8">
+                <!-- Service Card 1 -->
+                <div
+                    class="border-none px-8 py-8 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 hover:bg-green-50 service-card">
+                    <i class="fa-solid fa-stethoscope text-green-700 text-6xl mb-6 block"></i>
+                    <h1 class="text-2xl md:text-3xl font-bold text-green-800 mb-4">Health Check-ups</h1>
+                    <h3 class="text-base md:text-lg text-gray-700 leading-relaxed">
+                        Comprehensive physical examinations to monitor your pet's overall health and catch potential
+                        issues early.
+                    </h3>
+                </div>
+
+                <!-- Service Card 2 -->
+                <div
+                    class="border-none px-8 py-8 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 hover:bg-green-50 service-card">
+                    <i class="fa-solid fa-syringe text-green-700 text-6xl mb-6 block"></i>
+                    <h1 class="text-2xl md:text-3xl font-bold text-green-800 mb-4">Vaccinations</h1>
+                    <h3 class="text-base md:text-lg text-gray-700 leading-relaxed">
+                        Essential immunizations to protect your pets from serious diseases and maintain their long-term
+                        health.
+                    </h3>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div
+                    class="border-none px-8 py-8 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 hover:bg-green-50 service-card">
+                    <i class="fa-solid fa-scissors text-green-700 text-6xl mb-6 block"></i>
+                    <h1 class="text-2xl md:text-3xl font-bold text-green-800 mb-4">Grooming</h1>
+                    <h3 class="text-base md:text-lg text-gray-700 leading-relaxed">
+                        Professional grooming services including bathing, nail trimming, and styling to keep your pet
+                        looking their best.
+                    </h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Developers Acknowledgement Section -->
+        <section class="flex justify-center flex-col py-16 px-6 md:px-10 bg-white/50 backdrop-blur-sm">
+            <div class="mb-12 developer-section-title">
+                <h1 class="text-center text-3xl md:text-5xl font-bold text-green-800 mb-3">DEVELOPERS ACKNOWLEDGEMENT
+                </h1>
+                <p class="text-center text-gray-600 text-base md:text-lg">Meet the talented team behind this project</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 max-w-7xl mx-auto w-full">
+                <div class="flex flex-col items-center group developer-card">
+                    <div
+                        class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
+                        <img src="assets/img/user.webp" alt="Developer 1" class="w-full h-full object-cover">
+                    </div>
+                    <h3
+                        class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
+                        Developer Name</h3>
+                    <p class="text-gray-600 text-sm text-center">Role/Position</p>
+                </div>
+                <div class="flex flex-col items-center group developer-card">
+                    <div
+                        class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
+                        <img src="assets/img/user.webp" alt="Developer 2" class="w-full h-full object-cover">
+                    </div>
+                    <h3
+                        class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
+                        Developer Name</h3>
+                    <p class="text-gray-600 text-sm text-center">Role/Position</p>
+                </div>
+                <div class="flex flex-col items-center group developer-card">
+                    <div
+                        class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
+                        <img src="assets/img/user.webp" alt="Developer 3" class="w-full h-full object-cover">
+                    </div>
+                    <h3
+                        class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
+                        Developer Name</h3>
+                    <p class="text-gray-600 text-sm text-center">Role/Position</p>
+                </div>
+                <div class="flex flex-col items-center group developer-card">
+                    <div
+                        class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
+                        <img src="assets/img/user.webp" alt="Developer 4" class="w-full h-full object-cover">
+                    </div>
+                    <h3
+                        class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
+                        Developer Name</h3>
+                    <p class="text-gray-600 text-sm text-center">Role/Position</p>
+                </div>
+            </div>
+        </section>
+        <footer id="contact">
+            <div class="flex flex-col md:flex-row items-center justify-between w-full overflow-hidden">
+                <!-- Left Section -->
+                <div class="p-6 md:p-10 flex flex-col gap-6 md:w-1/2">
+                    <div class="contact-section flex items-center gap-4">
+                        <img src="assets/img/green-paw.png"
+                            class="w-10 transition-transform hover:rotate-12 hover:scale-110" alt="Clinic Logo">
+                        <h2 class="text-xl font-semibold text-green-800 tracking-wide">
+                            SOUTHERN LEYTE VETERINARY CLINIC
+                        </h2>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">CONTACT INFORMATION</h3>
+                        <address class="not-italic leading-relaxed">
+                            Brgy. Asuncion, Maasin City, Southern Leyte<br>
+                            (053) 570-1234<br>
+                            <a href="mailto:Soleyteveterinaryclinic@gmail.com" class="text-green-700 hover:underline">
+                                Soleyteveterinaryclinic@gmail.com
+                            </a>
+                        </address>
+                    </div>
+                </div>
+
+                <!-- Right Section (Cat Image) -->
+                <div class="md:w-1/2 flex justify-center md:justify-end items-end">
+                    <img src="assets/img/cat.webp" alt="cat"
+                        class="block h-auto max-h-[350px] object-contain object-bottom select-none pointer-events-none">
+                </div>
+            </div>
+        </footer>
+    </main>
+</body>
+
+</html>
