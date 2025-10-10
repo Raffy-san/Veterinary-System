@@ -334,11 +334,22 @@ if (empty($_SESSION['csrf_token'])) {
                 updateBodyScroll();
             };
 
+            // Find the toggle status modal and form
+            const toggleModal = document.getElementById("ToggleModal");
+            const toggleForm = document.getElementById("togglePetStatus");
+
+            // Helper to reset the toggle modal form and hide death fields
+            function resetToggleModal() {
+                toggleForm.reset();
+                document.getElementById("deathFields").style.display = "none";
+            }
+
             // Attach close button functionality
             document.querySelectorAll(".modal .close").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const modal = btn.closest(".modal");
                     closeModal(modal);
+                    if (modal === toggleModal) resetToggleModal();
                 });
             });
 
@@ -347,6 +358,7 @@ if (empty($_SESSION['csrf_token'])) {
                 modal.addEventListener("click", (e) => {
                     if (e.target === modal) {
                         closeModal(modal);
+                        if (modal === toggleModal) resetToggleModal();
                     }
                 });
             });
