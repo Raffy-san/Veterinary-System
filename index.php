@@ -95,6 +95,10 @@
             animation: fadeIn 0.8s ease-out;
         }
 
+        footer {
+            animation: fadeIn 0.8s ease-out;
+        }
+
         .logo-section {
             animation: slideInLeft 0.8s ease-out;
         }

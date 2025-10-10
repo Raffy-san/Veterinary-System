@@ -104,7 +104,10 @@ $petCount = fetchOneData(
             <?php
             $pets = fetchAllData(
                 $pdo,
-                "SELECT * FROM pets WHERE owner_id = ?",
+                "SELECT pets.*, death_records.* 
+                        FROM pets
+                        LEFT JOIN death_records ON pets.id = death_records.pet_id
+                        WHERE pets.owner_id = ?",
                 [$client['owner_id']]
             );
 
@@ -119,10 +122,23 @@ $petCount = fetchOneData(
                 'default' => ['icon' => 'fa-paw', 'color' => 'text-gray-600', 'bg' => 'bg-gray-100']
             ];
 
+            $status = [
+                'Alive' => ['bg' => 'bg-green-500', 'color' => 'text-white'],
+                'Dead' => ['bg' => 'bg-red-500', 'color' => 'text-white']
+            ];
+
             if ($pets) {
                 foreach ($pets as $pet) {
                     $species = $pet['species'] ?? 'default';
                     $speciesInfo = $speciesData[$species] ?? $speciesData['default'];
+
+                    $timeOfDeath = '';
+                    if (!empty($pet['time_of_death'])) {
+                        $t = DateTime::createFromFormat('H:i:s', $pet['time_of_death']);
+                        if ($t) {
+                            $timeOfDeath = $t->format('h:i A');
+                        }
+                    }
                     ?>
                     <div class="bg-white border border-gray-200 rounded-lg p-4 md:p-8">
                         <div class="pet-header flex justify-between items-start mb-4 md:mb-6">
@@ -133,7 +149,8 @@ $petCount = fetchOneData(
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <h2 class="text-lg md:text-xl font-medium text-gray-900 mb-1 truncate">
-                                        <?= htmlspecialchars($pet['name']); ?>
+                                        <?= htmlspecialchars($pet['name']); ?> - <span
+                                            class="<?= $status[$pet['status']]['bg'] ?> <?= $status[$pet['status']]['color'] ?> text-xs font-semibold px-2.5 py-0.5 rounded"><?= htmlspecialchars($pet['status']); ?></span>
                                     </h2>
                                     <p class="text-sm md:text-base text-gray-500">
                                         <?= htmlspecialchars($pet['breed']); ?> •
@@ -197,7 +214,7 @@ $petCount = fetchOneData(
                         </div>
 
                         <?php if (!empty($pet['notes'])): ?>
-                            <div class="border-t border-gray-100 pt-4 md:pt-6">
+                            <div class="border-t border-b border-gray-100 py-4 md:py-6">
                                 <div class="flex items-center mb-2">
                                     <i class="fas fa-sticky-note text-indigo-500 mr-2 text-sm md:text-base"></i>
                                     <p class="text-xs md:text-sm text-gray-500 font-medium">Notes</p>
@@ -205,6 +222,54 @@ $petCount = fetchOneData(
                                 <p class="text-sm md:text-base text-gray-700 leading-relaxed"
                                     style="word-break: break-word; white-space: pre-lines;">
                                     <?= nl2br(htmlspecialchars(ltrim($pet['notes']))); ?>
+                                </p>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($pet['status'] === 'Dead'): ?>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 pt-4 md:pt-6 mb-4 md:mb-6">
+                                <div class="flex items-start md:items-center">
+                                    <i
+                                        class="fas fa-calendar-plus text-orange-500 mr-2 md:mr-3 text-sm md:text-base mt-1 md:mt-0 flex-shrink-0"></i>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-xs md:text-sm text-gray-500 mb-1">Date of Death`</p>
+                                        <p class="text-sm md:text-base text-gray-900">
+                                            <?= date('M d, Y', strtotime($pet['date_of_death'])); ?>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start md:items-center">
+                                    <i
+                                        class="fas fa-clock text-red-600 mr-2 md:mr-3 text-sm md:text-base mt-1 md:mt-0 flex-shrink-0"></i>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-xs md:text-sm text-gray-500 mb-1">Time of Death</p>
+                                        <p class="text-sm md:text-base text-gray-900">
+                                            <?= $timeOfDeath; ?>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start md:items-center">
+                                    <i
+                                        class="fas fa-location-dot text-indigo-600 mr-2 md:mr-3 text-sm md:text-base mt-1 md:mt-0 flex-shrink-0"></i>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-xs md:text-sm text-gray-500 mb-1">Location of Death</p>
+                                        <p class="text-sm md:text-base text-gray-900">
+                                            <?= htmlspecialchars($pet['location_of_death']); ?>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-gray-100 py-4 md:py-6">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-sticky-note text-green-800 mr-2 text-sm md:text-base"></i>
+                                    <p class="text-xs md:text-sm text-gray-500 font-medium">Cause of Death</p>
+                                </div>
+                                <p class="text-sm md:text-base text-gray-700 leading-relaxed"
+                                    style="word-break: break-word; white-space: pre-lines;">
+                                    <?= nl2br(htmlspecialchars(ltrim($pet['cause_of_death']))); ?>
                                 </p>
                             </div>
                         <?php endif; ?>
