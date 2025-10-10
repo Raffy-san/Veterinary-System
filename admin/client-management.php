@@ -193,8 +193,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <input type="password" name="password" id="addClientPassword" required
                             class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Password">
-                        <i id="toggleAddPassword"
-                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-4 py-2 text-gray-600 text-sm">
+                       <i id="toggleAddPassword"
+                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-3 py-1.5 text-gray-600 text-sm sm:text-base">
                         </i>
                     </div>
                     <div class="mb-4 w-auto">
@@ -286,7 +286,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter new password">
                         <i id="toggleUpdatePassword"
-                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-4 py-2 text-gray-600 text-sm">
+                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-3 py-1.5 text-gray-600 text-sm sm:text-base">
                         </i>
                     </div>
 
