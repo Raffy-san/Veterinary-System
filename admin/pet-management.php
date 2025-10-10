@@ -101,7 +101,7 @@ if (empty($_SESSION['csrf_token'])) {
                          FROM pets p
                          LEFT JOIN owners o ON p.owner_id = o.id
                          LEFT JOIN death_records dr ON p.id = dr.pet_id
-                         LEFT JOIN certificates c ON p.id = c.pet_id"
+                         LEFT JOIN certificates c ON p.id = c.pet_id AND c.certificate_type = 'death_certificate'"
                     );
 
                     $status = [

@@ -35,6 +35,7 @@ if (
 // Validate inputs
 $death_record_id = filter_input(INPUT_POST, 'death_record_id', FILTER_VALIDATE_INT);
 $issued_by = $current_user['user_id'];
+$certificate_type = 'death_certificate';
 
 if (!$death_record_id || !$issued_by) {
     jsonResponse("error", "Invalid or missing input");
@@ -48,17 +49,18 @@ try {
 
     // Insert into certificates table
     $stmt = $pdo->prepare("
-    INSERT INTO certificates (pet_id, death_record_id, certificate_number, issued_by, certificate_issued)
-    SELECT dr.pet_id, dr.id, ?, ?, 1
+    INSERT INTO certificates (pet_id, death_record_id, certificate_type, certificate_number, issued_by, certificate_issued)
+    SELECT dr.pet_id, dr.id, ?, ?, ?, 1
     FROM death_records dr
     WHERE dr.id = ?
     ON DUPLICATE KEY UPDATE
+        certificate_type = VALUES(certificate_type),
         certificate_number = VALUES(certificate_number),
         issued_by = VALUES(issued_by),
         certificate_issued = 1,
         certificate_date = NOW();
     ");
-    $stmt->execute([$certificate_number, $issued_by, $death_record_id]);
+    $stmt->execute([$certificate_type, $certificate_number, $issued_by, $death_record_id]);
 
 
     $pdo->commit();
