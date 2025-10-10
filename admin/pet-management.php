@@ -166,8 +166,6 @@ if (empty($_SESSION['csrf_token'])) {
         >
             Issue Death Certificate
         </button>";
-
-
                         }
                         echo "</td>";
                         echo "</tr>";
