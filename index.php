@@ -152,7 +152,12 @@
             animation: slideInLeft 1s ease-out 0.5s backwards;
         }
 
+        .service-section-title {
+            animation: fadeInUp 1s ease-out;
+        }
+
         .service-card {
+            animation: fadeInUp 1s ease-out backwards;
             transition: all 0.3s ease;
             cursor: pointer;
         }
@@ -167,6 +172,22 @@
 
         .service-card:hover .service-icon {
             transform: scale(1.1);
+        }
+
+        .service-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .service-card:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .service-card:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .service-card:nth-child(4) {
+            animation-delay: 0.5s;
         }
 
         .developer-section-title {
@@ -353,7 +374,8 @@
                 <div class="max-w-2xl">
                     <h1
                         class="hero-text text-4xl md:text-5xl font-bold text-green-600 text-center md:text-left tracking-wide leading-tight mb-6">
-                        YOUR TRUSTED PARTNER FOR COMPLETE <span class="text-green-900">ANIMAL HEALTH</span> AND WELLNESS.
+                        YOUR TRUSTED PARTNER FOR COMPLETE <span class="text-green-900">ANIMAL HEALTH</span> AND
+                        WELLNESS.
                     </h1>
                     <h3
                         class="hero-subtext text-lg md:text-xl text-gray-700 text-center md:text-left font-normal leading-relaxed">
@@ -385,21 +407,26 @@
 
             <!-- Your content goes here (on top of background) -->
             <div class="relative z-10 max-w-4xl mx-auto">
-                <h1 class="about-text text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-lg">Who We Are</h1>
-                <p class="about-subtext text-lg md:text-xl text-white leading-relaxed drop-shadow-md mb-8">
+                <h1
+                    class="about-text text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-lg text-center sm:text-start">
+                    Who We Are</h1>
+                <p
+                    class="about-subtext text-lg md:text-xl text-white leading-relaxed drop-shadow-md mb-8 text-center sm:text-start">
                     At Southern Leyte Veterinary Clinic, we are dedicated to providing compassionate and
                     comprehensive care for your beloved pets. Our team of experienced veterinarians and staff work
                     tirelessly to ensure the health, happiness, and well-being of every animal that comes through our
                     doors.
                 </p>
                 <div class="rounded-lg p-6 mb-4 shadow-lg">
-                    <h2 class="about-text text-2xl font-bold  text-white drop-shadow-lg mb-2">MISSION</h2>
-                    <p class="about-subtext text-white text-lg mb-4">
+                    <h2 class="about-text text-2xl font-bold text-white drop-shadow-lg mb-2 text-center sm:text-start">
+                        MISSION</h2>
+                    <p class="about-subtext text-white text-lg mb-4 text-center sm:text-start">
                         To make Southern Leyte sufficient in good quality breeder stocks, safe and wholesome meat
                         products and by-products.
                     </p>
-                    <h2 class="about-text text-2xl font-bold  text-white drop-shadow-lg mb-2">VISION</h2>
-                    <p class="about-subtext text-white text-lg">
+                    <h2 class="about-text text-2xl font-bold  text-white drop-shadow-lg mb-2 text-center sm:text-start">
+                        VISION</h2>
+                    <p class="about-subtext text-white text-lg text-center sm:text-start">
                         Excellent veterinary service provider ensuring food safety, sufficiency and security through
                         livestock and poultry sustainable development programs.
                     </p>
@@ -409,7 +436,7 @@
 
         <section id="services" class="max-w-7xl mx-auto py-16 px-4 md:px-8">
             <!-- Section Header -->
-            <div class="text-center mb-12">
+            <div class="service-section-title text-center mb-12">
                 <h1 class="text-4xl md:text-5xl font-bold text-green-800 mb-4">SERVICES OFFERED</h1>
                 <p class="text-gray-600 text-lg max-w-2xl mx-auto">
                     We provide a wide range of veterinary and livestock support services to ensure animal health, food
@@ -418,19 +445,20 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Card 1 -->
-                <div class="bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
+                <div class="service-card bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
                     <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-seedling text-4xl text-green-600"></i>
+                        <i class="service-icon fas fa-seedling text-4xl text-green-600"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-green-800 mb-2">Livestock Production Support Services</h3>
-                    <p class="text-gray-700 mb-4 text-start"><i class="fas fa-check-circle text-green-600 mr-2"></i>Provision of
+                    <p class="text-gray-700 mb-4 text-start"><i
+                            class="fas fa-check-circle text-green-600 mr-2"></i>Provision of
                         livelihood opportunities through livestock breeder loan
                         projects, swine and poultry grow-out activities.</p>
                 </div>
                 <!-- Card 2 -->
-                <div class="bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
+                <div class="service-card bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
                     <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-shield-alt text-4xl text-emerald-600"></i>
+                        <i class="service-icon fas fa-shield-alt text-4xl text-emerald-600"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-green-800 mb-2">Veterinary Regulatory Support Services</h3>
                     <ul class="text-gray-700 text-left space-y-2 mb-2">
@@ -447,9 +475,9 @@
                     </ul>
                 </div>
                 <!-- Card 3 -->
-                <div class="bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
+                <div class="service-card bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
                     <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-graduation-cap text-4xl text-teal-600"></i>
+                        <i class="service-icon fas fa-graduation-cap text-4xl text-teal-600"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-green-800 mb-2">Extension, Education and Training Services</h3>
                     <ul class="text-gray-700 text-left space-y-2 mb-2">
@@ -465,9 +493,9 @@
                     </ul>
                 </div>
                 <!-- Card 4 -->
-                <div class="bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
+                <div class="service-card bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
                     <div class="w-20 h-20 bg-cyan-100 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-chart-line text-4xl text-cyan-600"></i>
+                        <i class="service-icon fas fa-chart-line text-4xl text-cyan-600"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-green-800 mb-2">Market Development and Support Services</h3>
                     <ul class="text-gray-700 text-left space-y-2 mb-2">

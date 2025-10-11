@@ -5,10 +5,10 @@ require __DIR__ . '/../config/config.php'; // DB connection
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-$pet_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$owner_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-if ($pet_id <= 0) {
-  die("Invalid pet information request.");
+if ($owner_id <= 0) {
+    die("Invalid owner information request.");
 }
 
 // Fetch pet and owner details
@@ -21,20 +21,26 @@ $stmt = $pdo->prepare("
         p.color,
         p.age,
         p.age_unit,
+        p.weight,
+        p.weight_unit,
+        p.birth_date,
         o.name AS owner_name,
         o.phone,
         o.email,
+        o.emergency,
         o.address
     FROM pets p
     LEFT JOIN owners o ON p.owner_id = o.id
-    WHERE p.id = ?
+    WHERE o.id = ?
 ");
-$stmt->execute([$pet_id]);
+$stmt->execute([$owner_id]);
 $info = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$info) {
-  die("Pet record not found.");
+    die("Pet record not found.");
 }
+
+$date_of_birth = date('F d, Y', strtotime($info['birth_date']));
 
 $logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/green-paw.png');
 
@@ -93,7 +99,13 @@ $html = "
                 <th style='text-align: left; border: 1px solid black; padding: 4px;'>Color</th>
                 <td style='border: 1px solid black; padding: 4px;'>{$info['color']}</td>
                 <th style='text-align: left; border: 1px solid black; padding: 4px;'>Age</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['age']} {$info['age_unit']}</td>
+                <td style='border: 1px solid black; padding: 4px;'>{$info['age']} {$info['age_unit']} old</td>
+            </tr>
+             <tr>
+                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Weight</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$info['weight']} {$info['weight_unit']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Birth Date</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$date_of_birth}</td>
             </tr>
         </table>
     </section>
@@ -116,8 +128,12 @@ $html = "
             <tr>
                 <th style='text-align: left; border: 1px solid black; padding: 4px;'>Phone</th>
                 <td style='border: 1px solid black; padding: 4px;'>{$info['phone']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Emergency Contact</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$info['emergency']}</td>
+            </tr>
+              <tr>
                 <th style='text-align: left; border: 1px solid black; padding: 4px;'>Email</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['email']}</td>
+                <td colspan='3' style='border: 1px solid black; padding: 4px;'>{$info['email']}</td>
             </tr>
         </table>
     </section>

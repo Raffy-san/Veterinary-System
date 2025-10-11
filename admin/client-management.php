@@ -98,6 +98,10 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         echo '<td class="py-2"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['pet_count'] . '</span></td>';
                         echo '<td class="py-2"><span class="' . $typeinfo['bg'] . ' ' . $typeinfo['color'] . ' text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['status'] . '</td>';
                         echo '<td class="py-2 text-right">
+                            <a href="../print/information.php?id=' . $client['owner_id'] . '" class="cursor-pointer text-gray-700 mr-2 text-xs font-semibold bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300" target="_blank">
+                            <i class="fa-solid fa-print"></i>
+                            Print
+                            </a>
                             <button 
                                 data-modal="viewModal" 
                                 data-id="' . $client['owner_id'] . '"
@@ -118,20 +122,20 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         // ✅ Conditionally render Activate/Deactivate button
                         if ($client['status'] === 'Inactive') {
                             echo '
-    <button 
-        class="toggle-status-btn cursor-pointer text-gray-700 mr-2 bg-red-100 text-xs font-semibold p-1.5 rounded border border-red-200 hover:bg-red-300"
-        data-id="' . $client['user_id'] . '"
-        data-action="activate">
-        Activate
-    </button>';
+                            <button 
+                                class="toggle-status-btn cursor-pointer text-gray-700 mr-2 bg-red-100 text-xs font-semibold p-1.5 rounded border border-red-200 hover:bg-red-300"
+                                data-id="' . $client['user_id'] . '"
+                                data-action="activate">
+                                Activate
+                            </button>';
                         } else {
                             echo '
-    <button 
-        class="toggle-status-btn cursor-pointer text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300"
-        data-id="' . $client['user_id'] . '"
-        data-action="deactivate">
-        Deactivate
-    </button>';
+                            <button 
+                                class="toggle-status-btn cursor-pointer text-gray-700 mr-2 bg-green-100 text-xs font-semibold p-1.5 rounded border border-green-200 hover:bg-green-300"
+                                data-id="' . $client['user_id'] . '"
+                                data-action="deactivate">
+                                Deactivate
+                            </button>';
                         }
                         echo '
                         <button 
@@ -193,8 +197,8 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         <input type="password" name="password" id="addClientPassword" required
                             class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Client Password">
-                       <i id="toggleAddPassword"
-                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-3 py-1.5 text-gray-600 text-sm sm:text-base">
+                        <i id="toggleAddPassword"
+                            class="fa-solid fa-eye cursor-pointer absolute right-3 py-1.5 text-gray-600 text-sm sm:text-base">
                         </i>
                     </div>
                     <div class="mb-4 w-auto">
@@ -286,7 +290,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                             class="w-full border border-gray-300 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter new password">
                         <i id="toggleUpdatePassword"
-                            class="fa-solid fa-eye cursor-pointer absolute right-3 bottom-3 py-1.5 text-gray-600 text-sm sm:text-base">
+                            class="fa-solid fa-eye cursor-pointer absolute right-3 py-1.5 text-gray-600 text-sm sm:text-base">
                         </i>
                     </div>
 
