@@ -50,7 +50,8 @@ try {
     if ($resultData && $resultData['status'] === "success") {
         // Regenerate CSRF token
         unset($_SESSION['csrf_token']);
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        // Regenerate CSRF token for security
+        SessionManager::regenerateCsrfToken();
 
         jsonResponse("success", "Client added successfully", [
             "csrf_token" => $_SESSION['csrf_token'],

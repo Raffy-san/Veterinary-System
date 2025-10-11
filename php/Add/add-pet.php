@@ -61,7 +61,8 @@ try {
 
     if ($resultData && $resultData['status'] === "success") {
         unset($_SESSION['csrf_token']);
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        // Regenerate CSRF token for security
+        SessionManager::regenerateCsrfToken();
 
         jsonResponse("success", "Pet added successfully", [
             "csrf_token" => $_SESSION['csrf_token'],

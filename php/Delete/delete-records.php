@@ -39,8 +39,9 @@ try {
     $deleted = deleteMedicalRecord($pdo, $recordID);
 
     if ($deleted) {
-        // regenerate CSRF token for next request
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        // Regenerate CSRF token for security
+        SessionManager::regenerateCsrfToken();
+
         jsonResponse("success", "Medical record deleted successfully", [
             "csrf_token" => $_SESSION['csrf_token']
         ]);

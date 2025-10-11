@@ -71,13 +71,14 @@ try {
 
     if ($resultData && $resultData['status'] === "success") {
         unset($_SESSION['csrf_token']);
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
+        // Regenerate CSRF token for security
+        SessionManager::regenerateCsrfToken();
+        
         jsonResponse("success", "Medical record added successfully", [
             "csrf_token" => $_SESSION['csrf_token'],
         ]);
     } else {
-        jsonResponse("error", $resultData['message'] ?? "Failed to add mdical record");
+        jsonResponse("error", $resultData['message'] ?? "Failed to add medical record");
     }
 } catch (Exception $e) {
     error_log("Update record failed: " . $e->getMessage());

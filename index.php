@@ -152,24 +152,21 @@
             animation: slideInLeft 1s ease-out 0.5s backwards;
         }
 
-        .service-section-title {
-            animation: fadeInUp 1s ease-out;
-        }
-
         .service-card {
-            animation: fadeInUp 1s ease-out backwards;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .service-card:nth-child(1) {
-            animation-delay: 0.2s;
+        .service-card:hover {
+            transform: translateY(-8px);
         }
 
-        .service-card:nth-child(2) {
-            animation-delay: 0.3s;
+        .service-icon {
+            transition: transform 0.3s ease;
         }
 
-        .service-card:nth-child(3) {
-            animation-delay: 0.4s;
+        .service-card:hover .service-icon {
+            transform: scale(1.1);
         }
 
         .developer-section-title {
@@ -356,7 +353,7 @@
                 <div class="max-w-2xl">
                     <h1
                         class="hero-text text-4xl md:text-5xl font-bold text-green-600 text-center md:text-left tracking-wide leading-tight mb-6">
-                        YOUR TRUSTED PARTNER FOR COMPLETE <span class="text-green-900">PET HEALTH</span> AND WELLNESS.
+                        YOUR TRUSTED PARTNER FOR COMPLETE <span class="text-green-900">ANIMAL HEALTH</span> AND WELLNESS.
                     </h1>
                     <h3
                         class="hero-subtext text-lg md:text-xl text-gray-700 text-center md:text-left font-normal leading-relaxed">
@@ -389,55 +386,97 @@
             <!-- Your content goes here (on top of background) -->
             <div class="relative z-10 max-w-4xl mx-auto">
                 <h1 class="about-text text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-lg">Who We Are</h1>
-                <p class="about-subtext text-lg md:text-xl text-white leading-relaxed drop-shadow-md">
+                <p class="about-subtext text-lg md:text-xl text-white leading-relaxed drop-shadow-md mb-8">
                     At Southern Leyte Veterinary Clinic, we are dedicated to providing compassionate and
                     comprehensive care for your beloved pets. Our team of experienced veterinarians and staff work
                     tirelessly to ensure the health, happiness, and well-being of every animal that comes through our
                     doors.
                 </p>
+                <div class="rounded-lg p-6 mb-4 shadow-lg">
+                    <h2 class="about-text text-2xl font-bold  text-white drop-shadow-lg mb-2">MISSION</h2>
+                    <p class="about-subtext text-white text-lg mb-4">
+                        To make Southern Leyte sufficient in good quality breeder stocks, safe and wholesome meat
+                        products and by-products.
+                    </p>
+                    <h2 class="about-text text-2xl font-bold  text-white drop-shadow-lg mb-2">VISION</h2>
+                    <p class="about-subtext text-white text-lg">
+                        Excellent veterinary service provider ensuring food safety, sufficiency and security through
+                        livestock and poultry sustainable development programs.
+                    </p>
+                </div>
             </div>
         </section>
 
-        <section id="services" class="flex justify-center flex-col py-16 px-6 md:px-10">
-            <div class="mb-12 service-section-title">
-                <h1 class="text-start text-3xl md:text-5xl font-bold text-green-800 mb-3">SERVICES WE OFFER</h1>
-                <h3 class="text-start text-gray-600 text-base md:text-lg max-w-3xl">
-                    We provide comprehensive veterinary care services designed to keep your pets healthy, happy, and
-                    thriving at every stage of their lives.
-                </h3>
+        <section id="services" class="max-w-7xl mx-auto py-16 px-4 md:px-8">
+            <!-- Section Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-green-800 mb-4">SERVICES OFFERED</h1>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                    We provide a wide range of veterinary and livestock support services to ensure animal health, food
+                    safety, and sustainable development in Southern Leyte.
+                </p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto w-full gap-8">
-                <!-- Service Card 1 -->
-                <div
-                    class="border-none px-8 py-8 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 hover:bg-green-50 service-card">
-                    <i class="fa-solid fa-stethoscope text-green-700 text-6xl mb-6 block"></i>
-                    <h1 class="text-2xl md:text-3xl font-bold text-green-800 mb-4">Health Check-ups</h1>
-                    <h3 class="text-base md:text-lg text-gray-700 leading-relaxed">
-                        Comprehensive physical examinations to monitor your pet's overall health and catch potential
-                        issues early.
-                    </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-seedling text-4xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-green-800 mb-2">Livestock Production Support Services</h3>
+                    <p class="text-gray-700 mb-4 text-start"><i class="fas fa-check-circle text-green-600 mr-2"></i>Provision of
+                        livelihood opportunities through livestock breeder loan
+                        projects, swine and poultry grow-out activities.</p>
                 </div>
-
-                <!-- Service Card 2 -->
-                <div
-                    class="border-none px-8 py-8 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 hover:bg-green-50 service-card">
-                    <i class="fa-solid fa-syringe text-green-700 text-6xl mb-6 block"></i>
-                    <h1 class="text-2xl md:text-3xl font-bold text-green-800 mb-4">Vaccinations</h1>
-                    <h3 class="text-base md:text-lg text-gray-700 leading-relaxed">
-                        Essential immunizations to protect your pets from serious diseases and maintain their long-term
-                        health.
-                    </h3>
+                <!-- Card 2 -->
+                <div class="bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
+                    <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-shield-alt text-4xl text-emerald-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-green-800 mb-2">Veterinary Regulatory Support Services</h3>
+                    <ul class="text-gray-700 text-left space-y-2 mb-2">
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Prevention and control of animal
+                            diseases through field disease diagnosis, treatment and vaccinations.</li>
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Veterinary quarantine program through
+                            livestock movement monitoring and regulation, border control for Trans-Boundary Animal
+                            Diseases.</li>
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Provision of vaccines to control
+                            Rabies, Hemorrhagic Septicemia, Newcastle Disease, Fowl Pox, Fowl Coryza, Hog Cholera and
+                            other livestock and poultry viral and bacterial diseases.</li>
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Implementation of food hygiene and
+                            food safety regulations, feeds and veterinary drugs establishment regulations.</li>
+                    </ul>
                 </div>
-
-                <!-- Service Card 3 -->
-                <div
-                    class="border-none px-8 py-8 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 hover:bg-green-50 service-card">
-                    <i class="fa-solid fa-scissors text-green-700 text-6xl mb-6 block"></i>
-                    <h1 class="text-2xl md:text-3xl font-bold text-green-800 mb-4">Grooming</h1>
-                    <h3 class="text-base md:text-lg text-gray-700 leading-relaxed">
-                        Professional grooming services including bathing, nail trimming, and styling to keep your pet
-                        looking their best.
-                    </h3>
+                <!-- Card 3 -->
+                <div class="bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
+                    <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-graduation-cap text-4xl text-teal-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-green-800 mb-2">Extension, Education and Training Services</h3>
+                    <ul class="text-gray-700 text-left space-y-2 mb-2">
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Assist in organizing livestock
+                            farmers.</li>
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Conduct and provide capability
+                            development trainings on livestock production and financial management to farmer
+                            cooperatives and associations.</li>
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Conduct and provide technical
+                            management trainings to livestock extension workers.</li>
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Implement and monitor all livestock
+                            enterprise development projects.</li>
+                    </ul>
+                </div>
+                <!-- Card 4 -->
+                <div class="bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center text-center">
+                    <div class="w-20 h-20 bg-cyan-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-4xl text-cyan-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-green-800 mb-2">Market Development and Support Services</h3>
+                    <ul class="text-gray-700 text-left space-y-2 mb-2">
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Establishment and monitoring of all
+                            slaughterhouses.</li>
+                        <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Monitoring and assessments of
+                            livestock inventory, farm gate and retail prices of livestock and poultry products and
+                            by-products.</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -453,47 +492,47 @@
                 <div class="flex flex-col items-center group developer-card">
                     <div
                         class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
-                        <img src="assets/img/user.webp" alt="Developer 1" class="w-full h-full object-cover">
+                        <img src="assets/img/casipong.webp" alt="Developer 1" class="w-full h-full object-cover">
                     </div>
                     <h3
                         class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
-                        Developer Name</h3>
-                    <p class="text-gray-600 text-sm text-center">Role/Position</p>
+                        Anthony Casipong</h3>
+                    <p class="text-gray-600 text-sm text-center">Leader</p>
                 </div>
                 <div class="flex flex-col items-center group developer-card">
                     <div
                         class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
-                        <img src="assets/img/user.webp" alt="Developer 2" class="w-full h-full object-cover">
+                        <img src="assets/img/mori.webp" alt="Developer 2" class="w-full h-full object-cover">
                     </div>
                     <h3
                         class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
-                        Developer Name</h3>
-                    <p class="text-gray-600 text-sm text-center">Role/Position</p>
+                        Dianne Mori</h3>
+                    <p class="text-gray-600 text-sm text-center">Member</p>
                 </div>
                 <div class="flex flex-col items-center group developer-card">
                     <div
                         class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
-                        <img src="assets/img/user.webp" alt="Developer 3" class="w-full h-full object-cover">
+                        <img src="assets/img/mancao.webp" alt="Developer 3" class="w-full h-full object-cover">
                     </div>
                     <h3
                         class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
-                        Developer Name</h3>
-                    <p class="text-gray-600 text-sm text-center">Role/Position</p>
+                        Jyrus Jiv Mancao</h3>
+                    <p class="text-gray-600 text-sm text-center">Member</p>
                 </div>
                 <div class="flex flex-col items-center group developer-card">
                     <div
                         class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
-                        <img src="assets/img/user.webp" alt="Developer 4" class="w-full h-full object-cover">
+                        <img src="assets/img/murcia.webp" alt="Developer 4" class="w-full h-full object-cover">
                     </div>
                     <h3
                         class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
-                        Developer Name</h3>
-                    <p class="text-gray-600 text-sm text-center">Role/Position</p>
+                        Archell Murcia</h3>
+                    <p class="text-gray-600 text-sm text-center">Member</p>
                 </div>
             </div>
         </section>
         <footer id="contact">
-            <div class="flex flex-col md:flex-row items-center justify-between w-full overflow-hidden">
+            <div class="flex flex-col md:flex-row items-end justify-between w-full overflow-hidden">
                 <!-- Left Section -->
                 <div class="p-6 md:p-10 flex flex-col gap-6 md:w-1/2">
                     <div class="contact-section flex items-center gap-4">
@@ -507,12 +546,17 @@
                     <div class="contact-text">
                         <h3 class="text-lg font-semibold mb-2">CONTACT INFORMATION</h3>
                         <address class="not-italic leading-relaxed">
-                            Brgy. Asuncion, Maasin City, Southern Leyte<br>
-                            (053) 570-1234<br>
-                            <a href="mailto:Soleyteveterinaryclinic@gmail.com" class="text-green-700 hover:underline">
-                                Soleyteveterinaryclinic@gmail.com
+                            Provincial Veterinary Services Office, Capitol Site
+                            <br>Asuncion, Maasin City
+                            <br>Southern Leyte, 6600<br>
+                            09306231352<br>
+                            <a href="mailto:pvsosl@gmail.com" class="text-green-700 hover:underline">
+                                pvsosl@gmail.com
                             </a>
                         </address>
+                        <a href="https://www.facebook.com/pvso.southernleyte" class="text-green-700 hover:underline">
+                            <i class="fa-brands fa-facebook"></i>
+                        </a>
                     </div>
                 </div>
 
