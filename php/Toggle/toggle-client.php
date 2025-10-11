@@ -52,8 +52,8 @@ try {
 
     $pdo->commit();
 
-    // regenerate CSRF token for next request
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    // Regenerate CSRF token for security
+    SessionManager::regenerateCsrfToken();
 
     jsonResponse("success", "Client " . $action . "d successfully", [
         "csrf_token" => $_SESSION['csrf_token']

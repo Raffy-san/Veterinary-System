@@ -89,7 +89,10 @@ $resultData = json_decode($result, true);
 // If success, regenerate CSRF token for next requests
 if ($resultData && $resultData['status'] === "success") {
     unset($_SESSION['csrf_token']);
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+    // Regenerate CSRF token for security
+    SessionManager::regenerateCsrfToken();
+
     jsonResponse("success", "Admin account updated successfully", [
         "csrf_token" => $_SESSION['csrf_token']
     ]);
