@@ -300,7 +300,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         ) . '</td>';
 
                         echo '<td class="py-2 text-right space-x-1">
-                               <button class="issue-certificate-btn cursor-pointer font-semibold text-xs text-gray-700 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300"
+                               <button class="issue-certificate-modal cursor-pointer font-semibold text-xs text-gray-700 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300"
                                 data-medical-record-id="' . htmlspecialchars($record['medical_record_id']) . '"
                                 data-medical-certificate-number="' . htmlspecialchars($record['certificate_number']) . '"
                                 data-pet-name="' . htmlspecialchars($record['patient_name']) . '">Print</button>
@@ -517,6 +517,26 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <a id="confirmDeleteBtn" href="#"
                         class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
                         Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="printModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center"
+            style="background-color: rgba(0,0,0,0.4);">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                <div class="flex flex-record items-center mb-4">
+                    <i class="fa-solid fa-circle-question mr-2 text-green-600"></i>
+                    <h3 class="font-semibold text-lg">Issue Medical Certificate</h3>
+                </div>
+                <p id="printMessage" class="mb-4 text-sm text-gray-600">
+                    <!-- print Message -->
+                </p>
+                <div class="flex justify-end space-x-2">
+                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
+                    <a id="confirmPrintBtn" href="#"
+                        class="issue-medical-certificate px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs">
+                        Issue
                     </a>
                 </div>
             </div>
@@ -907,49 +927,60 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     });
             });
 
-            document.querySelectorAll(".issue-certificate-btn").forEach(button => {
-                button.addEventListener("click", async () => {
-                    const medicalRecordId = button.dataset.medicalRecordId;
-                    const patientName = button.dataset.petName;
+            document.querySelectorAll(".issue-certificate-modal").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const recordId = btn.dataset.medicalRecordId;
+                    const modal = document.getElementById("printModal");
+                    const petName = btn.dataset.petName;
+                    modal.classList.remove("hidden");
+                    modal.classList.add("flex");
+                    updateBodyScroll();
 
-                    if (!confirm(`Issue Medical certificate for ${patientName}?`)) return;
-
-                    try {
-                        const response = await fetch("../php/Toggle/issue-medical-certificate.php", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/x-www-form-urlencoded"
-                            },
-                            body: new URLSearchParams({
-                                csrf_token: csrfToken,
-                                medical_record_id: medicalRecordId
-                            })
-                        });
-
-                        const data = await response.json();
-
-                        // Update CSRF token for next request
-                        if (data.csrf_token) csrfToken = data.csrf_token;
-
-                        if (data.status === "success") {
-                            showMessage(
-                                "Certificate Issued",
-                                `✅ Certificate issued for ${patientName}\nCertificate No: ${data.certificate_number}`,
-                                () => {
-                                    // Open PDF in new tab
-                                    const win = window.open(`../print/medical-certificate.php?id=${medicalRecordId}`, "_blank");
-                                    if (!win) showMessage("Popup Blocked", "Please allow popups to view the certificate.");
-                                }
-                            );
-                        } else {
-                            showMessage("Error", "❌ " + data.message);
-                        }
-
-                    } catch (error) {
-                        console.error("Error issuing certificate:", error);
-                        showMessage("Error", "An unexpected error occurred. Please try again.");
-                    }
+                    document.getElementById("confirmPrintBtn").dataset.id = recordId;
+                    document.getElementById("printMessage").textContent =
+                        `Issue Medical certificate for ${petName}?`;
                 });
+            });
+
+            document.getElementById("confirmPrintBtn").addEventListener("click", async () => {
+                const medicalRecordId = document.getElementById("confirmPrintBtn").dataset.id;
+                const patientName = document.getElementById("printMessage").textContent;
+
+                try {
+                    const response = await fetch("../php/Toggle/issue-medical-certificate.php", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: new URLSearchParams({
+                            csrf_token: csrfToken,
+                            medical_record_id: medicalRecordId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    // Update CSRF token for next request
+                    if (data.csrf_token) csrfToken = data.csrf_token;
+
+                    if (data.status === "success") {
+                        showMessage(
+                            "Certificate Issued",
+                            `✅ Certificate issued for ${patientName}\nCertificate No: ${data.certificate_number}`,
+                            () => {
+                                // Open PDF in new tab
+                                const win = window.open(`../print/medical-certificate.php?id=${medicalRecordId}`, "_blank");
+                                if (!win) showMessage("Popup Blocked", "Please allow popups to view the certificate.");
+                            }
+                        );
+                    } else {
+                        showMessage("Error", "❌ " + data.message);
+                    }
+
+                } catch (error) {
+                    console.error("Error issuing certificate:", error);
+                    showMessage("Error", "An unexpected error occurred. Please try again.");
+                }
             });
         });
 

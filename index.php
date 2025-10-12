@@ -379,7 +379,7 @@
                     </h1>
                     <h3
                         class="hero-subtext text-lg md:text-xl text-gray-700 text-center md:text-left font-normal leading-relaxed">
-                        Providing compassionate care and expert veterinary services to keep your furry friends healthy
+                        Providing compassionate care and expert veterinary services to keep your beloved animals healthy
                         and happy.
                     </h3>
                 </div>
@@ -413,7 +413,7 @@
                 <p
                     class="about-subtext text-lg md:text-xl text-white leading-relaxed drop-shadow-md mb-8 text-center sm:text-start">
                     At Southern Leyte Veterinary Clinic, we are dedicated to providing compassionate and
-                    comprehensive care for your beloved pets. Our team of experienced veterinarians and staff work
+                    comprehensive care for your beloved animals. Our team of experienced veterinarians and staff work
                     tirelessly to ensure the health, happiness, and well-being of every animal that comes through our
                     doors.
                 </p>
