@@ -582,7 +582,7 @@
                                 pvsosl@gmail.com
                             </a>
                         </address>
-                        <a href="https://www.facebook.com/pvso.southernleyte" class="text-green-700 hover:underline">
+                        <a href="https://www.facebook.com/pvso.southernleyte" target="__blank" class="text-green-700 hover:underline">
                             <i class="fa-brands fa-facebook"></i>
                         </a>
                     </div>
