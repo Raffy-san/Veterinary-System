@@ -1140,7 +1140,6 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
         togglePasswordVisibility('addClientPassword', 'toggleAddPassword');
         togglePasswordVisibility('updateClientPassword', 'toggleUpdatePassword');
     </script>
-
 </body>
 
 </html>
