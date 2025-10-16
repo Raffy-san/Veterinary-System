@@ -11,7 +11,25 @@ if ($owner_id <= 0) {
     die("Invalid owner information request.");
 }
 
-// Fetch pet and owner details
+// Fetch owner details
+$stmt = $pdo->prepare("
+    SELECT 
+        o.name AS owner_name,
+        o.phone,
+        o.email,
+        o.emergency,
+        o.address
+    FROM owners o
+    WHERE o.id = ?
+");
+$stmt->execute([$owner_id]);
+$owner = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$owner) {
+    die("Owner record not found.");
+}
+
+// Fetch all pets for this owner
 $stmt = $pdo->prepare("
     SELECT 
         p.name AS pet_name,
@@ -23,24 +41,16 @@ $stmt = $pdo->prepare("
         p.age_unit,
         p.weight,
         p.weight_unit,
-        p.birth_date,
-        o.name AS owner_name,
-        o.phone,
-        o.email,
-        o.emergency,
-        o.address
+        p.birth_date
     FROM pets p
-    LEFT JOIN owners o ON p.owner_id = o.id
-    WHERE o.id = ?
+    WHERE p.owner_id = ?
 ");
 $stmt->execute([$owner_id]);
-$info = $stmt->fetch(PDO::FETCH_ASSOC);
+$pets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if (!$info) {
-    die("Pet record not found.");
+if (!$pets) {
+    die("No pets found for this owner.");
 }
-
-$date_of_birth = date('F d, Y', strtotime($info['birth_date']));
 
 $logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/green-paw.png');
 
@@ -72,45 +82,10 @@ $html = "
     </header>
 
     <p style='text-align: justify; margin: 10px 0; font-size: 14px;'>
-        This document contains verified details of the pet and its owner as recorded in the official database
+        This document contains verified details of the pet(s) and their owner as recorded in the official database
         of <strong>Southern Leyte Veterinary Clinic</strong>. The information provided below is accurate as of the date of issuance.
     </p>
 
-    <!-- PET INFORMATION -->
-    <section style='margin-bottom: 10px;'>
-        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px; font-size: 14px;'>
-            <strong>PET INFORMATION</strong>
-        </div>
-
-        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 5px;'>
-            <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 25%;'>Pet Name</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['pet_name']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 25%;'>Gender</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['gender']}</td>
-            </tr>
-            <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Species</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['species']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Breed</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['breed']}</td>
-            </tr>
-            <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Color</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['color']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Age</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['age']} {$info['age_unit']} old</td>
-            </tr>
-             <tr>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Weight</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['weight']} {$info['weight_unit']}</td>
-                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Birth Date</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$date_of_birth}</td>
-            </tr>
-        </table>
-    </section>
-
-    <!-- OWNER INFORMATION -->
     <section style='margin-bottom: 10px;'>
         <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px; font-size: 14px;'>
             <strong>OWNER INFORMATION</strong>
@@ -119,24 +94,68 @@ $html = "
         <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 5px;'>
             <tr>
                 <th style='text-align: left; border: 1px solid black; padding: 4px; width: 25%;'>Owner Name</th>
-                <td colspan='3' style='border: 1px solid black; padding: 4px;'>{$info['owner_name']}</td>
+                <td colspan='3' style='border: 1px solid black; padding: 4px;'>{$owner['owner_name']}</td>
             </tr>
             <tr>
                 <th style='text-align: left; border: 1px solid black; padding: 4px;'>Address</th>
-                <td colspan='3' style='border: 1px solid black; padding: 4px;'>{$info['address']}</td>
+                <td colspan='3' style='border: 1px solid black; padding: 4px;'>{$owner['address']}</td>
             </tr>
             <tr>
                 <th style='text-align: left; border: 1px solid black; padding: 4px;'>Phone</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['phone']}</td>
+                <td style='border: 1px solid black; padding: 4px;'>{$owner['phone']}</td>
                 <th style='text-align: left; border: 1px solid black; padding: 4px;'>Emergency Contact</th>
-                <td style='border: 1px solid black; padding: 4px;'>{$info['emergency']}</td>
+                <td style='border: 1px solid black; padding: 4px;'>{$owner['emergency']}</td>
             </tr>
               <tr>
                 <th style='text-align: left; border: 1px solid black; padding: 4px;'>Email</th>
-                <td colspan='3' style='border: 1px solid black; padding: 4px;'>{$info['email']}</td>
+                <td colspan='3' style='border: 1px solid black; padding: 4px;'>{$owner['email']}</td>
             </tr>
         </table>
     </section>
+";
+
+// Loop through each pet and display their info
+foreach ($pets as $index => $pet) {
+    $date_of_birth = date('F d, Y', strtotime($pet['birth_date']));
+    $html .= "
+    <!-- PET INFORMATION -->
+    <section style='margin-bottom: 10px; page-break-inside: avoid;'>
+        <div style='border: 1px solid black; background-color: rgb(230,230,230); text-align: center; padding: 5px; font-size: 14px;'>
+            <strong>PET INFORMATION " . (count($pets) > 1 ? '(' . ($index + 1) . ')' : '') . "</strong>
+        </div>
+
+        <table style='width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 5px;'>
+            <tr>
+                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 25%;'>Pet Name</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$pet['pet_name']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 4px; width: 25%;'>Gender</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$pet['gender']}</td>
+            </tr>
+            <tr>
+                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Species</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$pet['species']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Breed</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$pet['breed']}</td>
+            </tr>
+            <tr>
+                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Color</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$pet['color']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Age</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$pet['age']} {$pet['age_unit']} old</td>
+            </tr>
+             <tr>
+                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Weight</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$pet['weight']} {$pet['weight_unit']}</td>
+                <th style='text-align: left; border: 1px solid black; padding: 4px;'>Birth Date</th>
+                <td style='border: 1px solid black; padding: 4px;'>{$date_of_birth}</td>
+            </tr>
+        </table>
+    </section>
+    ";
+}
+
+// OWNER INFORMATION (shown once)
+$html .= "
 
     <p style='margin-top: 25px; text-align: justify; font-size: 14px;'>
         Certified true and correct as per the clinic's official records.
@@ -161,5 +180,5 @@ $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
 
 // Output
-$filename = strtolower(str_replace(' ', '_', $info['pet_name'])) . "_Owner_Pet_Info.pdf";
+$filename = strtolower(str_replace(' ', '_', $owner['owner_name'])) . "_Owner_Pet_Info.pdf";
 $dompdf->stream($filename, ['Attachment' => false]);
