@@ -20,7 +20,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
+    <link rel="icon" type="image/png" href="../assets/img/logo.webp">
     <script src="../assets/js/script.js"></script>
     <link rel="stylesheet" href="../assets/css/output.css">
     <link rel="stylesheet" href="../assets/css/global.css">
@@ -60,6 +60,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                                     SELECT pets.id AS pet_id, pets.name AS pet_name, owners.name AS owner_name
                                     FROM pets
                                     INNER JOIN owners ON pets.owner_id = owners.id
+                                    WHERE pets.status = 'Alive'
                                     ORDER BY owners.name, pets.name
                                 ");
 
@@ -241,11 +242,12 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <?php
                     $records = fetchAllData(
                         $pdo,
-                        "SELECT m.id AS medical_record_id, m.visit_date, m.visit_time, m.veterinarian, m.weight, m.weight_unit, m.temperature, m.temp_unit, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes, m.follow_up_date, c.certificate_number
+                        "SELECT m.id AS medical_record_id, m.visit_date, m.visit_time, m.veterinarian, m.weight, m.weight_unit, m.temperature, m.temp_unit, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes, m.follow_up_date, m.is_deleted, c.certificate_number
                         FROM medical_records m 
                         JOIN pets p ON m.pet_id = p.id
                         JOIN owners o ON p.owner_id = o.id
                         LEFT JOIN certificates c ON c.record_id = m.id
+                        WHERE m.is_deleted = '0'
                         ORDER BY m.created_at DESC"
                     );
 

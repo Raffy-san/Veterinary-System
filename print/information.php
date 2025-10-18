@@ -52,7 +52,7 @@ if (!$pets) {
     die("No pets found for this owner.");
 }
 
-$logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/green-paw.png');
+$logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/logo.webp');
 
 // Setup Dompdf
 $options = new Options();

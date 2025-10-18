@@ -21,7 +21,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
+    <link rel="icon" type="image/png" href="../assets/img/logo.webp">
     <link rel="stylesheet" href="../assets/css/output.css">
     <script src="../assets/js/script.js"></script>
     <link rel="stylesheet" href="../assets/css/global.css">

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="assets/img/green-paw.png">
+    <link rel="icon" type="image/png" href="assets/img/logo.webp">
     <link rel="stylesheet" href="assets/css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -347,7 +347,7 @@
             class="flex justify-between items-center text-green-700 px-6 py-8 bg-white/40 backdrop-blur-sm w-full">
             <!-- Logo -->
             <div class="logo-section text-xl font-semibold tracking-wide flex justify-between items-center gap-4">
-                <img src="assets/img/green-paw.png" class="w-10 transition-transform hover:rotate-12 hover:scale-110"
+                <img src="assets/img/logo.webp" class="w-10 transition-transform hover:rotate-12 hover:scale-110"
                     alt="Clinic Logo">
                 <h2 class="logo-text text-green-800 hidden sm:inline">SOUTHERN LEYTE VETERINARY CLINIC</h2>
                 <h2 class="logo-text text-green-800 inline sm:hidden">SLVC</h2>
@@ -417,7 +417,7 @@
                     tirelessly to ensure the health, happiness, and well-being of every animal that comes through our
                     doors.
                 </p>
-                <div class="rounded-lg p-6 mb-4 shadow-lg">
+                <div class="rounded-lg p-6 mb-4 shadow-lg" style="background-color: rgba(0,0,0,0.4);">
                     <h2 class="about-text text-2xl font-bold text-white drop-shadow-lg mb-2 text-center sm:text-start">
                         MISSION</h2>
                     <p class="about-subtext text-white text-lg mb-4 text-center sm:text-start">
@@ -564,7 +564,7 @@
                 <!-- Left Section -->
                 <div class="p-6 md:p-10 flex flex-col gap-6 md:w-1/2">
                     <div class="contact-section flex items-center gap-4">
-                        <img src="assets/img/green-paw.png"
+                        <img src="assets/img/logo.webp"
                             class="w-10 transition-transform hover:rotate-12 hover:scale-110" alt="Clinic Logo">
                         <h2 class="text-xl font-semibold text-green-800 tracking-wide">
                             SOUTHERN LEYTE VETERINARY CLINIC
@@ -582,7 +582,8 @@
                                 pvsosl@gmail.com
                             </a>
                         </address>
-                        <a href="https://www.facebook.com/pvso.southernleyte" target="__blank" class="text-green-700 hover:underline">
+                        <a href="https://www.facebook.com/pvso.southernleyte" target="__blank"
+                            class="text-green-700 hover:underline">
                             <i class="fa-brands fa-facebook"></i>
                         </a>
                     </div>
