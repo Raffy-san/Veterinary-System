@@ -59,7 +59,7 @@ $issued_date = date('F d, Y', strtotime($death['certificate_date']));
 $date_of_death = date('F d, Y', strtotime($death['date_of_death']));
 
 
-$logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/green-paw.png');
+$logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/logo.webp');
 
 // Setup Dompdf
 $options = new Options();

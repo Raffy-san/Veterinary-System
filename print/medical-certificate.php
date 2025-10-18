@@ -76,7 +76,7 @@ if ($record_id > 0) {
     $record['notes'] = !empty($record['notes']) ? $record['notes'] : 'No additional notes';
 
 
-    $logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/green-paw.png');
+    $logoPath = 'file://' . realpath(__DIR__ . '/../assets/img/logo.webp');
 
     // Setup Dompdf
     $options = new Options();

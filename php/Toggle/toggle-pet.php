@@ -34,7 +34,7 @@ $location_of_death = trim($_POST['location_of_death'] ?? '');
 $recorded_by = trim($_POST['recorded_by'] ?? '');
 $remarks = trim($_POST['remarks'] ?? '');
 
-if (!$petID || !in_array($status, ['Alive', 'Dead'])) {
+if (!$petID || !in_array($status, ['Alive', 'Deceased'])) {
     jsonResponse("error", "Invalid input");
 }
 

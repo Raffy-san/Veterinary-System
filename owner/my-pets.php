@@ -27,7 +27,7 @@ $petCount = fetchOneData(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
+    <link rel="icon" type="image/png" href="../assets/img/logo.webp">
     <link rel="stylesheet" href="../assets/css/output.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <title>My Pets</title>
@@ -124,7 +124,7 @@ $petCount = fetchOneData(
 
             $status = [
                 'Alive' => ['bg' => 'bg-green-500', 'color' => 'text-white'],
-                'Dead' => ['bg' => 'bg-red-500', 'color' => 'text-white']
+                'Deceased' => ['bg' => 'bg-red-500', 'color' => 'text-white']
             ];
 
             if ($pets) {
@@ -226,7 +226,7 @@ $petCount = fetchOneData(
                             </div>
                         <?php endif; ?>
 
-                        <?php if ($pet['status'] === 'Dead'): ?>
+                        <?php if ($pet['status'] === 'Deceased'): ?>
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 pt-4 md:pt-6 mb-4 md:mb-6">
                                 <div class="flex items-start md:items-center">
                                     <i

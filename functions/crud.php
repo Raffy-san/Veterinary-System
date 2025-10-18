@@ -179,7 +179,7 @@ function updatePet($pdo, $data)
         $stmt = $pdo->prepare("
             UPDATE pets SET name = ?, species = ?, breed = ?, age = ?, age_unit = ?, gender = ?, weight = ?, weight_unit = ?, color = ?, birth_date = ?, notes = ? WHERE id = ?
         ");
-        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['age_unit'] ,$data['gender'], $data['weight'], $data['weight_unit'], $data['color'], $data['birth_date'], $data['notes'], $data['pet_id']]);
+        $stmt->execute([$data['name'], $data['species'], $data['breed'], $data['age'], $data['age_unit'], $data['gender'], $data['weight'], $data['weight_unit'], $data['color'], $data['birth_date'], $data['notes'], $data['pet_id']]);
         return json_encode(["status" => "success", "message" => "Pet updated successfully"]);
 
     } catch (PDOException $e) {
@@ -305,14 +305,22 @@ function updateMedicalRecord($pdo, $data)
 function deleteMedicalRecord($pdo, $id)
 {
     try {
-        $stmt = $pdo->prepare("DELETE FROM medical_records WHERE id = ?");
+        // Instead of deleting the record, mark it as deleted
+        $stmt = $pdo->prepare("UPDATE medical_records SET deleted_at = NOW(), is_deleted = 1 WHERE id = ?");
         $stmt->execute([$id]);
-        return json_encode(["status" => "success", "message" => "Medical record deleted successfully"]);
 
+        return json_encode([
+            "status" => "success",
+            "message" => "Medical record archived successfully"
+        ]);
     } catch (PDOException $e) {
-        return json_encode(["status" => "error", "message" => "Error deleting medical record: " . $e->getMessage()]);
+        return json_encode([
+            "status" => "error",
+            "message" => "Error archiving medical record: " . $e->getMessage()
+        ]);
     }
 }
+
 
 function updateAdmin($pdo, $data)
 {

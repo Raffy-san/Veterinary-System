@@ -17,7 +17,7 @@ if (SessionManager::isLoggedIn()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="assets/img/green-paw.png">
+    <link rel="icon" type="image/png" href="assets/img/logo.webp">
     <title>Login - Medical Record System</title>
     <link rel="stylesheet" href="assets/css/output.css">
     <script src="assets/js/script.js"></script>
@@ -29,7 +29,7 @@ if (SessionManager::isLoggedIn()) {
     <section class="w-full max-w-md bg-white rounded-lg shadow-xl p-6 sm:p-8">
         <!-- Icon -->
         <div class="w-full flex justify-center mb-2">
-            <i class="fa-solid fa-paw text-5xl sm:text-6xl text-green-500 rotate-45"></i>
+            <img src="assets/img/logo.webp" class="h-[5rem] w-[5rem]" alt="">
         </div>
 
         <!-- Headings -->

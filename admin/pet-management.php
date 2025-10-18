@@ -23,7 +23,7 @@ if (empty($_SESSION['csrf_token'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../assets/img/green-paw.png">
+    <link rel="icon" type="image/png" href="../assets/img/logo.webp">
     <link rel="stylesheet" href="../assets/css/global.css">
     <script src="../assets/js/script.js"></script>
     <link rel="stylesheet" href="../assets/css/output.css">
@@ -106,7 +106,7 @@ if (empty($_SESSION['csrf_token'])) {
 
                     $status = [
                         'Alive' => ['bg' => 'bg-green-500', 'color' => 'text-white'],
-                        'Dead' => ['bg' => 'bg-red-500', 'color' => 'text-white']
+                        'Deceased' => ['bg' => 'bg-red-500', 'color' => 'text-white']
                     ];
 
                     foreach ($pets as $row) {
@@ -156,7 +156,7 @@ if (empty($_SESSION['csrf_token'])) {
                                 </button>
                                 
                                 <button class='open-status-modal cursor-pointer font-semibold text-xs text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300'  data-id='" . $row['pet_id'] . "'  data-name='" . htmlspecialchars($row['pet_name'] ?? '') . "'>Toggle Status</button>";
-                        if (isset($row['status']) && strtolower($row['status']) === 'dead' && !empty($row['death_record_id'])) {
+                        if (isset($row['status']) && strtolower($row['status']) === 'deceased' && !empty($row['death_record_id'])) {
                             echo "
         <button 
             class='issue-certificate-modal cursor-pointer font-semibold text-xs text-gray-700 bg-red-100 p-1.5 border rounded border-red-200 hover:bg-red-300'
@@ -240,7 +240,7 @@ if (empty($_SESSION['csrf_token'])) {
                             class="w-full border border-gray-300 bg-white px-2 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             required>
                             <option value="Alive">Alive</option>
-                            <option value="Dead">Dead</option>
+                            <option value="Deceased">Deceased</option>
                         </select>
                     </div>
 
@@ -443,7 +443,7 @@ if (empty($_SESSION['csrf_token'])) {
                     ownerDetails.innerHTML = "<h4 class='font-semibold mb-4'>Owner information</h4>";
                     notesDetails.innerHTML = "<h4 class='font-semibold mb-4'>Notes</h4>";
 
-                    if (status === "dead") {
+                    if (status === "deceased") {
                         deathDetails.classList.remove("hidden");
                         deathDetails.innerHTML = "<h4 class='font-semibold mb-4'>Death Details</h4>";
                     }
@@ -479,7 +479,7 @@ if (empty($_SESSION['csrf_token'])) {
 
                     addField(notesDetails, "", btn.dataset.notes || "None");
 
-                    if (status === "dead") {
+                    if (status === "deceased") {
                         addField(deathDetails, "Date of Death:", btn.dataset.deathdate);
                         addField(deathDetails, "Time of Death:", `${formattedTime}`);
                         addField(deathDetails, "Reason of Death:", btn.dataset.deathreason);
@@ -545,7 +545,7 @@ if (empty($_SESSION['csrf_token'])) {
 
 
             statusSelect.addEventListener("change", () => {
-                deathFields.style.display = statusSelect.value === "Dead" ? "block" : "none";
+                deathFields.style.display = statusSelect.value === "Deceased" ? "block" : "none";
             });
 
             // When clicking "Toggle Status" button, set pet_id and pet_name
