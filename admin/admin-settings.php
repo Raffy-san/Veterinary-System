@@ -1,5 +1,6 @@
 <?php
 include_once __DIR__ . '/../config/config.php';
+include_once __DIR__ . '/../functions/settings.php';
 require_once __DIR__ . '/../functions/session.php';
 require_once __DIR__ . '/../helpers/fetch.php';
 require_once __DIR__ . '/../functions/crud.php';
@@ -79,7 +80,7 @@ $csrf_token = $_SESSION['csrf_token'];
     include '../includes/admin-header.php';
     ?>
 
-    <main class="p-10 max-w-[1400px] mx-auto">
+    <main class="p-10 max-w-[1400px] mx-auto space-y-6">
         <section class="w-full bg-white shadow-lg rounded-xl p-8">
             <!-- Header -->
             <div class="mb-8 border-b border-gray-200 pb-6">
@@ -179,9 +180,34 @@ $csrf_token = $_SESSION['csrf_token'];
                     </button>
                 </div>
             </form>
-            <?php include '../includes/message-modal.php' ?>
-
         </section>
+
+        <section class="w-full bg-white shadow-lg rounded-xl p-8">
+            <form method="POST" id="updateDefaultPassword" action="" class="space-y-4">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Default Admin Password</label>
+                    <input type="text" name="admin_password"
+                        value="<?php echo htmlspecialchars(getDefaultPassword($pdo, 'admin')); ?>"
+                        class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                        required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Default Owner Password</label>
+                    <input type="text" name="owner_password"
+                        value="<?php echo htmlspecialchars(getDefaultPassword($pdo, 'owner')); ?>"
+                        class="border border-gray-300 rounded-lg p-3 mt-1 w-full pr-12 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                        required>
+                </div>
+                <button type="submit" id="updateDefaultPasswordBtn"
+                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer">
+                    <i class="fas fa-save"></i>
+                    Update Defaults
+                </button>
+            </form>
+        </section>
+
+        <?php include '../includes/message-modal.php' ?>
     </main>
 
     <script>
@@ -420,6 +446,41 @@ $csrf_token = $_SESSION['csrf_token'];
                 .finally(() => {
                     submitButton.disabled = false;
                     submitButton.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                });
+        });
+
+        document.getElementById("updateDefaultPassword").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitButton = document.getElementById('updateDefaultPasswordBtn');
+
+            // Disable button to prevent multiple submissions
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            fetch("../php/Update/update-default-password.php", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        showMessage("Success", data.message, "success");
+                    } else {
+                        showMessage("Error", data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    showMessage("Error", "Something went wrong!", "error");
+                    console.error("Fetch Error:", error);
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-save"></i> Update Defaults';
                 });
         });
 

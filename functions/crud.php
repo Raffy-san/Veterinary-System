@@ -2,10 +2,10 @@
 function addClient($pdo, $data)
 {
     try {
-        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         $access_type = 'owner';
         $status = 1;
 
+        $defaultPassword = password_hash(getDefaultPassword($pdo, $access_type), PASSWORD_DEFAULT);
         // Check for existing email in users table
         $check = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
         $check->execute([$data['email']]);
@@ -20,7 +20,7 @@ function addClient($pdo, $data)
             INSERT INTO users (email, password, access_type, status) 
             VALUES (?, ?, ?, ?)
         ");
-        $stmt->execute([$data['email'], $hashedPassword, $access_type, $status]);
+        $stmt->execute([$data['email'], $defaultPassword, $access_type, $status]);
         $user_id = $pdo->lastInsertId();
 
         // Insert into owners table

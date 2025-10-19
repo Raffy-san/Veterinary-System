@@ -9,6 +9,7 @@ require_once __DIR__ . '/../../functions/session.php';
 require_once __DIR__ . '/../../helpers/fetch.php';
 require_once __DIR__ . '/../../functions/crud.php';
 require_once __DIR__ . '/../../functions/response.php';
+require_once __DIR__ . '/../../functions/settings.php';
 
 SessionManager::requireLogin();
 SessionManager::requireRole('admin');

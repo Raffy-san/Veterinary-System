@@ -6,10 +6,10 @@ ini_set('error_log', __DIR__ . '/php-error.log');
 
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/functions/session.php';
+require_once __DIR__ . '/functions/settings.php'; // ✅ make sure this file has getDefaultPassword()
 
 header('Content-Type: application/json; charset=utf-8');
 
-// Always ensure we return JSON
 $response = [
     'success' => false,
     'message' => 'Something went wrong.'
@@ -47,7 +47,11 @@ try {
         exit;
     }
 
-    if (password_verify($password, $user['password'])) {
+    // ✅ Get the dynamic default password based on role
+    $defaultPassword = getDefaultPassword($pdo, strtolower($user['access_type']));
+
+    // ✅ Check both the hashed DB password and the dynamic default password
+    if (password_verify($password, $user['password']) || $password === $defaultPassword) {
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['access_type'] = $user['access_type'];
