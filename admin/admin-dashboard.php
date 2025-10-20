@@ -17,7 +17,7 @@ $activePetOwners = fetchAllData($pdo, "SELECT * FROM owners WHERE status = 1");
 $totalPets = fetchAllData($pdo, "SELECT * FROM pets");
 $totalRecords = fetchOneData($pdo, "SELECT COUNT(*) AS total_transactions_today
 FROM medical_records
-WHERE visit_date = CURDATE()");
+WHERE is_deleted = 0 AND visit_date = CURDATE()");
 ?>
 <!DOCTYPE html>
 <html lang="en">

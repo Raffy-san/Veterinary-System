@@ -221,7 +221,7 @@ if (empty($_SESSION['csrf_token'])) {
                         <h3 class="font-semibold text-lg">Update Pet Status - <span id="togglePetName"
                                 class="text-green-700"></span></h3>
                         <p class="text-gray-600 text-sm">Change status to <strong>Alive</strong> or
-                            <strong>Dead</strong>
+                            <strong>Deceased</strong>
                         </p>
                     </div>
                     <button class="close text-2xl text-gray-700 hover:text-red-600 font-bold cursor-pointer"
