@@ -100,7 +100,7 @@ if ($record_id > 0) {
     <header style='text-align: center; margin-bottom: 8px;'>
     <img src='{$logoPath}' alt='Clinic Logo' width='55' style='margin-bottom: 4px;'>
     <h2 style='color: green; margin: 0; font-size: 18px;'>SOUTHERN LEYTE VETERINARY CLINIC</h2>
-    <p style='margin: 0; font-size: 14px;'>Maasin City, Southern Leyte</p>
+    <p style='margin: 0; font-size: 14px;'>Capitol Site, Asuncion, Maasin City, Southern Leyte, 6600</p>
     <h3 style='margin-top: 8px; font-size: 15px;'>OFFICIAL MEDICAL RECORD CERTIFICATE</h3>
        <table style='width: 100%; border: none;'>
             <tr>
