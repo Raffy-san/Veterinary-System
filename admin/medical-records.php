@@ -13,6 +13,12 @@ if (!$admin) {
 }
 
 $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
+
+// ----------------- NEW: determine deleted filter from query (default = active only) -----------------
+$deletedParam = isset($_GET['deleted']) ? $_GET['deleted'] : '0';
+if (!in_array($deletedParam, ['0', '1'])) {
+    $deletedParam = '0';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -194,26 +200,39 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                     <h4 class="text-gray-600">Track treatments, medications, and medical history</h4>
                 </div>
                 <div class="flex flex-row items-center space-x-4">
-                    <div class="flex justify-between items-center space-x-4">
-                        <h3 class="relative inline-block mt-4 font-semibold">Filter By Visit Type:</h3>
+                    <div class="flex flex-row items-center space-x-4">
+                        <h3 class="relative inline-block mt-4 font-semibold">Filter:</h3>
+
+                        <!-- Filter for Deleted / Active -->
                         <div class="relative inline-block mt-4">
-                            <select id="typeFilter"
-                                class="appearance-none cursor-pointer w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
-                                bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
-                                hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
-                                <option value="">Show All</option>
+                            <select id="deletedFilter" class="appearance-none cursor-pointer w-36 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
+            bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
+            hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+                                <option value="0" <?= $deletedParam === '0' ? 'selected' : '' ?>>Show Active Records</option>
+                                <option value="1" <?= $deletedParam === '1' ? 'selected' : '' ?>>Show Deleted Records</option>
+                            </select>
+                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <i class="fa-solid fa-chevron-down text-green-600"></i>
+                            </span>
+                        </div>
+
+                        <div class="relative inline-block mt-4">
+                            <select id="typeFilter" class="appearance-none cursor-pointer w-32 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
+            bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
+            hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+                                <option value="">All Visit Types</option>
                                 <option value="Routine Checkup">Routine Checkup</option>
                                 <option value="Vaccination">Vaccination</option>
                                 <option value="Treatment">Treatment</option>
                                 <option value="Emergency">Emergency</option>
                                 <option value="Surgery">Surgery</option>
                             </select>
-                            <!-- Dropdown Icon -->
                             <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                 <i class="fa-solid fa-chevron-down text-green-600"></i>
                             </span>
                         </div>
                     </div>
+
                     <button data-modal="addNewRecord"
                         class="open-add-modal cursor-pointer mt-4 px-4 py-2 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700"><i
                             class="fa-solid fa-plus mr-2"></i>New Record</button>
@@ -240,16 +259,27 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                 </thead>
                 <tbody id="recordsBody">
                     <?php
-                    $records = fetchAllData(
-                        $pdo,
-                        "SELECT m.id AS medical_record_id, m.visit_date, m.visit_time, m.veterinarian, m.weight, m.weight_unit, m.temperature, m.temp_unit, p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes, m.follow_up_date, m.is_deleted, c.certificate_number
-                        FROM medical_records m 
+                    // Server-side filter: default show active records only unless ?deleted=1 provided
+                    $where = "";
+                    if ($deletedParam === '1') {
+                        $where = "WHERE m.is_deleted = '1'";
+                    } else { // default active only
+                        $where = "WHERE m.is_deleted = '0'";
+                    }
+
+                    $sql = "
+                        SELECT m.id AS medical_record_id, m.visit_date, m.visit_time, m.veterinarian, m.weight, m.weight_unit, m.temperature, m.temp_unit,
+                               p.name AS patient_name, o.name AS owner_name, m.visit_type, m.diagnosis, m.treatment, m.medications, m.notes,
+                               m.follow_up_date, m.is_deleted, c.certificate_number
+                        FROM medical_records m
                         JOIN pets p ON m.pet_id = p.id
                         JOIN owners o ON p.owner_id = o.id
                         LEFT JOIN certificates c ON c.record_id = m.id
-                        WHERE m.is_deleted = '0'
-                        ORDER BY m.created_at DESC"
-                    );
+                        $where
+                        ORDER BY m.created_at DESC
+                    ";
+
+                    $records = fetchAllData($pdo, $sql);
 
                     $visitType = [
                         'Routine Checkup' => ['icon' => 'fa-solid fa-stethoscope', 'color' => 'text-green-800', 'bg' => 'bg-green-100'],
@@ -276,6 +306,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         echo '<tr 
                             data-id="' . htmlspecialchars($record['medical_record_id']) . '" 
                             data-type="' . htmlspecialchars($record['visit_type']) . '" 
+                            data-deleted="' . htmlspecialchars($record['is_deleted']) . '"
                             class="border-b border-gray-300 hover:bg-green-50 text-sm">';
                         echo "<td class='py-2'>
                                 <span class='font-medium'>" . htmlspecialchars($record['visit_date']) . "</span><br>
@@ -560,10 +591,21 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             const tableBody = document.getElementById("recordsBody");
             const filterSelect = document.getElementById('typeFilter');
             const rows = document.querySelectorAll("#recordsBody tr");
+            // visually mark deleted rows so admin can spot them
+            rows.forEach(r => {
+                const d = r.getAttribute('data-deleted');
+                if (d === '1') {
+                    // tailwind classes already used sitewide; fallback to inline if not available
+                    r.classList.add('opacity-60');
+                    // optionally add a label or strike-through
+                    // r.style.textDecoration = 'line-through';
+                }
+            });
             const pagination = document.getElementById("pagination");
             const rowsPerPage = 6;
             let currentPage = 1;
             const totalPages = Math.ceil(rows.length / rowsPerPage);
+            const deletedFilter = document.getElementById('deletedFilter');
 
             const addField = (container, label, value) => {
                 const p = document.createElement("p");
@@ -700,20 +742,23 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             function applyFilters() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const filterValue = filterSelect.value.toLowerCase();
+                const deletedValue = deletedFilter ? deletedFilter.value : '0'; // '0' or '1'
                 let visibleCount = 0;
 
                 rows.forEach(row => {
                     if (!row.cells.length || row.id === "noResults") return;
 
-                    const visitType = row.getAttribute('data-type') || '';
+                    const visitType = (row.getAttribute('data-type') || '').toLowerCase();
                     const date = row.cells[0].textContent.toLowerCase();
                     const patient = row.cells[1].textContent.toLowerCase();
                     const diagnosis = row.cells[3].textContent.toLowerCase();
+                    const rowDeleted = row.getAttribute('data-deleted') || '0';
 
                     const matchesSearch = date.includes(searchTerm) || patient.includes(searchTerm) || diagnosis.includes(searchTerm);
-                    const matchesFilter = !filterValue || visitType.toLowerCase() === filterValue;
+                    const matchesFilter = !filterValue || visitType === filterValue;
+                    const matchesDeleted = (rowDeleted === deletedValue);
 
-                    const shouldShow = matchesSearch && matchesFilter;
+                    const shouldShow = matchesSearch && matchesFilter && matchesDeleted;
                     row.style.display = shouldShow ? "" : "none";
                     if (shouldShow) visibleCount++;
                 });
@@ -724,7 +769,21 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
             // Add event listeners
             searchInput.addEventListener('input', applyFilters);
             filterSelect.addEventListener('change', applyFilters);
+            if (deletedFilter) {
+                deletedFilter.addEventListener('change', function () {
+                    const value = this.value; // '0' or '1'
+                    const url = new URL(window.location.href);
+                    if (value === '0') {
+                        url.searchParams.delete('deleted'); // default active (no param)
+                    } else {
+                        url.searchParams.set('deleted', value);
+                    }
+                    window.location.href = url.toString();
+                });
+            }
 
+            // call once to initialize filtered view
+            applyFilters();
 
             // Pagination
             const showPage = page => {
@@ -770,7 +829,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
 
                 fetch(`../Get/get-record.php?id=${medicalRecordid}`)
                     .then(response => response.json())
-                    .then(data => {
+                    .then (data => {
                         if (data.error) {
                             alert(data.error);
                             return;
@@ -831,6 +890,17 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                 });
             }
 
+            // Helper: close all modals and reset forms inside them
+            function closeAllModals() {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    const form = modal.querySelector('form');
+                    if (form) form.reset();
+                });
+                updateBodyScroll();
+            }
+
             // =================== Add Record ===================
             const addForm = document.getElementById("addRecordForm");
             if (addForm) {
@@ -850,141 +920,150 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         })
                         .catch(err => showMessage("Error", "Add failed. See console for details."));
                 });
-            }
 
-            // =================== Update Record ===================
-            document.getElementById("updateMedicalRecordForm").addEventListener("submit", function (e) {
-                e.preventDefault();
+                // =================== Update Record ===================
+                document.getElementById("updateMedicalRecordForm").addEventListener("submit", function (e) {
+                    e.preventDefault();
 
-                const formData = new FormData(this);
-                formData.append("csrf_token", csrfToken); // ✅ include CSRF token
+                    const formData = new FormData(this);
+                    formData.append("csrf_token", csrfToken); // ✅ include CSRF token
 
-                const updateButton = document.getElementById('updateRecordButton');
-                updateButton.disabled = true;
-                updateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                    const updateButton = document.getElementById('updateRecordButton');
+                    updateButton.disabled = true;
+                    updateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
 
-                fetch('../php/Update/update-records.php', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.csrf_token) csrfToken = data.csrf_token; // ✅ update token if refreshed
-                        if (data.status === "success") {
-                            showMessage("Success", data.message, () => location.reload());
-                        } else {
-                            showMessage("Error", data.message);
+                    fetch('../php/Update/update-records.php', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
                         }
                     })
-                    .catch(() => showMessage("Error", "Update failed."))
-                    .finally(() => {
-                        updateButton.disabled = false;
-                        updateButton.innerHTML = "Update";
-                    });
-            });
-
-            // =================== Delete Record ===================
-            document.querySelectorAll(".open-delete-modal").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const recordId = btn.dataset.id;
-                    const modal = document.getElementById("deleteModal");
-                    modal.classList.remove("hidden");
-                    modal.classList.add("flex");
-                    updateBodyScroll();
-
-                    document.getElementById("confirmDeleteBtn").dataset.id = recordId;
-                    document.getElementById("deleteMessage").textContent =
-                        `Are you sure you want to delete this medical record? It cannot be undone.`;
-                });
-            });
-
-            document.getElementById("confirmDeleteBtn").addEventListener("click", e => {
-                e.preventDefault();
-                const recordId = e.target.dataset.id;
-                e.target.textContent = "Deleting...";
-                e.target.disabled = true;
-
-                fetch("../php/Delete/delete-records.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: new URLSearchParams({ record_id: recordId, csrf_token: csrfToken })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.csrf_token) csrfToken = data.csrf_token; // update global CSRF
-
-                        showMessage(data.status === "success" ? "Success" : "Error", data.message, () => {
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.csrf_token) csrfToken = data.csrf_token; // ✅ update token if refreshed
                             if (data.status === "success") {
-                                location.reload(); // ensures CSRF consistency
+                                showMessage("Success", data.message, () => location.reload());
+                            } else {
+                                showMessage("Error", data.message);
                             }
-                        });
-                    })
-                    .catch(err => showMessage("Error", "Delete failed. See console for details."))
-                    .finally(() => {
-                        e.target.textContent = "Delete";
-                        e.target.disabled = false;
-                    });
-            });
-
-            document.querySelectorAll(".issue-certificate-modal").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const recordId = btn.dataset.medicalRecordId;
-                    const modal = document.getElementById("printModal");
-                    const petName = btn.dataset.petName;
-                    modal.classList.remove("hidden");
-                    modal.classList.add("flex");
-                    updateBodyScroll();
-
-                    document.getElementById("confirmPrintBtn").dataset.id = recordId;
-                    document.getElementById("printMessage").textContent =
-                        `Issue Medical certificate for ${petName}?`;
-                });
-            });
-
-            document.getElementById("confirmPrintBtn").addEventListener("click", async () => {
-                const medicalRecordId = document.getElementById("confirmPrintBtn").dataset.id;
-                const patientName = document.getElementById("printMessage").textContent;
-
-                try {
-                    const response = await fetch("../php/Toggle/issue-medical-certificate.php", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded"
-                        },
-                        body: new URLSearchParams({
-                            csrf_token: csrfToken,
-                            medical_record_id: medicalRecordId
                         })
+                        .catch(() => showMessage("Error", "Update failed."))
+                        .finally(() => {
+                            updateButton.disabled = false;
+                            updateButton.innerHTML = "Update";
+                        });
+                });
+
+                // =================== Delete Record ===================
+                document.querySelectorAll(".open-delete-modal").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const recordId = btn.dataset.id;
+                        const modal = document.getElementById("deleteModal");
+                        modal.classList.remove("hidden");
+                        modal.classList.add("flex");
+                        updateBodyScroll();
+
+                        document.getElementById("confirmDeleteBtn").dataset.id = recordId;
+                        document.getElementById("deleteMessage").textContent =
+                            `Are you sure you want to delete this medical record? It cannot be undone.`;
                     });
+                });
 
-                    const data = await response.json();
+                document.getElementById("confirmDeleteBtn").addEventListener("click", e => {
+                    e.preventDefault();
+                    const recordId = e.target.dataset.id;
+                    e.target.textContent = "Deleting...";
+                    e.target.disabled = true;
 
-                    // Update CSRF token for next request
-                    if (data.csrf_token) csrfToken = data.csrf_token;
+                    fetch("../php/Delete/delete-records.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({ record_id: recordId, csrf_token: csrfToken })
+                    })
+                        .then(res => res.json())
+                        .then (data => {
+                            if (data.csrf_token) csrfToken = data.csrf_token; // update global CSRF
 
-                    if (data.status === "success") {
-                        showMessage(
-                            "Certificate Issued",
-                            `✅ Certificate issued for ${patientName}\nCertificate No: ${data.certificate_number}`,
-                            () => {
-                                // Open PDF in new tab
-                                const win = window.open(`../print/medical-certificate.php?id=${medicalRecordId}`, "_blank");
-                                if (!win) showMessage("Popup Blocked", "Please allow popups to view the certificate.");
-                            }
-                        );
-                    } else {
-                        showMessage("Error", "❌ " + data.message);
+                            showMessage(data.status === "success" ? "Success" : "Error", data.message, () => {
+                                if (data.status === "success") {
+                                    location.reload(); // ensures CSRF consistency
+                                }
+                            });
+                        })
+                        .catch(err => showMessage("Error", "Delete failed. See console for details."))
+                        .finally(() => {
+                            e.target.textContent = "Delete";
+                            e.target.disabled = false;
+                        });
+                });
+
+                document.querySelectorAll(".issue-certificate-modal").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const recordId = btn.dataset.medicalRecordId;
+                        const modal = document.getElementById("printModal");
+                        const petName = btn.dataset.petName || '';
+                        modal.classList.remove("hidden");
+                        modal.classList.add("flex");
+                        updateBodyScroll();
+
+                        // store both id and pet name on the confirm button
+                        const confirmBtn = document.getElementById("confirmPrintBtn");
+                        confirmBtn.dataset.id = recordId;
+                        confirmBtn.dataset.petName = petName;
+                        document.getElementById("printMessage").textContent =
+                            `Issue Medical certificate for ${petName}?`;
+                    });
+                });
+
+                document.getElementById("confirmPrintBtn").addEventListener("click", async (e) => {
+                    e.preventDefault(); // prevent anchor navigation
+                    const confirmBtn = document.getElementById("confirmPrintBtn");
+                    const medicalRecordId = confirmBtn.dataset.id;
+                    const patientName = confirmBtn.dataset.petName || 'patient';
+
+                    try {
+                        const response = await fetch("../php/Toggle/issue-medical-certificate.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: new URLSearchParams({
+                                csrf_token: csrfToken,
+                                medical_record_id: medicalRecordId
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        // Update CSRF token for next request
+                        if (data.csrf_token) csrfToken = data.csrf_token;
+
+                        if (data.status === "success") {
+                            // close any open modals first
+                            closeAllModals();
+
+                            showMessage(
+                                "Certificate Issued",
+                                `✅ Certificate issued for ${patientName}\nCertificate No: ${data.certificate_number}`,
+                                () => {
+                                    // Open PDF in new tab
+                                    const win = window.open(`../print/medical-certificate.php?id=${medicalRecordId}`, "_blank");
+                                    if (!win) showMessage("Popup Blocked", "Please allow popups to view the certificate.");
+                                }
+                            );
+                        } else {
+                            showMessage("Error", "❌ " + data.message);
+                        }
+
+                    } catch (error) {
+                        console.error("Error issuing certificate:", error);
+                        showMessage("Error", "An unexpected error occurred. Please try again.");
                     }
-
-                } catch (error) {
-                    console.error("Error issuing certificate:", error);
-                    showMessage("Error", "An unexpected error occurred. Please try again.");
-                }
-            });
+                });
+            }
         });
+
 
     </script>
 </body>
