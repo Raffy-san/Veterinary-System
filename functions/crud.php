@@ -5,8 +5,14 @@ function addClient($pdo, $data)
         $access_type = 'owner';
         $status = 1;
 
-        $defaultPassword = password_hash(getDefaultPassword($pdo, $access_type), PASSWORD_DEFAULT);
-        // Check for existing email in users table
+        // Real password (could be random or admin-defined)
+        $realPassword = $data['password'] ?? '';
+        $hashedPassword = password_hash($realPassword, PASSWORD_DEFAULT);
+
+        // Default password is only for backup — DO NOT store it in users table
+        // It’s retrieved later from settings table via getDefaultPassword()
+
+        // Check for existing email
         $check = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
         $check->execute([$data['email']]);
         if ($check->fetchColumn() > 0) {
@@ -15,17 +21,15 @@ function addClient($pdo, $data)
 
         $pdo->beginTransaction();
 
-        // Insert into users table (no username, use email)
         $stmt = $pdo->prepare("
-            INSERT INTO users (email, password, access_type, status) 
+            INSERT INTO users (email, password, access_type, status)
             VALUES (?, ?, ?, ?)
         ");
-        $stmt->execute([$data['email'], $defaultPassword, $access_type, $status]);
+        $stmt->execute([$data['email'], $hashedPassword, $access_type, $status]);
         $user_id = $pdo->lastInsertId();
 
-        // Insert into owners table
         $stmt = $pdo->prepare("
-            INSERT INTO owners (user_id, name, email, phone, emergency, address, status) 
+            INSERT INTO owners (user_id, name, email, phone, emergency, address, status)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
@@ -39,15 +43,20 @@ function addClient($pdo, $data)
         ]);
 
         $pdo->commit();
-        return json_encode(["status" => "success", "message" => "Client added successfully"]);
+        return json_encode([
+            "status" => "success",
+            "message" => "Client added successfully"
+        ]);
 
     } catch (PDOException $e) {
         $pdo->rollBack();
         error_log("AddClient failed: " . $e->getMessage());
-        return json_encode(["status" => "error", "message" => "Unable to add client. Please try again."]);
+        return json_encode([
+            "status" => "error",
+            "message" => "Unable to add client. Please try again."
+        ]);
     }
 }
-
 
 function updateClient($pdo, $data)
 {

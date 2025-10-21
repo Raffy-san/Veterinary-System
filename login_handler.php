@@ -50,7 +50,6 @@ try {
     // ✅ Get the dynamic default password based on role
     $defaultPassword = getDefaultPassword($pdo, strtolower($user['access_type']));
 
-    // ✅ Check both the hashed DB password and the dynamic default password
     if (password_verify($password, $user['password']) || $password === $defaultPassword) {
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
@@ -66,6 +65,7 @@ try {
         echo json_encode($response);
         exit;
     }
+
 
 } catch (Exception $e) {
     error_log("Login error: " . $e->getMessage());
