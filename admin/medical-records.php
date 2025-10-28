@@ -360,9 +360,11 @@ if (!in_array($deletedParam, ['0', '1'])) {
                                     data-medications="' . htmlspecialchars($record['medications'] ?? '') . '" 
                                     data-follow="' . htmlspecialchars($dataFollow) . '" 
                                     data-notes="' . htmlspecialchars($record['notes'] ?? '') . '" 
-                                    class="open-modal fa-solid fa-eye cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300"></button>
-                                <button class="open-edit-modal fa-solid fa-pencil cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button> ';
+                                    class="open-modal fa-solid fa-eye cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300"></button>';
                         if ($record['is_deleted'] === 0) {
+                            echo '
+                                <button class="open-edit-modal fa-solid fa-pencil cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
+                       ';
                             echo '
                                 <button class="open-delete-modal fa-solid fa-trash cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-red-400" data-id="' . $record['medical_record_id'] . '">
                                 </button>';
