@@ -208,8 +208,10 @@ if (!in_array($deletedParam, ['0', '1'])) {
                             <select id="deletedFilter" class="appearance-none cursor-pointer w-36 px-4 py-2 pr-8 rounded-lg text-xs font-semibold text-gray-700
             bg-gradient-to-r from-green-100 to-green-200 border border-green-500 
             hover:from-green-200 hover:to-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
-                                <option value="0" <?= $deletedParam === '0' ? 'selected' : '' ?>>Show Active Records</option>
-                                <option value="1" <?= $deletedParam === '1' ? 'selected' : '' ?>>Show Deleted Records</option>
+                                <option value="0" <?= $deletedParam === '0' ? 'selected' : '' ?>>Show Active Records
+                                </option>
+                                <option value="1" <?= $deletedParam === '1' ? 'selected' : '' ?>>Show Deleted Records
+                                </option>
                             </select>
                             <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                 <i class="fa-solid fa-chevron-down text-green-600"></i>
@@ -359,13 +361,16 @@ if (!in_array($deletedParam, ['0', '1'])) {
                                     data-follow="' . htmlspecialchars($dataFollow) . '" 
                                     data-notes="' . htmlspecialchars($record['notes'] ?? '') . '" 
                                     class="open-modal fa-solid fa-eye cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300"></button>
-                                <button class="open-edit-modal fa-solid fa-pencil cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button>
-                                <button class="open-delete-modal fa-solid fa-trash cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-red-400" data-id="' . $record['medical_record_id'] . '"></button>
-                            </td>';
+                                <button class="open-edit-modal fa-solid fa-pencil cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-green-300" data-id="' . $record['medical_record_id'] . '"></button> ';
+                        if ($record['is_deleted'] === 0) {
+                            echo '
+                                <button class="open-delete-modal fa-solid fa-trash cursor-pointer text-gray-700 bg-green-100 p-2 rounded hover:bg-red-400" data-id="' . $record['medical_record_id'] . '">
+                                </button>';
+                        }
+                        '</td>';
                         echo '</tr>';
                     }
                     ?>
-
                     <tr id="noResults" class="hidden">
                         <td colspan="8" class="text-center py-4 text-gray-500">No results found</td>
                     </tr>
@@ -829,7 +834,7 @@ if (!in_array($deletedParam, ['0', '1'])) {
 
                 fetch(`../Get/get-record.php?id=${medicalRecordid}`)
                     .then(response => response.json())
-                    .then (data => {
+                    .then(data => {
                         if (data.error) {
                             alert(data.error);
                             return;
@@ -982,7 +987,7 @@ if (!in_array($deletedParam, ['0', '1'])) {
                         body: new URLSearchParams({ record_id: recordId, csrf_token: csrfToken })
                     })
                         .then(res => res.json())
-                        .then (data => {
+                        .then(data => {
                             if (data.csrf_token) csrfToken = data.csrf_token; // update global CSRF
 
                             showMessage(data.status === "success" ? "Success" : "Error", data.message, () => {
