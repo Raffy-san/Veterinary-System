@@ -96,12 +96,11 @@ if (empty($_SESSION['csrf_token'])) {
                     <?php
                     $pets = fetchAllData(
                         $pdo,
-                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.age_unit, p.gender, p.color, p.weight, p.weight_unit, p.birth_date , p.notes, p.status, dr.id AS death_record_id, dr.cause_of_death, dr.date_of_death, dr.time_of_death, dr.recorded_by, dr.location_of_death, dr.remarks, c.certificate_number, c.certificate_date, c.certificate_issued, c.issued_by,
+                        "SELECT p.id AS pet_id, p.name AS pet_name, p.species, p.breed, p.age, p.age_unit, p.gender, p.color, p.weight, p.weight_unit, p.birth_date , p.notes, p.status, dr.id AS death_record_id, dr.cause_of_death, dr.date_of_death, dr.time_of_death, dr.recorded_by, dr.location_of_death, dr.remarks,
                                 o.name AS owner_name, o.phone AS owner_phone, o.email AS owner_email
                          FROM pets p
                          LEFT JOIN owners o ON p.owner_id = o.id
-                         LEFT JOIN death_records dr ON p.id = dr.pet_id
-                         LEFT JOIN certificates c ON p.id = c.pet_id AND c.certificate_type = 'death_certificate'"
+                         LEFT JOIN death_records dr ON p.id = dr.pet_id"
                     );
 
                     $status = [
@@ -156,17 +155,6 @@ if (empty($_SESSION['csrf_token'])) {
                                 </button>
                                 
                                 <button class='open-status-modal cursor-pointer font-semibold text-xs text-gray-700 mr-2 bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300'  data-id='" . $row['pet_id'] . "'  data-name='" . htmlspecialchars($row['pet_name'] ?? '') . "'>Toggle Status</button>";
-                        if (isset($row['status']) && strtolower($row['status']) === 'deceased' && !empty($row['death_record_id'])) {
-                            echo "
-        <button 
-            class='issue-certificate-modal cursor-pointer font-semibold text-xs text-gray-700 bg-red-100 p-1.5 border rounded border-red-200 hover:bg-red-300'
-            data-death-record-id='" . htmlspecialchars($row['death_record_id']) . "'
-            data-death-certificate-number='" . htmlspecialchars($row['certificate_number']) . "'
-            data-pet-name='" . htmlspecialchars($row['pet_name']) . "'
-        >
-            Issue Death Certificate
-        </button>";
-                        }
                         echo "</td>";
                         echo "</tr>";
                     }
@@ -294,26 +282,6 @@ if (empty($_SESSION['csrf_token'])) {
                         Save Changes
                     </button>
                 </form>
-            </div>
-        </div>
-
-        <div id="printModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center"
-            style="background-color: rgba(0,0,0,0.4);">
-            <div class="bg-white rounded-lg p-6 max-w-md w-full">
-                <div class="flex flex-record items-center mb-4">
-                    <i class="fa-solid fa-circle-question mr-2 text-green-600"></i>
-                    <h3 class="font-semibold text-lg">Issue Death Certificate</h3>
-                </div>
-                <p id="printMessage" class="mb-4 text-sm text-gray-600">
-                    <!-- print Message -->
-                </p>
-                <div class="flex justify-end space-x-2">
-                    <button class="close px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-xs">Cancel</button>
-                    <a id="confirmPrintBtn" href="#"
-                        class="issue-death-certificate px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs">
-                        Issue
-                    </a>
-                </div>
             </div>
         </div>
 
@@ -579,63 +547,6 @@ if (empty($_SESSION['csrf_token'])) {
                     showMessage("Success", "Pet status updated successfully!", () => location.reload());
                 } else {
                     showMessage("Error", data.message);
-                }
-            });
-
-            document.querySelectorAll(".issue-certificate-modal").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const recordId = btn.dataset.deathRecordId;
-                    const modal = document.getElementById("printModal");
-                    const petName = btn.dataset.petName;
-                    modal.classList.remove("hidden");
-                    modal.classList.add("flex");
-                    updateBodyScroll();
-
-                    document.getElementById("confirmPrintBtn").dataset.id = recordId;
-                    document.getElementById("printMessage").textContent =
-                        `Issue death certificate for ${petName}?`;
-                });
-            });
-
-            document.getElementById("confirmPrintBtn").addEventListener("click", async () => {
-                const deathRecordId = document.getElementById("confirmPrintBtn").dataset.id;
-                const petName = document.getElementById("printMessage").textContent;
-
-                try {
-                    const response = await fetch("../php/Toggle/issue-certificate.php", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded"
-                        },
-                        body: new URLSearchParams({
-                            csrf_token: csrfToken,
-                            death_record_id: deathRecordId
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    // Update CSRF token for next request
-                    if (data.csrf_token) csrfToken = data.csrf_token;
-
-                    if (data.status === "success") {
-                        closeAllModals();
-                        showMessage(
-                            "Certificate Issued",
-                            `✅ Certificate issued for ${petName}\nCertificate No: ${data.certificate_number}`,
-                            () => {
-                                // Open PDF in new tab
-                                const win = window.open(`../print/death-certificate.php?id=${deathRecordId}`, "_blank");
-                                if (!win) showMessage("Popup Blocked", "Please allow popups to view the certificate.");
-                            }
-                        );
-                    } else {
-                        showMessage("Error", "❌ " + data.message);
-                    }
-
-                } catch (error) {
-                    console.error("Error issuing certificate:", error);
-                    showMessage("Error", "An unexpected error occurred. Please try again.");
                 }
             });
 

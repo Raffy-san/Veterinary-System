@@ -98,10 +98,6 @@ $csrf_token = $_SESSION['csrf_token'] ?? SessionManager::regenerateCsrfToken();
                         echo '<td class="py-2"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['pet_count'] . '</span></td>';
                         echo '<td class="py-2"><span class="' . $typeinfo['bg'] . ' ' . $typeinfo['color'] . ' text-xs font-semibold px-2.5 py-0.5 rounded">' . $client['status'] . '</td>';
                         echo '<td class="py-2 text-right">
-                            <a href="../print/information.php?id=' . $client['owner_id'] . '" class="cursor-pointer text-gray-700 mr-2 text-xs font-semibold bg-green-100 p-1.5 border rounded border-green-200 hover:bg-green-300" target="_blank">
-                            <i class="fa-solid fa-print"></i>
-                            Print
-                            </a>
                             <button 
                                 data-modal="viewModal" 
                                 data-id="' . $client['owner_id'] . '"
