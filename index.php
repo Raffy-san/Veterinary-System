@@ -509,56 +509,6 @@
             </div>
         </section>
 
-        <!-- Developers Acknowledgement Section -->
-        <section class="flex justify-center flex-col py-16 px-6 md:px-10 bg-white/50 backdrop-blur-sm">
-            <div class="mb-12 developer-section-title">
-                <h1 class="text-center text-3xl md:text-5xl font-bold text-green-800 mb-3">DEVELOPERS ACKNOWLEDGEMENT
-                </h1>
-                <p class="text-center text-gray-600 text-base md:text-lg">Meet the talented team behind this project</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 max-w-7xl mx-auto w-full">
-                <div class="flex flex-col items-center group developer-card">
-                    <div
-                        class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
-                        <img src="assets/img/casipong.webp" alt="Developer 1" class="w-full h-full object-cover">
-                    </div>
-                    <h3
-                        class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
-                        Anthony Casipong</h3>
-                    <p class="text-gray-600 text-sm text-center">Leader</p>
-                </div>
-                <div class="flex flex-col items-center group developer-card">
-                    <div
-                        class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
-                        <img src="assets/img/mori.webp" alt="Developer 2" class="w-full h-full object-cover">
-                    </div>
-                    <h3
-                        class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
-                        Dianne Mori</h3>
-                    <p class="text-gray-600 text-sm text-center">Member</p>
-                </div>
-                <div class="flex flex-col items-center group developer-card">
-                    <div
-                        class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
-                        <img src="assets/img/mancao.webp" alt="Developer 3" class="w-full h-full object-cover">
-                    </div>
-                    <h3
-                        class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
-                        Jyrus Jiv Mancao</h3>
-                    <p class="text-gray-600 text-sm text-center">Member</p>
-                </div>
-                <div class="flex flex-col items-center group developer-card">
-                    <div
-                        class="w-45 h-45 md:w-55 md:h-55 border-4 border-green-600 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-green-700 mb-4">
-                        <img src="assets/img/murcia.webp" alt="Developer 4" class="w-full h-full object-cover">
-                    </div>
-                    <h3
-                        class="text-lg md:text-xl font-semibold text-green-800 group-hover:text-green-600 transition text-center">
-                        Archell Murcia</h3>
-                    <p class="text-gray-600 text-sm text-center">Member</p>
-                </div>
-            </div>
-        </section>
         <footer id="contact">
             <div class="flex flex-col md:flex-row items-end justify-between w-full overflow-hidden">
                 <!-- Left Section -->
